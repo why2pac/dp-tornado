@@ -14,14 +14,6 @@ import importlib
 
 
 class Handler(tornado.web.RequestHandler):
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(Handler, cls).__new__(cls, *args)
-
-        return cls._instance
-
     def __init__(self, application, request, **kwargs):
         super(Handler, self).__init__(application, request, **kwargs)
 

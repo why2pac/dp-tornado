@@ -32,7 +32,7 @@ class Model(object):
 
         try:
             module = importlib.import_module('%s.%s' % (self.__dict__['_prefix'], name))
-            model = getattr(module, name.capitalize())
+            model = getattr(module, '%sModel' % name.capitalize())
 
         except ImportError:
             return None

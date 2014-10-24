@@ -8,6 +8,6 @@
 from engine.model import Model as dpModel
 
 
-class User(dpModel):
+class UserModel(dpModel):
     def get_user_by_user_uuid(self, user_uuid):
         return user_uuid

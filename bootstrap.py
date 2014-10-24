@@ -29,7 +29,7 @@ if __name__ == '__main__':
     tornado.options.define('max_worker', default=64)
     tornado.options.define('num_processes', default=1)
     tornado.options.define('port', default=8080)
-    tornado.options.define('debug', default=True)
+    tornado.options.define('debug', default=False if tornado.options.options.num_processes <= 0 else True)
     tornado.options.define('gzip', default=True)
 
     # Initialize Logging

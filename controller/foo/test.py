@@ -7,6 +7,6 @@
 from engine.controller import Controller as dpController
 
 
-class BarController(dpController):
-    def get(self, a=None, b=None):
-        self.finish('bar controller (%s, %s)' % (a, b))
+class TestController(dpController):
+    def get(self):
+        self.finish(self.model.foo.bar.user.get_user_by_user_uuid('user_uuid'))

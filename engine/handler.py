@@ -1,19 +1,25 @@
-# -*- coding: utf-8 -*-
 #
 #	dp for Tornado
 #		YoungYong Park (youngyongpark@gmail.com)
 #		2014.10.23
-#		
+#
 
 
 import tornado.web
 import tornado.ioloop
+import tornado.gen
+import tornado.concurrent
+import tornado.options
 
 import inspect
 import importlib
 
+from concurrent.futures import ThreadPoolExecutor
+
 
 class Handler(tornado.web.RequestHandler):
+    executor = ThreadPoolExecutor(tornado.options.options.max_worker)
+
     def __init__(self, application, request, **kwargs):
         super(Handler, self).__init__(application, request, **kwargs)
 
@@ -39,14 +45,11 @@ class Handler(tornado.web.RequestHandler):
 
     def route(self, method, path):
         module_path = '%s.%s' % (self.prefix, path.replace('/', '.'))
-        module_paths = str.split(str(module_path.encode('UTF-8')), '.')
+        module_paths = str.split(str(module_path), '.')
         parameters = []
         previous = None
 
-        while True:
-            if module_paths[-1].strip() != '':
-                break
-
+        if module_paths[-1].strip() == '':
             module_paths.pop()
 
         while True:
@@ -99,14 +102,14 @@ class Handler(tornado.web.RequestHandler):
                 method(*parameters)
                 return True
 
-            except tornado.web.HTTPError, e:
+            except tornado.web.HTTPError as e:
                 raise e
 
-            except Exception, e:
+            except Exception as e:
                 import traceback
 
-                print e
-                print traceback.print_exc()
+                print(e)
+                print(traceback.print_exc())
 
                 # TODO, Logging
 
@@ -148,7 +151,13 @@ class Handler(tornado.web.RequestHandler):
         else:
             self.route_index()
 
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
     def get(self, path=None):
+        yield self.__get(path)
+
+    @tornado.concurrent.run_on_executor
+    def __get(self, path=None):
         if path and not self.get_requested:
             self.get_requested = True
             self.route('get', path)

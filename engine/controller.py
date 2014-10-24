@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 #	dp for Tornado
 #		YoungYong Park (youngyongpark@gmail.com)
@@ -6,9 +5,10 @@
 #		
 
 from .handler import Handler as dpHandler
+from .engine import Engine as dpEngine
 
 
-class Controller(dpHandler):
+class Controller(dpHandler, dpEngine):
     def initialize(self, prefix, parent=None):
         self.prefix = prefix
         self.parent = parent
@@ -19,18 +19,6 @@ class Controller(dpHandler):
         self.patch_requested = False
         self.delete_requested = False
         self.put_requested = False
-
-    def render(self, template_name, kwargs=None):
-        if kwargs:
-            self.parent.render(template_name, **kwargs)
-        else:
-            self.parent.render(template_name)
-
-    def render_string(self, template_name, kwargs=None):
-        if kwargs:
-            return self.parent.render_string(template_name, **kwargs)
-        else:
-            return self.parent.render_string(template_name)
 
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
         secure_cookie = crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])
@@ -48,11 +36,23 @@ class Controller(dpHandler):
         else:
             return None
 
-    def write(self, chunk):
-        self.parent.write(chunk)
-
     def redirect(self, url, permanent=False, status=None):
         self.parent.redirect(url, permanent, status)
 
+    def render(self, template_name, kwargs=None):
+        if kwargs:
+            self.view.render(self, template_name, kwargs)
+        else:
+            self.view.render(self, template_name)
+
+    def render_string(self, template_name, kwargs=None):
+        if kwargs:
+            return self.view.render_string(self, template_name, kwargs)
+        else:
+            return self.view.render_string(self, template_name)
+
+    def write(self, chunk):
+        self.view.write(self, chunk)
+
     def finish(self, chunk=None):
-        self.parent.finish(chunk)
+        self.view.finish(self, chunk)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 #	dp for Tornado
 #		YoungYong Park (youngyongpark@gmail.com)
@@ -8,34 +7,33 @@
 
 import tornado.web
 import tornado.ioloop
+import tornado.httpserver
+import tornado.options
 
+import logging
+import logging.handlers
+
+import time
+import os
+import multiprocessing
 import importlib
 
-from engine.plugin.tornado_utils.tornado_static import StaticURL, Static, PlainStaticURL, PlainStatic
-
+import application
 
 class RestfulApplication(tornado.web.Application):
-    def __init__(self, handlers, settings):
-        if 'debug' in settings and settings['debug']:
-            settings['ui_modules']['Static'] = PlainStatic
-            settings['ui_modules']['StaticURL'] = PlainStaticURL
-        else:
-            settings['ui_modules']['Static'] = Static
-            settings['ui_modules']['StaticURL'] = StaticURL
-
-        super(RestfulApplication, self).__init__(handlers, **settings)
+    def __init__(self, handlers, kwargs):
+        super(RestfulApplication, self).__init__(handlers, **kwargs)
 
 if __name__ == '__main__':
-    import logging
-    import logging.handlers
+    # Setup Options
+    tornado.options.define('max_worker', default=64)
+    tornado.options.define('num_processes', default=1)
+    tornado.options.define('port', default=8080)
+    tornado.options.define('debug', default=True)
+    tornado.options.define('gzip', default=True)
 
-    import sys
-    import os
-
+    # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
-
-    import time
-    import multiprocessing
 
     logging.info('-------------------------------')
     logging.info('dp for Tornado has been started')
@@ -45,12 +43,8 @@ if __name__ == '__main__':
     logging.info('-------------------------------')
 
     services = []
-    services_raw = [
-        (r"/", 'controller.StarterController'),
-        (r"/(.*)", 'controller.StarterController'),
-    ]
 
-    for service in services_raw:
+    for service in application.services:
         s = str.split(service[1], '.')
         class_name = s.pop()
         module_path = '.'.join(s)
@@ -60,30 +54,24 @@ if __name__ == '__main__':
 
         services.append((service[0], handler, dict(prefix=module_path)))
 
-    port_default = 8080
-    port = port_default
-
-    if len(sys.argv) > 1:
-        try:
-            port = int(sys.argv[1])
-            port = port if port > 0 else port_default
-        except ValueError:
-            port = port_default
+    currentdir = os.path.dirname(os.path.realpath(__file__))
 
     settings = {
-        'template_path': '%s/view' % (os.path.dirname(os.path.realpath(__file__)), ),
-        'static_path': '%s/static' % (os.path.dirname(os.path.realpath(__file__)), ),
+        'template_path': '%s/view' % currentdir,
+        'static_path': '%s/static' % currentdir,
         'static_url_prefix': '/s/',
-        'combined_static_dir': '%s/static' % (os.path.dirname(os.path.realpath(__file__)), ),
+        'combined_static_dir': '%s/static' % currentdir,
         'combined_static_url_prefix': '/s/combined/',
-        'YUI_LOCATION': '%s/engine/plugin/yuicompressor-2.4.8.jar' % (os.path.dirname(os.path.realpath(__file__)), ),
-        'debug': True,
-        'gzip': True,
+        'YUI_LOCATION': '%s/engine/plugin/yuicompressor-2.4.8.jar' % currentdir,
+        'debug': tornado.options.options.debug,
+        'gzip': tornado.options.options.gzip,
         'cookie_secret': 'Lx2xJsi3xO02XJc17Bhs8',
         'ui_modules': {}
     }
 
     application = RestfulApplication(services, settings)
-    application.listen(port)
+    service = tornado.httpserver.HTTPServer(application, xheaders=True)
+    service.bind(tornado.options.options.port, '')
+    service.start(tornado.options.options.num_processes)
 
     tornado.ioloop.IOLoop.instance().start()

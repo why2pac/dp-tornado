@@ -6,8 +6,6 @@
 
 
 from __future__ import absolute_import
-
-from .singleton import Singleton as dpSingleton
 from .namer import Namer as dpNamer
 
 import importlib
@@ -27,7 +25,6 @@ class Model(object):
             return self.__dict__[name]
 
         if name in self._prepared:
-            print('reused')
             return self._prepared[name]
 
         try:

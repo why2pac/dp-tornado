@@ -8,5 +8,6 @@ from engine.controller import Controller as dpController
 
 
 class TestController(dpController):
+    # URL matching with /foo/test
     def get(self):
         self.finish(self.model.foo.bar.user.get_user_by_user_uuid('user_uuid'))

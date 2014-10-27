@@ -8,5 +8,6 @@
 from engine.handler import Handler as dpHandler
 
 class StarterController(dpHandler):
+    # URL matching with /
     def index(self):
         self.finish('Welcome dp for Tornado')

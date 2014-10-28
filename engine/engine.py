@@ -14,7 +14,7 @@ class EngineSingleton(metaclass=dpSingleton):
     @property
     def config(self):
         if not hasattr(self, '_config'):
-            self._config = dpConfig()
+            self._config = dpLoader('config')
 
         return self._config
 

@@ -26,7 +26,13 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
 
     def engine(self, config, database):
         try:
-            conf = self.config.__getattr__(config).databases.__getattr__(database)
+            package = config.split('.')
+            conf = self.config
+
+            for p in package:
+                conf = conf.__getattr__(p)
+
+            conf = conf.databases.__getattr__(database)
         except AttributeError:
             conf = None
 
@@ -38,7 +44,12 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         if not key in ModelSingleton().engines:
             ModelSingleton._lock.acquire()
 
-            connection_url = '%s://%s:%s@%s:%s/%s' % (conf.driver, conf.user, conf.password, conf.host, conf.port, conf.database)
+            connection_url = '%s://%s:%s@%s:%s/%s' % (
+                conf.driver,
+                conf.user, conf.password,
+                conf.host, conf.port,
+                conf.database)
+
             ModelSingleton().engines[key] = create_engine(
                 connection_url,
                 convert_unicode=conf.convert_unicode if conf.convert_unicode is not None else True,

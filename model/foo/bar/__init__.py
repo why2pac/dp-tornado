@@ -12,16 +12,16 @@ class BarModel(dpModel):
     # Method callable by self.model.foo.bar.user.ex_row from Controller
     def ex_row(self, user_id):
         return self.row(
-            'SELECT * FROM userinfo WHERE user_id = %s', user_id, 'foo/bar')
+            'SELECT * FROM userinfo WHERE user_id = %s', user_id, 'foo.bar/bar')
 
     # Method callable by self.model.foo.bar.user.ex_rows from Controller
     def ex_rows(self):
         return self.rows(
-            'SELECT * FROM userinfo LIMIT 10', None, 'foo/bar')
+            'SELECT * FROM userinfo LIMIT 10', None, 'foobar/bar')
 
     # Method callable by self.model.foo.bar.user.ex_commit from Controller
     def ex_commit(self, user_id):
-        proxy = self.begin('foo/bar')
+        proxy = self.begin('foo.bar/bar')
 
         before = proxy.row('SELECT * FROM userinfo WHERE user_id = %s', user_id, proxy)
         print('before : %s' % before)
@@ -35,7 +35,7 @@ class BarModel(dpModel):
 
     # Method callable by self.model.foo.bar.user.ex_rollback from Controller
     def ex_rollback(self, user_id):
-        proxy = self.begin('foo/bar')
+        proxy = self.begin('foobar/bar')
 
         before = proxy.row('SELECT * FROM userinfo WHERE user_id = %s', user_id, proxy)
         print('before : %s' % before)

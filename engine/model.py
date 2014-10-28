@@ -41,14 +41,14 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
             connection_url = '%s://%s:%s@%s:%s/%s' % (conf.driver, conf.user, conf.password, conf.host, conf.port, conf.database)
             ModelSingleton().engines[key] = create_engine(
                 connection_url,
-                convert_unicode=True,
-                echo=True,
-                echo_pool=True,
-                pool_size=1,
+                convert_unicode=conf.convert_unicode if conf.convert_unicode is not None else True,
+                echo=conf.echo if conf.echo is not None else False,
+                echo_pool=conf.echo_pool if conf.echo_pool is not None else False,
+                pool_size=conf.pool_size if conf.pool_size is not None else 16,
                 poolclass=QueuePool,
-                pool_recycle=3600,
-                max_overflow=0,
-                pool_timeout=5)
+                pool_recycle=conf.pool_recycle if conf.pool_recycle is not None else 3600,
+                max_overflow=conf.max_overflow if conf.max_overflow is not None else -1,
+                pool_timeout=conf.pool_timeout if conf.pool_timeout is not None else 30)
 
             ModelSingleton._lock.release()
 

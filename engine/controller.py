@@ -21,15 +21,17 @@ class Controller(dpHandler, dpEngine):
         self.put_requested = False
 
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
-        secure_cookie = crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])
+        secure_cookie = self.helper.crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])
         return self.parent.set_secure_cookie(name, secure_cookie, expires_days, version, **kwargs)
 
     def get_secure_cookie(self, name, value=None, max_age_days=31, min_version=None):
         secure_cookie = self.parent.get_secure_cookie(name, value, max_age_days, min_version)
 
         if secure_cookie:
-            try: secure_cookie = crypto.decrypt(secure_cookie, self.request.headers["User-Agent"])
-            except: secure_cookie = None
+            try:
+                secure_cookie = self.helper.crypto.decrypt(secure_cookie, self.request.headers["User-Agent"])
+            except:
+                secure_cookie = None
 
             return secure_cookie if secure_cookie else None
 

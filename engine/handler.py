@@ -15,6 +15,7 @@ import inspect
 import importlib
 
 from concurrent.futures import ThreadPoolExecutor
+from engine.response import Response as dpResponse
 
 
 class Handler(tornado.web.RequestHandler):
@@ -104,6 +105,10 @@ class Handler(tornado.web.RequestHandler):
 
             except tornado.web.HTTPError as e:
                 raise e
+
+            except dpResponse as e:
+                self.finish(e.response())
+                return False
 
             except Exception as e:
                 import traceback

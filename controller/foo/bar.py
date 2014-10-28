@@ -5,6 +5,7 @@
 #
 
 from engine.controller import Controller as dpController
+from engine.response import Response as dpResponse
 
 
 class BarController(dpController):

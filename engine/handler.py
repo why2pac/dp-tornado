@@ -143,18 +143,44 @@ class Handler(tornado.web.RequestHandler):
         self.set_status(status_code)
         self.finish('%s, %s' % (status_code, error.reason if error and error.reason else 'An error has occurred'))
 
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
     def head(self, path=None):
+        yield self.__head(path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def get(self, path=None):
+        yield self.__get(path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def post(self, path=None):
+        yield self.__post(path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def delete(self, path=None):
+        yield self.__delete(path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def patch(self, path=None):
+        yield self.__patch(path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def put(self, path=None):
+        yield self.__put(path)
+
+    @tornado.concurrent.run_on_executor
+    def __head(self, path=None):
         if path and not self.head_requested:
             self.head_requested = True
             self.route('head', path)
 
         else:
             self.route_index()
-
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def get(self, path=None):
-        yield self.__get(path)
 
     @tornado.concurrent.run_on_executor
     def __get(self, path=None):
@@ -165,7 +191,8 @@ class Handler(tornado.web.RequestHandler):
         else:
             self.route_index()
 
-    def post(self, path=None):
+    @tornado.concurrent.run_on_executor
+    def __post(self, path=None):
         if path and not self.post_requested:
             self.post_requested = True
             self.route('post', path)
@@ -173,7 +200,8 @@ class Handler(tornado.web.RequestHandler):
         else:
             self.route_index()
 
-    def delete(self, path=None):
+    @tornado.concurrent.run_on_executor
+    def __delete(self, path=None):
         if path and not self.delete_requested:
             self.delete_requested = True
             self.route('delete', path)
@@ -181,7 +209,8 @@ class Handler(tornado.web.RequestHandler):
         else:
             self.route_index()
 
-    def patch(self, path=None):
+    @tornado.concurrent.run_on_executor
+    def __patch(self, path=None):
         if path and not self.patch_requested:
             self.patch_requested = True
             self.route('patch', path)
@@ -189,7 +218,8 @@ class Handler(tornado.web.RequestHandler):
         else:
             self.route_index()
 
-    def put(self, path=None):
+    @tornado.concurrent.run_on_executor
+    def __put(self, path=None):
         if path and not self.put_requested:
             self.put_requested = True
             self.route('put', path)

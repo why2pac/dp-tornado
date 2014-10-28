@@ -25,7 +25,7 @@ class Loader(object):
 
         try:
             module = importlib.import_module('%s.%s' % (self.__dict__['_path_prefix'], name))
-            obj = getattr(module, '%s%s' % (name.capitalize(), self.__dict__['_category'].capitalize()))
+            obj = getattr(module, '%s%s' % (Loader.capitalized_method_name(name), self.__dict__['_category'].capitalize()))
 
         except ImportError:
             return None
@@ -41,3 +41,10 @@ class Loader(object):
             _prepared.index()
 
         return self._prepared[name]
+
+    @staticmethod
+    def capitalized_method_name(method_name):
+        s = method_name.split('_')
+        x = map(lambda p: p.capitalize(), s)
+
+        return ''.join(x)

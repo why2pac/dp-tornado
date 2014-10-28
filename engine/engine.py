@@ -4,13 +4,13 @@
 #		2014.10.23
 #		
 
-from .config import Config as dpConfig
-from .model import Model as dpModel
-from .helper import Helper as dpHelper
 from .view import View as dpView
+from .config import Config as dpConfig
+from .singleton import Singleton as dpSingleton
+from .loader import Loader as dpLoader
 
 
-class Engine(object):
+class EngineSingleton(metaclass=dpSingleton):
     @property
     def config(self):
         if not hasattr(self, '_config'):
@@ -21,14 +21,14 @@ class Engine(object):
     @property
     def model(self):
         if not hasattr(self, '_model'):
-            self._model = dpModel()
+            self._model = dpLoader('model')
 
         return self._model
 
     @property
     def helper(self):
         if not hasattr(self, '_helper'):
-            self._helper = dpHelper()
+            self._helper = dpLoader('helper')
 
         return self._helper
 
@@ -38,3 +38,21 @@ class Engine(object):
             self._view = dpView()
 
         return self._view
+
+
+class Engine(object):
+    @property
+    def config(self):
+        return EngineSingleton().config
+
+    @property
+    def model(self):
+        return EngineSingleton().model
+
+    @property
+    def helper(self):
+        return EngineSingleton().helper
+
+    @property
+    def view(self):
+        return EngineSingleton().view

@@ -20,8 +20,13 @@ import importlib
 
 import application
 
+from engine.plugin.static import StaticURL
+
+
 class RestfulApplication(tornado.web.Application):
     def __init__(self, handlers, kwargs):
+        kwargs['ui_modules']['Static'] = StaticURL
+
         super(RestfulApplication, self).__init__(handlers, **kwargs)
 
 if __name__ == '__main__':

@@ -5,8 +5,9 @@
 #		
 
 
-from .singleton import Singleton
+from .singleton import Singleton as dpSingleton
+from .engine import Engine as dpEngine
 
 
-class Helper(object, metaclass=Singleton):
+class Helper(dpEngine, metaclass=dpSingleton):
     pass

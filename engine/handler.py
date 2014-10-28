@@ -107,7 +107,9 @@ class Handler(tornado.web.RequestHandler):
                 raise e
 
             except dpResponse as e:
+                self.set_status(e.http_status_code)
                 self.finish(e.response())
+                
                 return False
 
             except Exception as e:

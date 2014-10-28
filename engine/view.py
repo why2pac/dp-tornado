@@ -18,9 +18,9 @@ class View(object, metaclass=Singleton):
     @staticmethod
     def render_string(controller, template_name, kwargs=None):
         if kwargs:
-            return controller.parent.render_string(template_name, **kwargs)
+            return str(controller.parent.render_string(template_name, **kwargs), 'UTF-8')
         else:
-            return controller.parent.render_string(template_name)
+            return str(controller.parent.render_string(template_name), 'UTF-8')
 
     @staticmethod
     def write(controller, chunk):

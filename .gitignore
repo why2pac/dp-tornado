@@ -1,6 +1,9 @@
 # PyCharm Configuration
 .idea/
 
+# Combined
+static/combined
+
 # Macintosh
 .DS_Store
 

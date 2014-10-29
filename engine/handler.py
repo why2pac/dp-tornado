@@ -243,7 +243,7 @@ class Handler(tornado.web.RequestHandler):
             return self.request.headers["User-Agent"]
 
         else:
-            from plugin import http_agent_parser
+            from .plugin import http_agent_parser
 
             ua = self.get_user_agent(False)
             ua = http_agent_parser.detect(ua)

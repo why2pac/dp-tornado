@@ -17,6 +17,14 @@ class Loader(object):
         self.__dict__['_prepared'] = {}
 
     def __getattr__(self, name):
+        try:
+            attr = self.__getattribute__(name)
+        except AttributeError:
+            attr = None
+
+        if attr:
+            return attr
+
         if name in self.__dict__:
             return self.__dict__[name]
 
@@ -35,6 +43,9 @@ class Loader(object):
             return self._prepared[name]
 
         _prepared = obj()
+        _prepared.__dict__['_category'] = self.__dict__['_category']
+        _prepared.__dict__['_path_prefix'] = '%s.%s' % (self.__dict__['_path_prefix'], name)
+
         self._prepared[name] = _prepared
 
         if hasattr(_prepared, 'index'):

@@ -7,6 +7,7 @@
 
 from .engine import Engine as dpEngine
 from .singleton import Singleton as dpSingleton
+from .loader import Loader as dpLoader
 
 from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
@@ -180,7 +181,7 @@ class ModelProxy(object):
         return ModelSingleton().rows(sql, bind, dsn_or_conn)
 
 
-class Model(dpEngine):
+class Model(dpEngine, dpLoader):
     def _getconn(self, config_dsn):
         return ModelSingleton().getconn(config_dsn)
 

@@ -6,9 +6,9 @@
 
 
 class Response(Exception):
-    def __init__(self, message=None, http_status_code=None):
-        self._http_status_code = http_status_code if http_status_code else 200
-        self._message = message if message else 'An error has occurred'
+    def __init__(self, http_status_code=200, message='An error has occurred'):
+        self._http_status_code = http_status_code
+        self._message = message
 
     @property
     def http_status_code(self):

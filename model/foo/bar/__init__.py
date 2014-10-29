@@ -23,12 +23,12 @@ class BarModel(dpModel):
     def ex_commit(self, user_id):
         proxy = self.begin('foo.bar/bar')
 
-        before = proxy.row('SELECT * FROM userinfo WHERE user_id = %s', user_id, proxy)
+        before = proxy.row('SELECT * FROM userinfo WHERE user_id = %s', user_id)
         print('before : %s' % before)
 
-        proxy.execute('UPDATE userinfo SET registered_date=55, lately_login_date=66 WHERE user_id=%s', user_id, proxy)
+        proxy.execute('UPDATE userinfo SET registered_date=33, lately_login_date=66 WHERE user_id=%s', user_id)
 
-        after = proxy.row('SELECT * FROM userinfo WHERE user_id = %s', user_id, proxy)
+        after = proxy.row('SELECT * FROM userinfo WHERE user_id = %s', user_id)
         print('after : %s' % after)
 
         proxy.commit(proxy)

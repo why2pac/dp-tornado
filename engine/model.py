@@ -25,7 +25,7 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
 
         return self._engines
 
-    def engine(self, config, database):
+    def engine(self, config, database, cache=False):
         try:
             package = config.split('.')
             conf = self.config
@@ -33,7 +33,12 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
             for p in package:
                 conf = conf.__getattr__(p)
 
-            conf = conf.databases.__getattr__(database)
+            if not cache:
+                conf = conf.databases.__getattr__(database)
+
+            else:
+                conf = conf.caches.__getattr__(database)
+
         except AttributeError:
             conf = None
 
@@ -45,11 +50,17 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         if not key in ModelSingleton().engines:
             ModelSingleton._lock.acquire()
 
-            connection_url = '%s://%s:%s@%s:%s/%s' % (
-                conf.driver,
-                conf.user, conf.password,
-                conf.host, conf.port,
-                conf.database)
+            if conf.driver == 'memory':
+                connection_args = {'check_same_thread': False}
+                connection_url = 'sqlite://'
+
+            else:
+                connection_args = {}
+                connection_url = '%s://%s:%s@%s:%s/%s' % (
+                    conf.driver,
+                    conf.user, conf.password,
+                    conf.host, conf.port,
+                    conf.database)
 
             ModelSingleton().engines[key] = create_engine(
                 connection_url,
@@ -60,24 +71,25 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
                 poolclass=QueuePool,
                 pool_recycle=conf.pool_recycle if conf.pool_recycle is not None else 3600,
                 max_overflow=conf.max_overflow if conf.max_overflow is not None else -1,
-                pool_timeout=conf.pool_timeout if conf.pool_timeout is not None else 30)
+                pool_timeout=conf.pool_timeout if conf.pool_timeout is not None else 30,
+                connect_args=connection_args)
 
             ModelSingleton._lock.release()
 
         return ModelSingleton().engines[key]
 
-    def getconn(self, config_dsn):
+    def getconn(self, config_dsn, cache=False):
         config_dsn = config_dsn.split('/')
-        engine = ModelSingleton().engine(config_dsn[0], config_dsn[1])
+        engine = ModelSingleton().engine(config_dsn[0], config_dsn[1], cache=cache)
 
         if not engine:
             return None
 
         return engine.connect()
 
-    def begin(self, dsn_or_conn):
+    def begin(self, dsn_or_conn, cache=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
-        connection = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+        connection = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         transaction = connection.begin()
 
         return ModelProxy(connection, transaction)
@@ -101,27 +113,29 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
     def close(self, proxy):
         return proxy.connection.close()
 
-    def execute(self, sql, bind=None, dsn_or_conn=None):
+    def execute(self, sql, bind=None, dsn_or_conn=None, cache=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+        conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         conn = conn.connection if isinstance(conn, ModelProxy) else conn
 
         if isinstance(bind, dict):
             result = conn.execute(sql, **bind)
         elif isinstance(bind, list):
             result = conn.execute(sql, *bind)
-        else:
+        elif bind is not None:
             result = conn.execute(sql, (bind, ))
+        else:
+            result = conn.execute(sql)
 
         if config_dsn:
             conn.close()
 
         return result
 
-    def row(self, sql, bind=None, dsn_or_conn=None):
+    def row(self, sql, bind=None, dsn_or_conn=None, cache=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-        result = self.execute(sql, bind, dsn_or_conn=conn)
+        conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
+        result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
         row = None
 
         for r in result:
@@ -133,10 +147,10 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
 
         return row
 
-    def rows(self, sql, bind=None, dsn_or_conn=None):
+    def rows(self, sql, bind=None, dsn_or_conn=None, cache=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-        result = self.execute(sql, bind, dsn_or_conn=conn)
+        conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
+        result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
 
         rows = []
 
@@ -172,13 +186,13 @@ class ModelProxy(object):
         return ModelSingleton().close(self)
 
     def execute(self, sql, bind=None, dsn_or_conn=None):
-        return ModelSingleton().execute(sql, bind, dsn_or_conn)
+        return ModelSingleton().execute(sql, bind, dsn_or_conn or self)
 
     def row(self, sql, bind=None, dsn_or_conn=None):
-        return ModelSingleton().row(sql, bind, dsn_or_conn)
+        return ModelSingleton().row(sql, bind, dsn_or_conn or self)
 
     def rows(self, sql, bind=None, dsn_or_conn=None):
-        return ModelSingleton().rows(sql, bind, dsn_or_conn)
+        return ModelSingleton().rows(sql, bind, dsn_or_conn or self)
 
 
 class Model(dpEngine, dpLoader):

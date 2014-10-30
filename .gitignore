@@ -7,6 +7,9 @@ static/combined
 # Macintosh
 .DS_Store
 
+# SQLite Files
+resource/database/sqlite/*.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

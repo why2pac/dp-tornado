@@ -25,4 +25,7 @@ class TestController(dpController):
         row = self.model.foo.bar.ex_row('youngyongpark@gmail.com')
         print(row)
 
+        test = self.model.foo.bar.ex_local()
+        print(test)
+
         self.finish('ok')

@@ -46,3 +46,6 @@ class BarModel(dpModel):
         print('after : %s' % after)
 
         proxy.rollback(proxy)
+
+    def ex_local(self):
+        return self.execute('CREATE TABLE a (b INT, c TEXT)', None, 'foo.bar/local')

@@ -54,6 +54,17 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
                 connection_args = {'check_same_thread': False}
                 connection_url = 'sqlite://'
 
+            elif conf.driver == 'sqlite':
+                if conf.path:
+                    path = conf.path
+                else:
+                    import os
+                    abspath = os.path.dirname(os.path.realpath(__file__))
+                    path = '%s/../resource/database/sqlite/%s.db' % (abspath, database)
+
+                connection_args = {'check_same_thread': False}
+                connection_url = 'sqlite:///%s' % path
+
             else:
                 connection_args = {}
                 connection_url = '%s://%s:%s@%s:%s/%s' % (

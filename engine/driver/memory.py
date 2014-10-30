@@ -35,7 +35,7 @@ class MemoryCacheDriver(dpEngine, dpCacheDriver):
                 expire_at integer DEFAULT NULL
             )
         """ % {'table_name': table_name})
-        proxy.execute('CREATE INDEX %(table_name)s_idx ON %(table_name)s (expire_at);' % {'table_name': table_name})
+        proxy.execute('CREATE INDEX %(table_name)s_key_idx ON %(table_name)s (expire_at);' % {'table_name': table_name})
         proxy.commit()
 
     @staticmethod
@@ -100,11 +100,11 @@ class MemoryCacheDriver(dpEngine, dpCacheDriver):
         else:
             return None
 
-    def set(self, key, val, expire_in=None):
+    def set(self, key, val, expire_in=1209600):
         if expire_in is not None:
             expire_in = self.helper.datetime.current_time() + expire_in
 
-        type = MemoryCacheDriver._val_to_type(val)
+        val_type = MemoryCacheDriver._val_to_type(val)
 
         if isinstance(val, (list, dict)):
             import json
@@ -115,14 +115,14 @@ class MemoryCacheDriver(dpEngine, dpCacheDriver):
                 'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
                 '   VALUES (?, ?, ?, ?)'
                 .replace('{table_name}', MemoryCacheDriver._table_name(self._config_dsn)),
-                (key, val, type, expire_in), self._config_dsn, cache=True)
+                (key, val, val_type, expire_in), self._config_dsn, cache=True)
 
         else:
             return dpModelSingleton().execute(
                 'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
                 '   VALUES (?, ?, ?, (SELECT expire_at FROM {table_name} WHERE key = ?))'
                 .replace('{table_name}', MemoryCacheDriver._table_name(self._config_dsn)),
-                (key, val, type, key), self._config_dsn, cache=True)
+                (key, val, val_type, key), self._config_dsn, cache=True)
 
     def increase(self, key, amount, expire_in=None):
         if expire_in is not None:

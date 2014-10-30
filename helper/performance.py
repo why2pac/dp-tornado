@@ -8,7 +8,6 @@
 from __future__ import absolute_import
 from engine.helper import Helper as dpHelper
 
-import time
 import datetime
 
 
@@ -49,7 +48,7 @@ class PerformanceMeasurement(object):
         if with_print:
             if diff < 0.0001:
                 diff = '0.000100'
-            
+
             print('%s Elapsed : %s secs (%s)' % (self._log_prefix, diff, log_suffix))
 
         return diff

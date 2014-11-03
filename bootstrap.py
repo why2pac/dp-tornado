@@ -19,6 +19,7 @@ import multiprocessing
 import importlib
 
 import application
+import configparser
 
 from engine.plugin.static import StaticURL
 
@@ -30,12 +31,34 @@ class RestfulApplication(tornado.web.Application):
         super(RestfulApplication, self).__init__(handlers, **kwargs)
 
 if __name__ == '__main__':
+    # INI
+    config = configparser.RawConfigParser()
+    config.read('config.ini')
+
+    def get_config(c, option, section='server', default=None):
+        try:
+            get = c.get(section, option)
+
+            if default is True or default is False:
+                return True if get == '1' else False
+
+            elif isinstance(default, str):
+                return str(get)
+
+            elif isinstance(default, int):
+                return int(get)
+
+            else:
+                return get
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            return default
+
     # Setup Options
-    tornado.options.define('max_worker', default=64)
-    tornado.options.define('num_processes', default=1)
-    tornado.options.define('port', default=8080)
-    tornado.options.define('debug', default=False if tornado.options.options.num_processes <= 0 else True)
-    tornado.options.define('gzip', default=True)
+    tornado.options.define('max_worker', default=get_config(config, 'max_worker', default=64))
+    tornado.options.define('num_processes', default=get_config(config, 'num_processes', default=0))
+    tornado.options.define('port', default=get_config(config, 'port', default=8080))
+    tornado.options.define('debug', default=get_config(config, 'debug', default=False))
+    tornado.options.define('gzip', default=get_config(config, 'gzip', default=True))
 
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
@@ -70,7 +93,7 @@ if __name__ == '__main__':
         'YUI_LOCATION': '%s/engine/plugin/yuicompressor-2.4.8.jar' % currentdir,
         'debug': tornado.options.options.debug,
         'gzip': tornado.options.options.gzip,
-        'cookie_secret': 'Lx2xJsi3xO02XJc17Bhs8',
+        'cookie_secret': get_config(config, 'cookie_secret', default='default_cookie_secret'),
         'ui_modules': {}
     }
 
@@ -79,4 +102,7 @@ if __name__ == '__main__':
     service.bind(tornado.options.options.port, '')
     service.start(tornado.options.options.num_processes)
 
-    tornado.ioloop.IOLoop.instance().start()
+    try:
+        tornado.ioloop.IOLoop.instance().start()
+    except KeyboardInterrupt:
+        pass

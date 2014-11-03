@@ -10,6 +10,13 @@ from engine.controller import Controller as dpController
 class TestController(dpController):
     # URL matching with /foo/test
     def get(self):
+        session = self.session('val')
+        print(session)
+
+        self.session('val', 'assigned!!!')
+        session = self.session('val')
+        print(session)
+
         row = self.model.foo.bar.ex_row('youngyongpark@gmail.com')
         print(row)
 

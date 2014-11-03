@@ -15,6 +15,29 @@ from sqlalchemy.pool import QueuePool
 import threading
 
 
+class InValueModelConfig(object):
+    def __init__(self, driver=None, database=None, host=None, user=None, password=None, port=None, path=None):
+        self.driver = driver
+        self.database = database
+        self.host = host
+        self.user = user
+        self.password = password
+        self.port = port
+        self.path = path
+
+    def __getattr__(self, name):
+        try:
+            attr = self.__getattribute__(name)
+        except AttributeError:
+            attr = None
+
+        return attr
+
+    def __str__(self):
+        return 'InValueModelConfig (%s://%s:%s@%s:%s/%s/%s)' \
+               % (self.driver, self.user, self.password, self.host, self.port, self.database, self.path)
+
+
 class ModelSingleton(dpEngine, metaclass=dpSingleton):
     _lock = threading.Lock()
 
@@ -25,7 +48,26 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
 
         return self._engines
 
-    def engine(self, config, database, cache=False):
+    def _parse_config(self, config_dsn, delegate, cache=False):
+        if isinstance(config_dsn, InValueModelConfig):
+            delegate['config'] = 'InValueModelConfig'
+            delegate['database'] = config_dsn.database
+            delegate['key'] = '%s_%s' % (config_dsn.driver, config_dsn.database)
+
+            return config_dsn
+
+        config_dsn = config_dsn.split('/')
+
+        config = config_dsn[0]
+        database = config_dsn[1]
+
+        delegate['config'] = config
+        delegate['database'] = database
+        delegate['key'] = '%s_%s' % (delegate['config'], delegate['database'])
+
+        if delegate['key'] in ModelSingleton().engines:
+            return True
+
         try:
             package = config.split('.')
             conf = self.config
@@ -42,12 +84,16 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         except AttributeError:
             conf = None
 
+        return conf
+
+    def engine(self, config_dsn, cache=False):
+        delegate = {}
+        conf = self._parse_config(config_dsn, delegate, cache=cache)
+
         if not conf:
             return None
 
-        key = '%s_%s' % (config, database)
-
-        if not key in ModelSingleton().engines:
+        if not delegate['key'] in ModelSingleton().engines:
             ModelSingleton._lock.acquire()
 
             if conf.driver == 'memory':
@@ -60,7 +106,8 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
                 else:
                     import os
                     abspath = os.path.dirname(os.path.realpath(__file__))
-                    path = '%s/../resource/database/sqlite/%s.db' % (abspath, database)
+                    path = '%s/../resource/database/sqlite/%s_%s.db' \
+                           % (abspath, delegate['config'], delegate['database'])
 
                 connection_args = {'check_same_thread': False}
                 connection_url = 'sqlite:///%s' % path
@@ -73,7 +120,7 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
                     conf.host, conf.port,
                     conf.database)
 
-            ModelSingleton().engines[key] = create_engine(
+            ModelSingleton().engines[delegate['key']] = create_engine(
                 connection_url,
                 convert_unicode=conf.convert_unicode if conf.convert_unicode is not None else True,
                 echo=conf.echo if conf.echo is not None else False,
@@ -87,11 +134,10 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
 
             ModelSingleton._lock.release()
 
-        return ModelSingleton().engines[key]
+        return ModelSingleton().engines[delegate['key']]
 
     def getconn(self, config_dsn, cache=False):
-        config_dsn = config_dsn.split('/')
-        engine = ModelSingleton().engine(config_dsn[0], config_dsn[1], cache=cache)
+        engine = ModelSingleton().engine(config_dsn, cache=cache)
 
         if not engine:
             return None
@@ -99,7 +145,7 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         return engine.connect()
 
     def begin(self, dsn_or_conn, cache=False):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         connection = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         transaction = connection.begin()
 
@@ -125,7 +171,7 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         return proxy.connection.close()
 
     def execute(self, sql, bind=None, dsn_or_conn=None, cache=False):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         conn = conn.connection if isinstance(conn, ModelProxy) else conn
 
@@ -144,7 +190,7 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         return result
 
     def row(self, sql, bind=None, dsn_or_conn=None, cache=False):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
         row = None
@@ -159,7 +205,7 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
         return row
 
     def rows(self, sql, bind=None, dsn_or_conn=None, cache=False):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
 

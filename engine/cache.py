@@ -6,6 +6,7 @@
 
 
 from .engine import Engine as dpEngine
+from .model import InValueModelConfig as dpInValueModelConfig
 
 
 class CacheDriver(object):
@@ -48,10 +49,14 @@ class Cache(dpEngine):
 
         return self._pools
 
-    def _getdriver(self, config_dsn):
-        key = config_dsn
+    def _parse_config(self, config_dsn, delegate):
+        if isinstance(config_dsn, dpInValueModelConfig):
+            delegate['key'] = 'InValueModelConfig.%s_%s' % (config_dsn.driver, config_dsn.database)
+            return config_dsn
 
-        if key in self.pools:
+        delegate['key'] = config_dsn
+
+        if delegate['key'] in self.pools:
             return self.pools[config_dsn]
 
         config_dsn = config_dsn.split('/')
@@ -68,6 +73,14 @@ class Cache(dpEngine):
             conf = conf.caches.__getattr__(database)
         except AttributeError:
             conf = None
+
+        return conf
+
+    def _getdriver(self, config_dsn):
+        delegate = {}
+
+        conf = self._parse_config(config_dsn, delegate)
+        key = delegate['key']
 
         if not conf:
             raise Exception('Cache configuration initialized failed.')
@@ -91,6 +104,13 @@ class Cache(dpEngine):
                     key
                 )
 
+            elif conf.driver == 'sqlite':
+                from .driver.sqlite import SqliteCacheDriver as dpSqliteCacheDriver
+
+                self.pools[key] = dpSqliteCacheDriver.getpool(
+                    conf
+                )
+
             else:
                 raise NotImplementedError
 
@@ -105,21 +125,20 @@ class Cache(dpEngine):
         return driver.getconn()
 
     def get(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.get(key)
 
     def set(self, key, val, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         assert(expire_in is None or int(expire_in) >= 0)
         return conn.set(key, val, expire_in)
 
-
     def increase(self, key, amount, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, str) else None
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         assert(expire_in is None or int(expire_in) >= 0)

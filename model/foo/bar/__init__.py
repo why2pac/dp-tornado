@@ -48,4 +48,4 @@ class BarModel(dpModel):
         proxy.rollback(proxy)
 
     def ex_local(self):
-        return self.execute('CREATE TABLE a (b INT, c TEXT)', None, 'foo.bar/local')
+        return self.execute('CREATE TABLE IF NOT EXISTS a (b INT, c TEXT)', None, 'foo.bar/local')

@@ -11,6 +11,7 @@ import json
 import string
 import base64
 import random
+import hashlib
 
 CRYPTO_KEY = 'AADBBRCCADDGEEOFFNGG'
 
@@ -72,3 +73,6 @@ class CryptoHelper(dpHelper):
 
         except:
             return False
+
+    def md5_hash(self, plain):
+        return hashlib.md5(str(plain).encode()).hexdigest()

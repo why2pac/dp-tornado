@@ -15,6 +15,7 @@ class CacheDriver(object):
         self._conn = conn
         self._pipeline = None
         self._config_dsn = config_dsn
+        self._reference_count = 0
 
     @property
     def pool(self):

@@ -16,6 +16,8 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         driver = SqliteCacheDriver(config_dsn=config_dsn)
         SqliteCacheDriver._create_table(driver, config_dsn)
         driver._config_dsn = config_dsn
+        driver._reference_count = 0
+
         return driver
 
     def _table_name(self, config_dsn):
@@ -74,7 +76,24 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
     def getconn(self):
         return self
 
+    def _referenced(self):
+        self._reference_count += 1
+        self._try_clear_expired()
+
+    def _try_clear_expired(self):
+        if self._reference_count > 100000:
+            self._exec_clear_expired()
+
+    def _exec_clear_expired(self):
+        self._reference_count = 0
+
+        return dpModelSingleton().execute(
+            'DELETE FROM {table_name} WHERE expire_at < ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+            self.helper.datetime.current_time(), self._config_dsn, cache=True)
+
     def get(self, key):
+        self._referenced()
+
         result = dpModelSingleton().row(
             'SELECT '
             '   * '

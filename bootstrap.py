@@ -59,6 +59,7 @@ if __name__ == '__main__':
     tornado.options.define('port', default=get_config(config, 'port', default=8080))
     tornado.options.define('debug', default=get_config(config, 'debug', default=False))
     tornado.options.define('gzip', default=get_config(config, 'gzip', default=True))
+    tornado.options.define('crypto_key', default=get_config(config, 'key', section='crypto', default='CRy$t0-$CR@T'))
 
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')

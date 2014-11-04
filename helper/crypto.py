@@ -13,7 +13,9 @@ import base64
 import random
 import hashlib
 
-CRYPTO_KEY = 'AADBBRCCADDGEEOFFNGG'
+import tornado.options
+
+CRYPTO_KEY = tornado.options.options.crypto_key
 
 
 class CryptoHelper(dpHelper):

@@ -24,6 +24,10 @@ class Controller(dpHandler, dpEngine):
         self._sessionid = None
         self._sessiondb = dpInValueModelConfig(driver='sqlite', database='session')
 
+    @property
+    def remote_ip(self):
+        return self.request.remote_ip
+
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
         secure_cookie = self.helper.crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])
         return self.parent.set_secure_cookie(name, secure_cookie, expires_days, version, **kwargs)

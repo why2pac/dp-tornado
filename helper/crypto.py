@@ -19,8 +19,12 @@ CRYPTO_KEY = tornado.options.options.crypto_key
 
 
 class CryptoHelper(dpHelper):
-    def encrypt(self, clear, randomized=False, expire_in=0, key=CRYPTO_KEY):
-        if randomized or expire_in > 0:
+    def encrypt(self, clear, randomized=False, expire_in=0, key=CRYPTO_KEY, json_encode=False):
+        if isinstance(clear, (list, dict)):
+            clear = json.dumps(clear, separators=(',', ':'))
+            json_encode = True
+
+        if randomized or expire_in > 0 or json_encode:
 
             plain = {'p': clear}
 
@@ -32,6 +36,9 @@ class CryptoHelper(dpHelper):
 
             if expire_in > 0:
                 plain['ts'] = self.helper.datetime.current_time() + expire_in
+
+            if json_encode:
+                plain['e'] = True
 
             clear = json.dumps(plain, separators=(',', ':'))
 
@@ -61,6 +68,9 @@ class CryptoHelper(dpHelper):
                 decoded_json = json.loads(decoded, 'UTF-8')
 
                 if 'p' in decoded_json:
+                    if 'e' in decoded_json:
+                        decoded_json['p'] = json.loads(decoded_json['p'])
+
                     if 'ts' in decoded_json:
                         return decoded_json['p'] if self.helper.datetime.current_time() < decoded_json['ts'] else None
 

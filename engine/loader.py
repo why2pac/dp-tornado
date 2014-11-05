@@ -49,7 +49,8 @@ class Loader(object):
         self._prepared[name] = _prepared
 
         if hasattr(_prepared, 'index'):
-            _prepared.index()
+            if _prepared.index:
+                _prepared.index()
 
         return self._prepared[name]
 

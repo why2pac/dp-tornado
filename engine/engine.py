@@ -57,9 +57,6 @@ class EngineSingleton(metaclass=dpSingleton):
 
 
 class Engine(object):
-    def index(self):
-        pass
-
     @property
     def config(self):
         return EngineSingleton().config

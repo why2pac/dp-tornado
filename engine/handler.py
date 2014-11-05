@@ -148,7 +148,7 @@ class Handler(tornado.web.RequestHandler):
         error = error[1] if error else None
 
         self.set_status(status_code)
-        self.finish('%s, %s' % (status_code, error.reason if error and error.reason else 'An error has occurred'))
+        self.write('%s, %s' % (status_code, error.reason if error and error.reason else 'An error has occurred'))
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine

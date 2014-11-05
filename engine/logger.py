@@ -6,22 +6,46 @@
 
 
 import logging
+import traceback
 
 from .singleton import Singleton
 
 
 class Logger(object, metaclass=Singleton):
-    def exception(self, msg, *args, **kwargs):
-        logging.exception(msg, *args, **kwargs)
+    def _stripped_msg(self, msg, strip=False):
+        if not strip:
+            return msg
+
+        msg = msg.strip()
+
+        __ = (
+            '\n', '\\n',
+            '       ', '       ',
+            '      ', '      ',
+            '     ', '     ',
+            '    ', '    ',
+            '   ', '   ',
+            '  ', '  '
+        )
+
+        for _ in __:
+            msg = msg.replace(_, ' ')
+
+        return msg
+
+    def exception(self, exception, *args, **kwargs):
+        traceback.print_exc()
+
+        logging.exception(self._stripped_msg(str(exception), True), *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        logging.error(msg, *args, **kwargs)
+        logging.error(self._stripped_msg(msg, True), *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
-        logging.info(msg, *args, **kwargs)
+        logging.info(self._stripped_msg(msg), *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
-        logging.warning(msg, *args, **kwargs)
+        logging.warning(self._stripped_msg(msg), *args, **kwargs)
 
     def debug(self, msg, *args, **kwargs):
-        logging.debug(msg, *args, **kwargs)
+        logging.debug(self._stripped_msg(msg), *args, **kwargs)

@@ -114,13 +114,7 @@ class Handler(tornado.web.RequestHandler):
                 return False
 
             except Exception as e:
-                import traceback
-
-                print(e)
-                print(traceback.print_exc())
-
-                # TODO, Logging
-
+                self.logger.exception(e)
                 self.finish_with_error(500)
 
                 return False

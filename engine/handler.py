@@ -44,6 +44,7 @@ class Handler(tornado.web.RequestHandler):
 
         return ''.join(x)
 
+    @tornado.concurrent.run_on_executor
     def route(self, method, path):
         module_path = '%s.%s' % (self.prefix, path.replace('/', '.'))
         module_paths = str.split(str(module_path), '.')
@@ -148,91 +149,79 @@ class Handler(tornado.web.RequestHandler):
         error = error[1] if error else None
 
         self.set_status(status_code)
-        self.write('%s, %s' % (status_code, error.reason if error and error.reason else 'An error has occurred'))
+        self.finish('%s, %s' % (status_code, error.reason if error and error.reason else 'An error has occurred'))
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def head(self, path=None):
-        yield self.__head(path)
-
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def get(self, path=None):
-        yield self.__get(path)
-
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def post(self, path=None):
-        yield self.__post(path)
-
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def delete(self, path=None):
-        yield self.__delete(path)
-
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def patch(self, path=None):
-        yield self.__patch(path)
-
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
-    def put(self, path=None):
-        yield self.__put(path)
-
-    @tornado.concurrent.run_on_executor
-    def __head(self, path=None):
-        if path and not self.head_requested:
-            self.head_requested = True
-            self.route('head', path)
-
-        else:
-            self.route_index()
-
-    @tornado.concurrent.run_on_executor
-    def __get(self, path=None):
-        if path and not self.get_requested:
-            self.get_requested = True
-            self.route('get', path)
-
-        else:
-            self.route_index()
-
-    @tornado.concurrent.run_on_executor
-    def __post(self, path=None):
-        if path and not self.post_requested:
-            self.post_requested = True
-            self.route('post', path)
-
-        else:
-            self.route_index()
-
-    @tornado.concurrent.run_on_executor
-    def __delete(self, path=None):
-        if path and not self.delete_requested:
-            self.delete_requested = True
-            self.route('delete', path)
-
-        else:
-            self.route_index()
-
-    @tornado.concurrent.run_on_executor
-    def __patch(self, path=None):
-        if path and not self.patch_requested:
-            self.patch_requested = True
-            self.route('patch', path)
-
-        else:
-            self.route_index()
-
-    @tornado.concurrent.run_on_executor
-    def __put(self, path=None):
         if path and not self.put_requested:
             self.put_requested = True
-            self.route('put', path)
-
+            self.__head(path)
         else:
             self.route_index()
+
+    def get(self, path=None):
+        if path and not self.put_requested:
+            self.put_requested = True
+            self.__get(path)
+        else:
+            self.route_index()
+
+    def post(self, path=None):
+        if path and not self.put_requested:
+            self.put_requested = True
+            self.__post(path)
+        else:
+            self.route_index()
+
+    def delete(self, path=None):
+        if path and not self.put_requested:
+            self.put_requested = True
+            self.__delete(path)
+        else:
+            self.route_index()
+
+    def patch(self, path=None):
+        if path and not self.put_requested:
+            self.put_requested = True
+            self.__patch(path)
+        else:
+            self.route_index()
+
+    def put(self, path=None):
+        if path and not self.put_requested:
+            self.put_requested = True
+            self.__put(path)
+        else:
+            self.route_index()
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __head(self, path=None):
+        yield self.route('head', path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __get(self, path=None):
+        yield self.route('get', path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __post(self, path=None):
+        yield self.route('post', path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __delete(self, path=None):
+        yield self.route('delete', path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __patch(self, path=None):
+        yield self.route('patch', path)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __put(self, path=None):
+        yield self.route('put', path)
 
     @staticmethod
     def get_cdn_prefix():

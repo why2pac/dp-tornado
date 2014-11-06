@@ -33,7 +33,7 @@ class RestfulApplication(tornado.web.Application):
 if __name__ == '__main__':
     # INI
     config = configparser.RawConfigParser()
-    config.read('config.ini')
+    config.read('%s/config.ini' % (os.path.dirname(os.path.realpath(__file__)), ))
 
     def get_config(c, option, section='server', default=None):
         try:
@@ -64,12 +64,9 @@ if __name__ == '__main__':
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
 
-    logging.info('-------------------------------')
-    logging.info('dp for Tornado has been started')
-    logging.info('-------------------------------')
-    logging.info('Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
-    logging.info('CPU Count : %d' % multiprocessing.cpu_count())
-    logging.info('-------------------------------')
+    logging.info('---------------------------------')
+    logging.info('dp for Tornado has been started..')
+    logging.info('---------------------------------')
 
     services = []
 
@@ -97,6 +94,17 @@ if __name__ == '__main__':
         'cookie_secret': get_config(config, 'cookie_secret', default='default_cookie_secret'),
         'ui_modules': {}
     }
+
+    num_processed = (tornado.options.options.num_processes
+                     if tornado.options.options.num_processes else multiprocessing.cpu_count())
+
+    logging.info('Server Mode : %s' % ('Production' if not tornado.options.options.debug else 'Debugging'))
+    logging.info('Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
+    logging.info('Server Port : %s' % tornado.options.options.port)
+    logging.info('Max Workers : %s' % tornado.options.options.max_worker)
+    logging.info('Processors  : %s' % num_processed)
+    logging.info('CPU Count   : %d' % multiprocessing.cpu_count())
+    logging.info('---------------------------------')
 
     application = RestfulApplication(services, settings)
     service = tornado.httpserver.HTTPServer(application, xheaders=True)

@@ -22,11 +22,13 @@ import application
 import configparser
 
 from engine.plugin.static import StaticURL
+from engine.plugin.prefix import PrefixURL
 
 
 class RestfulApplication(tornado.web.Application):
     def __init__(self, handlers, kwargs):
         kwargs['ui_modules']['Static'] = StaticURL
+        kwargs['ui_modules']['Prefix'] = PrefixURL
 
         super(RestfulApplication, self).__init__(handlers, **kwargs)
 

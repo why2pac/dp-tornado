@@ -16,9 +16,10 @@ import importlib
 
 from concurrent.futures import ThreadPoolExecutor
 from engine.response import Response as dpResponse
+from engine.engine import Engine as dpEngine
 
 
-class Handler(tornado.web.RequestHandler):
+class Handler(tornado.web.RequestHandler, dpEngine):
     executor = ThreadPoolExecutor(tornado.options.options.max_worker)
 
     def __init__(self, application, request, **kwargs):

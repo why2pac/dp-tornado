@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 #	dp for Tornado
 #		YoungYong Park (youngyongpark@gmail.com)
@@ -34,6 +35,9 @@ class DatetimeHelper(dpHelper):
 
     def hour(self):
         return self.today().hour
+
+    def year(self):
+        return self.today().year
 
     def month(self):
         return self.today().month

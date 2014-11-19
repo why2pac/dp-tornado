@@ -97,8 +97,13 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
             ModelSingleton._lock.acquire()
 
             if conf.driver == 'memory':
+                import os
+                abspath = os.path.dirname(os.path.realpath(__file__))
+                path = '%s/../resource/database/sqlite/cache_%s_%s.db' \
+                       % (abspath, delegate['config'], delegate['database'])
+
                 connection_args = {'check_same_thread': False}
-                connection_url = 'sqlite://'
+                connection_url = 'sqlite:///%s' % path
 
             elif conf.driver == 'sqlite':
                 if conf.path:
@@ -120,17 +125,22 @@ class ModelSingleton(dpEngine, metaclass=dpSingleton):
                     conf.host, conf.port,
                     conf.database)
 
-            ModelSingleton().engines[delegate['key']] = create_engine(
-                connection_url,
-                convert_unicode=conf.convert_unicode if conf.convert_unicode is not None else True,
-                echo=conf.echo if conf.echo is not None else False,
-                echo_pool=conf.echo_pool if conf.echo_pool is not None else False,
-                pool_size=conf.pool_size if conf.pool_size is not None else 16,
-                poolclass=QueuePool,
-                pool_recycle=conf.pool_recycle if conf.pool_recycle is not None else 3600,
-                max_overflow=conf.max_overflow if conf.max_overflow is not None else -1,
-                pool_timeout=conf.pool_timeout if conf.pool_timeout is not None else 30,
-                connect_args=connection_args)
+            params = {
+                'convert_unicode':conf.convert_unicode if conf.convert_unicode is not None else True,
+                'echo':conf.echo if conf.echo is not None else False,
+                'echo_pool':conf.echo_pool if conf.echo_pool is not None else False,
+                'pool_size':conf.pool_size if conf.pool_size is not None else 16,
+                'poolclass':QueuePool,
+                'pool_recycle':conf.pool_recycle if conf.pool_recycle is not None else 3600,
+                'max_overflow':conf.max_overflow if conf.max_overflow is not None else -1,
+                'pool_timeout':conf.pool_timeout if conf.pool_timeout is not None else 30,
+                'connect_args':connection_args
+            }
+
+            if conf.isolation_level is not None:
+                params['isolation_level'] = conf.isolation_level
+
+            ModelSingleton().engines[delegate['key']] = create_engine(connection_url, **params)
 
             ModelSingleton._lock.release()
 

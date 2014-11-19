@@ -14,7 +14,6 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
     @staticmethod
     def getpool(config_dsn=None, host=None, port=None, database=None, user=None, password=None):
         driver = SqliteCacheDriver(config_dsn=config_dsn)
-        SqliteCacheDriver._create_table(driver, config_dsn)
         driver._config_dsn = config_dsn
         driver._reference_count = 0
 
@@ -23,7 +22,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
     def _table_name(self, config_dsn):
         return ('table_%s_%s' % (config_dsn.driver, config_dsn.database)).replace('/', '_').replace('.', '_')
 
-    def _create_table(self, config_dsn):
+    def create_table(self, config_dsn, clear=False):
         table_name = self._table_name(config_dsn)
 
         proxy = dpModelSingleton().begin(config_dsn, cache=True)
@@ -37,6 +36,10 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         """ % {'table_name': table_name})
         proxy.execute('CREATE INDEX IF NOT EXISTS %(table_name)s_key_idx ON %(table_name)s (expire_at);'
                       % {'table_name': table_name})
+
+        if clear:
+            proxy.execute('DELETE FROM %(table_name)s' % {'table_name': table_name})
+
         proxy.commit()
 
     @staticmethod

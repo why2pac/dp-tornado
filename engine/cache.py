@@ -50,6 +50,13 @@ class Cache(dpEngine):
 
         return self._pools
 
+    @property
+    def flags(self):
+        if not hasattr(self, '_flags'):
+            self._flags = {}
+
+        return self._flags
+
     def _parse_config(self, config_dsn, delegate):
         if isinstance(config_dsn, dpInValueModelConfig):
             delegate['key'] = 'InValueModelConfig.%s_%s' % (config_dsn.driver, config_dsn.database)
@@ -114,6 +121,12 @@ class Cache(dpEngine):
 
             else:
                 raise NotImplementedError
+
+            if not key in self.flags:
+                self.flags[key] = True
+
+                if hasattr(self.pools[key], 'create_table'):
+                    self.pools[key].create_table(config_dsn, True if conf.pure else False)
 
         return self.pools[key]
 

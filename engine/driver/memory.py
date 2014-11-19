@@ -12,7 +12,6 @@ class MemoryCacheDriver(dpSqliteCacheDriver):
     @staticmethod
     def getpool(config_dsn=None, host=None, port=None, database=None, user=None, password=None):
         driver = MemoryCacheDriver(config_dsn=config_dsn)
-        MemoryCacheDriver._create_table(driver, config_dsn)
         driver._config_dsn = config_dsn
         return driver
 

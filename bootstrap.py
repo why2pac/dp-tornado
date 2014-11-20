@@ -23,12 +23,14 @@ import configparser
 
 from engine.plugin.static import StaticURL
 from engine.plugin.prefix import PrefixURL
+from engine.plugin.pagination import Pagination
 
 
 class RestfulApplication(tornado.web.Application):
     def __init__(self, handlers, kwargs):
         kwargs['ui_modules']['Static'] = StaticURL
         kwargs['ui_modules']['Prefix'] = PrefixURL
+        kwargs['ui_modules']['Pagination'] = Pagination
 
         super(RestfulApplication, self).__init__(handlers, **kwargs)
 

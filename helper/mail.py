@@ -35,7 +35,7 @@ class MailSender(object):
 
         self.connected = True
 
-    def send(self, subject, content, from_user, to_user):
+    def send(self, subject, content, from_user, to_user, html=True):
         if self.connected:
             from email.mime.text import MIMEText
 
@@ -43,6 +43,9 @@ class MailSender(object):
             msg['Subject'] = subject
             msg['From'] = from_user
             msg['To'] = to_user
+
+            if html:
+                msg['Content-Type'] = 'text/html; charset=utf-8'
 
             self.connection.send_message(msg)
 
@@ -57,10 +60,10 @@ class MailSender(object):
 
 class MailHelper(dpHelper):
     def send(self, to_user, subject, content, from_user=None, cc=None, attach=None,
-             host=None, port=None, userid=None, password=None, ehlo=None, tls=False):
+             host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True):
         s = MailSender(host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
         s.connect()
-        s.send(subject=subject, content=content, from_user=from_user, to_user=to_user)
+        s.send(subject=subject, content=content, from_user=from_user, to_user=to_user, html=html)
         s.quit()
 
         return True

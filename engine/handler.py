@@ -35,6 +35,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.delete_requested = False
         self.put_requested = False
 
+        self._render = []
+        self._write = []
+        self._finish = []
+
     def initialize(self, prefix=None):
         self.prefix = prefix
     
@@ -103,7 +107,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
             try:
                 method(*parameters)
-                return True
+                return handler
 
             except tornado.web.HTTPError as e:
                 raise e
@@ -188,35 +192,76 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         else:
             self.route_index()
 
+    def __render(self, x):
+        if not x._render:
+            return
+
+        for s in x._render:
+            t = s['t']
+            k = s['k']
+
+            if not k:
+                self.render(t)
+            else:
+                self.render(t, **k)
+
+    def __write(self, x):
+        if not x._write:
+            return
+
+        for s in x._write:
+            self.write(s)
+
+    def __finish(self, x):
+        if not x._finish:
+            return
+
+        for s in x._finish:
+            self.finish(s)
+
+    def postprocess(self, x):
+        if x._render:
+            self.__render(x)
+        elif x._finish:
+            self.__finish(x)
+        elif x._write:
+            self.__write(x)
+
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __head(self, path=None):
-        yield self.route('head', path)
+        x = yield self.route('head', path)
+        self.postprocess(x)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __get(self, path=None):
-        yield self.route('get', path)
+        x = yield self.route('get', path)
+        self.postprocess(x)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __post(self, path=None):
-        yield self.route('post', path)
+        x = yield self.route('post', path)
+        self.postprocess(x)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __delete(self, path=None):
-        yield self.route('delete', path)
+        x = yield self.route('delete', path)
+        self.postprocess(x)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __patch(self, path=None):
-        yield self.route('patch', path)
+        x = yield self.route('patch', path)
+        self.postprocess(x)
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __put(self, path=None):
-        yield self.route('put', path)
+        x = yield self.route('put', path)
+        self.postprocess(x)
 
     @staticmethod
     def get_cdn_prefix():

@@ -83,10 +83,7 @@ class Controller(dpHandler, dpEngine):
         self.parent.redirect(url, permanent, status)
 
     def render(self, template_name, kwargs=None):
-        if kwargs:
-            self.view.render(self, template_name, kwargs)
-        else:
-            self.view.render(self, template_name)
+        self._render.append({'t': template_name, 'k': kwargs})
 
     def render_string(self, template_name, kwargs=None):
         if kwargs:
@@ -95,7 +92,7 @@ class Controller(dpHandler, dpEngine):
             return self.view.render_string(self, template_name)
 
     def write(self, chunk):
-        self.view.write(self, chunk)
+        self._write.append(chunk)
 
     def finish(self, chunk=None):
-        self.view.finish(self, chunk)
+        self._finish.append(chunk)

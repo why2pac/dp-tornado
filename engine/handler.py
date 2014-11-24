@@ -35,9 +35,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.delete_requested = False
         self.put_requested = False
 
-        self._render = []
         self._write = []
-        self._finish = []
+        self._finish = None
+        self._render = None
 
     def initialize(self, prefix=None):
         self.prefix = prefix
@@ -196,14 +196,13 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         if not x._render:
             return
 
-        for s in x._render:
-            t = s['t']
-            k = s['k']
+        t = x._render['t']
+        k = x._render['k']
 
-            if not k:
-                self.render(t)
-            else:
-                self.render(t, **k)
+        if not k:
+            self.render(t)
+        else:
+            self.render(t, **k)
 
     def __write(self, x):
         if not x._write:
@@ -216,8 +215,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         if not x._finish:
             return
 
-        for s in x._finish:
-            self.finish(s)
+        self.finish(x._finish)
 
     def postprocess(self, x):
         if x._render:

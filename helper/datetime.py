@@ -28,9 +28,13 @@ class DatetimeHelper(dpHelper):
     def today(self):
         return datetime.datetime.today()
 
-    def yyyymmdd(self):
+    def yyyymmdd(self, s=''):
         today = self.today()
-        return '%04d%02d%02d' % (today.year, today.month, today.day)
+        return '%04d%s%02d%s%02d' % (today.year, s, today.month, s, today.day)
+
+    def hhiiss(self, s=''):
+        today = self.today()
+        return '%02d%s%02d%s%02d' % (today.hour, s, today.minute, s, today.second)
 
     def hour(self):
         return self.today().hour

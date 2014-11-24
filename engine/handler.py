@@ -275,32 +275,33 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             ua = self.get_user_agent(False)
             ua = http_agent_parser.detect(ua)
 
-            platform = 'platform-%s-%s' % (ua['platform']['name']
-                                           if 'platform' in ua and 'name' in ua['platform'] else 'Unknown',
-                                           ua['platform']['version']
-                                           if 'platform' in ua and 'version' in ua['platform'] else 'Unknown')
+            p_name = ua['platform']['name'] if 'platform' in ua and 'name' in ua['platform'] else 'Unknown'
+            p_version = ua['platform']['version'] if 'platform' in ua and 'version' in ua['platform'] else 'Unknown'
+
+            platform = 'platform-%s-%s' % (p_name, p_version)
             platform = platform.lower().replace(' ', '-').replace('.', '-')
 
-            os = 'os-%s-%s' % (ua['os']['name']
-                               if 'os' in ua and 'name' in ua['os'] else 'Unknown',
-                               ua['os']['version']
-                               if 'os' in ua and 'version' in ua['os'] else 'Unknown')
+            os_name = ua['os']['name'] if 'os' in ua and 'name' in ua['os'] else 'Unknown'
+            os_version = ua['os']['version'] if 'os' in ua and 'version' in ua['os'] else 'Unknown'
+
+            os = 'os-%s-%s' % (os_name, os_version)
             os = os.lower().replace(' ', '-').replace('.', '-')
 
-            browser = 'browser-%s-%s' % (ua['browser']['name']
-                                         if 'browser' in ua and 'name' in ua['browser'] else 'Unknown',
-                                         ua['browser']['version']
-                                         if 'browser' in ua and 'version' in ua['browser'] else 'Unknown')
+            browser_name = ua['browser']['name'] if 'browser' in ua and 'name' in ua['browser'] else 'Unknown'
+            browser_version = ua['browser']['version'] if 'browser' in ua and 'version' in ua['browser'] else 'Unknown'
+
+            try:
+                browser_version_major = int(float(browser_version.split('.')[0]))
+            except ValueError:
+                browser_version_major = 0
+
+            browser = 'browser-%s-%s' % (browser_name, browser_version)
             browser = browser.lower().replace(' ', '-').replace('.', '-')
 
-            browser_major = 'browser-%s-%s' % (ua['browser']['name']
-                                               if 'browser' in ua and 'name' in ua['browser'] else 'Unknown',
-                                               int(float(ua['browser']['version'].split('.')[0]))
-                                               if 'browser' in ua and 'version' in ua['browser'] else 'Unknown')
+            browser_major = 'browser-%s-%s' % (browser_name, browser_version_major)
             browser_major = browser_major.lower().replace(' ', '-').replace('.', '-')
 
-            browser_type = 'browser-%s' % (ua['browser']['name']
-                                           if 'browser' in ua and 'name' in ua['browser'] else 'Unknown')
+            browser_type = 'browser-%s' % browser_name
             browser_type = browser_type.lower().replace(' ', '-').replace('.', '-')
 
             ua['platform_str'] = platform

@@ -50,9 +50,9 @@ class DatetimeHelper(dpHelper):
 
     def millisecs_to_next_hour(self, from_time=None):
         dst = self.today() + self.timedelta(hours=1)
-        from_time = from_time if from_time is not None else self.current_time()
+        from_time = from_time if from_time is not None else self.current_time_millis()
 
-        return self.mktime(dst.year, dst.month, dst.day, dst.hour, 0, 0) - from_time
+        return self.mktime(dst.year, dst.month, dst.day, dst.hour, 0, 0, millisecs=True) - from_time
 
     def secs_to_next_hour(self, from_time=None):
         return int(self.millisecs_to_next_hour(from_time=from_time) / 1000)
@@ -69,8 +69,8 @@ class DatetimeHelper(dpHelper):
     def timedelta(self, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
         return datetime.timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
 
-    def mktime(self, year=1970, month=1, day=1, hour=0, mins=0, sec=0):
-        return int(time.mktime((year, month, day, hour, mins, sec, 0, 0, 0)))
+    def mktime(self, year=1970, month=1, day=1, hour=0, mins=0, sec=0, millisecs=False):
+        return int(time.mktime((year, month, day, hour, mins, sec, 0, 0, 0))) * (1000 if millisecs else 1)
 
     def timestamp_from_datetime(self, dt, millisecs=False):
         if not isinstance(dt, datetime.datetime):

@@ -34,6 +34,10 @@ class Controller(dpEngine):
         self.prefix = prefix
         self.parent = parent
 
+    @property
+    def request(self):
+        return self.parent.request
+
     def get_argument(self, name, default=None, strip=True):
         return self.parent.get_argument(name, default, strip)
 

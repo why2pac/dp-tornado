@@ -14,34 +14,23 @@ import tornado.options
 import inspect
 import importlib
 
-from concurrent.futures import ThreadPoolExecutor
-from engine.response import Response as dpResponse
-from engine.engine import Engine as dpEngine
+from .response import Response as dpResponse
+from .engine import Engine as dpEngine
 
 
 class Handler(tornado.web.RequestHandler, dpEngine):
-    executor = ThreadPoolExecutor(tornado.options.options.max_worker)
+    executor = tornado.concurrent.futures.ThreadPoolExecutor(tornado.options.options.max_worker)
 
     def __init__(self, application, request, **kwargs):
         super(Handler, self).__init__(application, request, **kwargs)
 
         self.prefix = self.prefix
         self.parent = None
-
-        self.head_requested = False
-        self.post_requested = False
-        self.get_requested = False
-        self.patch_requested = False
-        self.delete_requested = False
-        self.put_requested = False
-
-        self._write = []
-        self._finish = None
-        self._render = None
+        self.routed = None
 
     def initialize(self, prefix=None):
         self.prefix = prefix
-    
+
     @staticmethod
     def capitalized_method_name(method_name):
         s = method_name.split('_')
@@ -78,7 +67,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 handler.prefix = self.prefix
                 handler.parent = self
 
-            except ImportError:
+            except (AttributeError, ImportError):
                 try:
                     class_name = '%sController' % (self.capitalized_method_name(previous))
                     handler = getattr(handler_module, class_name)
@@ -92,7 +81,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                     parameters.append(pop)
                     continue
 
-            method = getattr(handler, method)
+            method = getattr(handler, method, None)
+
+            if not method:
+                self.finish_with_error(404, 'Page Not Found (No Method Implemented)')
 
             spec = inspect.getargspec(method)
             req_param_count = len(spec.args) - 1
@@ -114,7 +106,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
             except dpResponse as e:
                 self.set_status(e.http_status_code)
-                handler.finish(e.response())
+                self.finish(e.response())
 
                 return handler
 
@@ -146,50 +138,58 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def write_error(self, status_code, **kwargs):
         error = kwargs.get('exc_info', None)
         error = error[1] if error else None
+        reason = error.reason if error and getattr(error, 'reason', None) else 'An error has occurred'
+        finish = '%s, %s' % (status_code, reason)
 
         self.set_status(status_code)
-        self.finish('%s, %s' % (status_code, error.reason if error and error.reason else 'An error has occurred'))
+        self.finish(finish)
 
     def head(self, path=None):
-        if path and not self.put_requested:
-            self.put_requested = True
+        if path and not self.routed:
+            self.routed = True
             self.__head(path)
         else:
+            self.routed = False
             self.route_index()
 
     def get(self, path=None):
-        if path and not self.put_requested:
-            self.put_requested = True
+        if path and not self.routed:
+            self.routed = True
             self.__get(path)
         else:
+            self.routed = False
             self.route_index()
 
     def post(self, path=None):
-        if path and not self.put_requested:
-            self.put_requested = True
+        if path and not self.routed:
+            self.routed = True
             self.__post(path)
         else:
+            self.routed = False
             self.route_index()
 
     def delete(self, path=None):
-        if path and not self.put_requested:
-            self.put_requested = True
+        if path and not self.routed:
+            self.routed = True
             self.__delete(path)
         else:
+            self.routed = False
             self.route_index()
 
     def patch(self, path=None):
-        if path and not self.put_requested:
-            self.put_requested = True
+        if path and not self.routed:
+            self.routed = True
             self.__patch(path)
         else:
+            self.routed = False
             self.route_index()
 
     def put(self, path=None):
-        if path and not self.put_requested:
-            self.put_requested = True
+        if path and not self.routed:
+            self.routed = True
             self.__put(path)
         else:
+            self.routed = False
             self.route_index()
 
     def __render(self, x):
@@ -260,54 +260,3 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def __put(self, path=None):
         x = yield self.route('put', path)
         self.postprocess(x)
-
-    @staticmethod
-    def get_cdn_prefix():
-        return ''
-
-    def get_user_agent(self, parsed=True):
-        if not parsed:
-            return self.request.headers["User-Agent"]
-
-        else:
-            from .plugin import http_agent_parser
-
-            ua = self.get_user_agent(False)
-            ua = http_agent_parser.detect(ua)
-
-            p_name = ua['platform']['name'] if 'platform' in ua and 'name' in ua['platform'] else 'Unknown'
-            p_version = ua['platform']['version'] if 'platform' in ua and 'version' in ua['platform'] else 'Unknown'
-
-            platform = 'platform-%s-%s' % (p_name, p_version)
-            platform = platform.lower().replace(' ', '-').replace('.', '-')
-
-            os_name = ua['os']['name'] if 'os' in ua and 'name' in ua['os'] else 'Unknown'
-            os_version = ua['os']['version'] if 'os' in ua and 'version' in ua['os'] else 'Unknown'
-
-            os = 'os-%s-%s' % (os_name, os_version)
-            os = os.lower().replace(' ', '-').replace('.', '-')
-
-            browser_name = ua['browser']['name'] if 'browser' in ua and 'name' in ua['browser'] else 'Unknown'
-            browser_version = ua['browser']['version'] if 'browser' in ua and 'version' in ua['browser'] else 'Unknown'
-
-            try:
-                browser_version_major = int(float(browser_version.split('.')[0]))
-            except ValueError:
-                browser_version_major = 0
-
-            browser = 'browser-%s-%s' % (browser_name, browser_version)
-            browser = browser.lower().replace(' ', '-').replace('.', '-')
-
-            browser_major = 'browser-%s-%s' % (browser_name, browser_version_major)
-            browser_major = browser_major.lower().replace(' ', '-').replace('.', '-')
-
-            browser_type = 'browser-%s' % browser_name
-            browser_type = browser_type.lower().replace(' ', '-').replace('.', '-')
-
-            ua['platform_str'] = platform
-            ua['os_str'] = os
-            ua['browser_str'] = browser
-            ua['browser_major_str'] = browser_major
-            ua['browser_type_str'] = browser_type
-
-            return ua

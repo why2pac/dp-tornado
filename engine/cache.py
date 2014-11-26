@@ -136,7 +136,8 @@ class Cache(dpEngine):
                         if not Cache.server_startup_at:
                             import tornado.ioloop
                             i = tornado.ioloop.IOLoop.instance()
-                            Cache.server_startup_at = i.startup_at
+                            startup_at = getattr(i, 'startup_at', 0)
+                            Cache.server_startup_at = startup_at
 
                         pure_key = '%s-%s' % (Cache.server_startup_at, str(config_dsn))
 

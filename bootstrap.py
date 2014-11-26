@@ -29,6 +29,8 @@ from engine.plugin import ui_methods
 
 class RestfulApplication(tornado.web.Application):
     def __init__(self, handlers, kwargs):
+        self.startup_at = int(round(time.time() * 1000))
+
         kwargs['ui_modules']['Static'] = StaticURL
         kwargs['ui_modules']['Prefix'] = PrefixURL
         kwargs['ui_modules']['Pagination'] = Pagination
@@ -117,7 +119,12 @@ if __name__ == '__main__':
     service.bind(tornado.options.options.port, '')
     service.start(tornado.options.options.num_processes)
 
+    import random
+    application.identifier = random.randint(100000, 999999)
+
     try:
-        tornado.ioloop.IOLoop.instance().start()
+        instance = tornado.ioloop.IOLoop.instance()
+        instance.__setattr__('startup_at', getattr(application, 'startup_at'))
+        instance.start()
     except KeyboardInterrupt:
         pass

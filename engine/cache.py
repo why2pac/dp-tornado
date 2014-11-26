@@ -43,6 +43,10 @@ class CacheDriver(object):
 
 
 class Cache(dpEngine):
+    server_startup_at = None
+    executed_pure = {}
+    executed_pure_cache_config = dpInValueModelConfig(driver='sqlite', database='executed_pure_cache')
+
     @property
     def pools(self):
         if not hasattr(self, '_pools'):
@@ -126,7 +130,30 @@ class Cache(dpEngine):
                 self.flags[key] = True
 
                 if hasattr(self.pools[key], 'create_table'):
-                    self.pools[key].create_table(config_dsn, True if conf.pure else False)
+                    pure = conf.pure
+
+                    if pure:
+                        if not Cache.server_startup_at:
+                            import tornado.ioloop
+                            i = tornado.ioloop.IOLoop.instance()
+                            Cache.server_startup_at = i.startup_at
+
+                        pure_key = '%s-%s' % (Cache.server_startup_at, str(config_dsn))
+
+                        if pure_key in Cache.executed_pure:
+                            pure = False
+
+                        elif pure:
+                            cached = self.get(pure_key, dsn_or_conn=Cache.executed_pure_cache_config)
+
+                            if cached:
+                                pure = False
+
+                            else:
+                                Cache.executed_pure[pure_key] = True
+                                self.set(pure_key, 1, dsn_or_conn=Cache.executed_pure_cache_config)
+
+                    self.pools[key].create_table(config_dsn, True if pure else False)
 
         return self.pools[key]
 

@@ -16,7 +16,7 @@ import threading
 
 
 class InValueModelConfig(object):
-    def __init__(self, driver=None, database=None, host=None, user=None, password=None, port=None, path=None):
+    def __init__(self, driver=None, database=None, host=None, user=None, password=None, port=None, path=None, pure=None):
         self.driver = driver
         self.database = database
         self.host = host
@@ -24,6 +24,7 @@ class InValueModelConfig(object):
         self.password = password
         self.port = port
         self.path = path
+        self.pure = pure
 
     def __getattr__(self, name):
         try:
@@ -34,8 +35,8 @@ class InValueModelConfig(object):
         return attr
 
     def __str__(self):
-        return 'InValueModelConfig (%s://%s:%s@%s:%s/%s/%s)' \
-               % (self.driver, self.user, self.password, self.host, self.port, self.database, self.path)
+        return 'InValueModelConfig (%s://%s:%s@%s:%s/%s/%s) (Pure:%s)' \
+               % (self.driver, self.user, self.password, self.host, self.port, self.database, self.path, self.pure)
 
 
 class ModelSingleton(dpEngine, metaclass=dpSingleton):

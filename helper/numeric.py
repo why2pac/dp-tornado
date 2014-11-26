@@ -9,11 +9,22 @@ from __future__ import absolute_import
 from engine.helper import Helper as dpHelper
 
 import re
+import sys
+
+py_version = sys.version_info[0]
 
 
 class NumericHelper(dpHelper):
     def extract_numbers(self, string):
-        return re.sub(r'\D+', '', str(string))
+        if py_version == 2:
+            types = basestring,
+        else:
+            types = str,
+
+        if not isinstance(string, types):
+            return None
+
+        return re.sub(r'\D+', '', string)
 
     def number_format(self, value, tsep=',', dsep='.'):
         value = self.extract_numbers(value)

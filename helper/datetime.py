@@ -48,6 +48,17 @@ class DatetimeHelper(dpHelper):
     def day(self):
         return self.today().day
 
+    def datetime(self, ts=None):
+        if ts:  # from timestamp
+            ts = int(ts)
+
+            if ts > 9999999999:  # with microseconds
+                return datetime.datetime.fromtimestamp(ts // 1000).replace(microsecond=ts % 1000 * 1000)
+            else:
+                return datetime.datetime.fromtimestamp(ts)
+        else:
+            return datetime.datetime.now()
+
     def millisecs_to_next_hour(self, from_time=None):
         dst = self.today() + self.timedelta(hours=1)
         from_time = from_time if from_time is not None else self.current_time_millis()

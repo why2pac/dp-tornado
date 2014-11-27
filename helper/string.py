@@ -31,3 +31,47 @@ class StringHelper(dpHelper):
             return True if len(username) <= length else False
         else:
             return False
+
+    def check_exist_repeated_text(self, s, criteria=3):
+        if not self.is_string(s):
+            return None
+
+        k = s[0]
+        n = 0
+
+        for c in s:
+            if c == k:
+                n += 1
+
+                if n >= criteria:
+                    return True
+
+            else:
+                k = c
+                n = 1
+
+        return False
+
+    def to_str(self, s, preserve_none=True):
+        if s is None:
+            return s
+
+        if not self.is_string(s):
+            s = str(s)
+
+        if type(s) == unicode_type:
+            return s.encode('UTF-8')
+        else:
+            return s
+
+    def to_unicode(self, s, preserve_none=True):
+        if s is None:
+            return s
+
+        if not self.is_string(s):
+            s = str(s)
+
+        if type(s) != unicode_type:
+            return s.decode('unicode-escape')
+        else:
+            return s

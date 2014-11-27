@@ -8,6 +8,7 @@
 from engine.cache import CacheDriver as dpCacheDriver
 from ..model import ModelSingleton as dpModelSingleton
 from ..engine import Engine as dpEngine
+from sqlalchemy.exc import OperationalError
 
 
 class SqliteCacheDriver(dpEngine, dpCacheDriver):
@@ -94,14 +95,34 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             'DELETE FROM {table_name} WHERE expire_at < ?'.replace('{table_name}', self._table_name(self._config_dsn)),
             self.helper.datetime.current_time(), self._config_dsn, cache=True)
 
-    def get(self, key):
+    def get(self, key, retry_count=0, raise_error=False):
         self._referenced()
 
-        result = dpModelSingleton().row(
-            'SELECT '
-            '   * '
-            'FROM {table_name} WHERE key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
-            key, self._config_dsn, cache=True)
+        try:
+            result = dpModelSingleton().row(
+                'SELECT '
+                '   * '
+                'FROM {table_name} WHERE key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+                key, self._config_dsn, cache=True)
+        except OperationalError as e:
+            # Retry (hack for sqlite database locking)
+            if retry_count:
+                import time
+                time.sleep(0.05)
+
+                try:
+                    self.create_table(self._config_dsn)
+                except:
+                    pass
+
+                return self.get(key, retry_count - 1)
+
+            else:
+                if raise_error:
+                    raise e
+
+                else:
+                    return None
 
         if result:
             if result['expire_at'] and result['expire_at'] < self.helper.datetime.current_time():
@@ -121,7 +142,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         else:
             return None
 
-    def set(self, key, val, expire_in=1209600):
+    def set(self, key, val, expire_in=1209600, retry_count=10, raise_error=False):
         if expire_in is not None:
             expire_in = self.helper.datetime.current_time() + expire_in
 
@@ -131,19 +152,42 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             import json
             val = json.dumps(val, separators=(',', ':'))
 
-        if expire_in:
-            return dpModelSingleton().execute(
-                'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
-                '   VALUES (?, ?, ?, ?)'
-                .replace('{table_name}', self._table_name(self._config_dsn)),
-                (key, val, val_type, expire_in), self._config_dsn, cache=True)
+        try:
+            if expire_in:
+                ret = dpModelSingleton().execute(
+                    'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
+                    '   VALUES (?, ?, ?, ?)'
+                    .replace('{table_name}', self._table_name(self._config_dsn)),
+                    (key, val, val_type, expire_in), self._config_dsn, cache=True)
 
-        else:
-            return dpModelSingleton().execute(
-                'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
-                '   VALUES (?, ?, ?, (SELECT expire_at FROM {table_name} WHERE key = ?))'
-                .replace('{table_name}', self._table_name(self._config_dsn)),
-                (key, val, val_type, key), self._config_dsn, cache=True)
+            else:
+                ret = dpModelSingleton().execute(
+                    'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
+                    '   VALUES (?, ?, ?, (SELECT expire_at FROM {table_name} WHERE key = ?))'
+                    .replace('{table_name}', self._table_name(self._config_dsn)),
+                    (key, val, val_type, key), self._config_dsn, cache=True)
+
+            return ret
+
+        except OperationalError as e:
+            # Retry (hack for sqlite database locking)
+            if retry_count:
+                import time
+                time.sleep(0.05)
+
+                try:
+                    self.create_table(self._config_dsn)
+                except:
+                    pass
+
+                return self.set(key, val, expire_in, retry_count - 1)
+
+            else:
+                if raise_error:
+                    raise e
+
+                else:
+                    return False
 
     def increase(self, key, amount, expire_in=None):
         if expire_in is not None:

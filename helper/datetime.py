@@ -28,25 +28,51 @@ class DatetimeHelper(dpHelper):
     def today(self):
         return datetime.datetime.today()
 
-    def yyyymmdd(self, s=''):
-        today = self.today()
-        return '%04d%s%02d%s%02d' % (today.year, s, today.month, s, today.day)
+    def yyyymmdd(self, s='', d=None):
+        if not isinstance(d, datetime.datetime):
+            d = self.datetime(d)
 
-    def hhiiss(self, s=''):
-        today = self.today()
-        return '%02d%s%02d%s%02d' % (today.hour, s, today.minute, s, today.second)
+        return '%04d%s%02d%s%02d' % (d.year, s, d.month, s, d.day)
 
-    def hour(self):
-        return self.today().hour
+    def hhiiss(self, s='', d=None):
+        if not isinstance(d, datetime.datetime):
+            d = self.datetime(d)
 
-    def year(self):
-        return self.today().year
+        return '%02d%s%02d%s%02d' % (d.hour, s, d.minute, s, d.second)
 
-    def month(self):
-        return self.today().month
+    def hour(self, s='', d=None):
+        if isinstance(d, datetime.datetime):
+            return d.hour
 
-    def day(self):
-        return self.today().day
+        return self.datetime(d).hour
+
+    def year(self, d=None):
+        if isinstance(d, datetime.datetime):
+            return d.year
+
+        return self.datetime(d).year
+
+    def month(self, d=None):
+        if isinstance(d, datetime.datetime):
+            return d.month
+
+        return self.datetime(d).month
+
+    def day(self, d=None):
+        if isinstance(d, datetime.datetime):
+            return d.day
+
+        return self.datetime(d).day
+
+    """
+    isoweekday=True:  Mon=1, Tue=2, ..., Sun=7
+    isoweekday=False: Mon=0, Tue=1, ..., Sun=6
+    """
+    def weekday(self, d=None, isoweekday=True):
+        if isinstance(d, datetime.datetime):
+            return d.isoweekday() if isoweekday else d.weekday()
+
+        return self.datetime(d).isoweekday() if isoweekday else self.datetime(d).weekday()
 
     def datetime(self, ts=None):
         if ts:  # from timestamp

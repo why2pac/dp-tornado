@@ -96,9 +96,9 @@ class DatetimeHelper(dpHelper):
 
     def millisecs_to_tomorrow(self, from_time=None):
         dst = self.today() + self.timedelta(days=1)
-        from_time = from_time if from_time is not None else self.current_time()
+        from_time = from_time if from_time is not None else self.current_time_millis()
 
-        return self.mktime(dst.year, dst.month, dst.day, 0, 0, 0) - from_time
+        return self.mktime(dst.year, dst.month, dst.day, 0, 0, 0, millisecs=True) - from_time
 
     def secs_to_tomorrow(self, from_time=None):
         return int(self.millisecs_to_tomorrow(from_time=from_time) / 1000)

@@ -32,3 +32,21 @@ class KoreaHelper(dpHelper):
             return '%s%s%s%s%s' % (number[0:3], separator, number[3:7], separator, number[7:11])
         else:
             return number
+
+    def weekday(self, w, short=False, isoweekday=True):
+        weekdays = {
+            0: '월',
+            1: '화',
+            2: '수',
+            3: '목',
+            4: '금',
+            5: '토',
+            6: '일'
+        }
+
+        w = int(w)
+
+        if isoweekday:
+            w -= 1
+
+        return '%s요일' % weekdays[w] if not short else weekdays[w]

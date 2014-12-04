@@ -17,13 +17,13 @@ class DatetimeHelper(dpHelper):
         return int(time.time())
 
     def time(self, dt=None):
-        return self.current_time() if datetime is None else self.timestamp_from_datetime(dt, False)
+        return self.current_time() if dt is None else self.timestamp_from_datetime(dt, False)
 
     def current_time_millis(self):
         return int(round(time.time() * 1000))
 
     def mtime(self, dt=None):
-        return self.current_time_millis() if datetime is None else self.timestamp_from_datetime(dt, True)
+        return self.current_time_millis() if dt is None else self.timestamp_from_datetime(dt, True)
 
     def today(self):
         return datetime.datetime.today()

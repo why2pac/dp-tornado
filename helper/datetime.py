@@ -28,6 +28,41 @@ class DatetimeHelper(dpHelper):
     def today(self):
         return datetime.datetime.today()
 
+    def yesterday(self, d=None):
+        if isinstance(d, int) and d >= 19700000 and d <= 99999999:
+            d = str(d)
+            d = self.datetime(self.mktime(int(d[0:4]), int(d[4:6]), int(d[6:8])))
+
+        elif d is not None:
+            raise ValueError
+
+        else:
+            d = self.today()
+
+        return d - self.timedelta(days=1)
+
+    def tomorrow(self, d=None):
+        if isinstance(d, int) and d >= 19700000 and d <= 99999999:
+            d = str(d)
+            d = self.datetime(self.mktime(int(d[0:4]), int(d[4:6]), int(d[6:8])))
+
+        elif d is not None:
+            raise ValueError
+
+        else:
+            d = self.today()
+
+        return d + self.timedelta(days=1)
+
+    def ago(self, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0, ts=False, millisecs=False):
+        ago = self.today() - self.timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
+
+        if ts:
+            return self.timestamp_from_datetime(ago, millisecs=millisecs)
+
+        else:
+            return ago
+
     def yyyymmdd(self, s='', d=None):
         if not isinstance(d, datetime.datetime):
             d = self.datetime(d)

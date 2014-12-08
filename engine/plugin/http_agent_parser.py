@@ -8,7 +8,7 @@ Tries to
     * assist python web apps to detect clients.
 """
 
-__version__ = '1.7.4'
+__version__ = '1.7.6'
 
 
 class DetectorsHub(dict):
@@ -126,7 +126,7 @@ class Browser(DetectorBase):
 class Firefox(Browser):
     look_for = "Firefox"
     version_markers = [('/', '')]
-    skip_if_found = ["SeaMonkey"]
+    skip_if_found = ["SeaMonkey", "web/snippet"]
 
 
 class SeaMonkey(Browser):
@@ -161,7 +161,8 @@ class Opera(Browser):
             return agent.split(look_for)[1][1:].split(' ')[0]
         except IndexError:
             look_for = "Opera"
-            return agent.split(look_for)[1][1:].split(' ')[0]
+            version = agent.split(look_for)[1][1:].split(' ')[0]
+            return version.split('(')[0]
 
 
 class OperaNew(Browser):
@@ -216,7 +217,7 @@ class Safari(Browser):
     look_for = "Safari"
 
     def checkWords(self, agent):
-        unless_list = ["Chrome", "OmniWeb", "wOSBrowser"]
+        unless_list = ["Chrome", "OmniWeb", "wOSBrowser", "Android"]
         if self.look_for in agent:
             for word in unless_list:
                 if word in agent:
@@ -235,7 +236,7 @@ class GoogleBot(Browser):
     # https://support.google.com/webmasters/answer/1061943
     look_for = ["Googlebot", "Googlebot-News", "Googlebot-Image",
                 "Googlebot-Video", "Googlebot-Mobile", "Mediapartners-Google",
-                "Mediapartners", "AdsBot-Google"]
+                "Mediapartners", "AdsBot-Google", "web/snippet"]
     bot = True
     version_markers = [('/', ';'), ('/', ' ')]
 
@@ -245,6 +246,10 @@ class GoogleFeedFetcher(Browser):
 
     def get_version(self, agent):
         pass
+
+class RunscopeRadar(Browser):
+    look_for = "runscope-radar"
+    bot = True
 
 class GoogleAppEngine(Browser):
     look_for = "AppEngine-Google"
@@ -333,6 +338,10 @@ class DotBot(Browser):
 
 class PhantomJS(Browser):
     look_for = "Browser/Phantom"
+    bot = True
+
+class FacebookExternalHit(Browser):
+    look_for = 'facebookexternalhit'
     bot = True
 
 
@@ -608,7 +617,7 @@ def detect(agent, fill_none=False):
         for detector in detectors:
             try:
                 detector.detect(agent, result)
-            except Exception:
+            except Exception as _err:
                 pass
 
     if fill_none:

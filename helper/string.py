@@ -10,9 +10,21 @@ from engine.helper import Helper as dpHelper
 
 import string
 import random
+import sys
+
+py_version = sys.version_info[0]
+unicode_type = type(u'')
 
 
 class StringHelper(dpHelper):
+    def is_string(self, s):
+        if py_version == 2:
+            types = basestring,
+        else:
+            types = str,
+
+        return True if isinstance(s, types) else False
+
     def random_string(self, length):
         return ''.join(random.sample(string.ascii_letters, length))
 

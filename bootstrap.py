@@ -1,7 +1,7 @@
 #
-#	dp for Tornado
-#		YoungYong Park (youngyongpark@gmail.com)
-#		2014.10.23
+#   dp for Tornado
+#       YoungYong Park (youngyongpark@gmail.com)
+#       2014.10.23
 #
 
 
@@ -21,6 +21,7 @@ import importlib
 import application
 import configparser
 
+from engine.plugin.static import Compressor
 from engine.plugin.static import StaticURL
 from engine.plugin.prefix import PrefixURL
 from engine.plugin.pagination import Pagination
@@ -88,15 +89,22 @@ if __name__ == '__main__':
 
         services.append((service[0], handler, dict(prefix=module_path)))
 
-    currentdir = os.path.dirname(os.path.realpath(__file__))
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    combined_dir = '%s/static/combined' % current_dir
+
+    # Clear combined files
+    Compressor.clear(combined_dir)
 
     settings = {
-        'template_path': '%s/view' % currentdir,
-        'static_path': '%s/static' % currentdir,
+        'template_path': '%s/view' % current_dir,
+        'static_path': '%s/static' % current_dir,
         'static_url_prefix': '/s/',
-        'combined_static_dir': '%s/static' % currentdir,
+        'combined_static_path': combined_dir,
         'combined_static_url_prefix': '/s/combined/',
-        'YUI_LOCATION': '%s/engine/plugin/yuicompressor-2.4.8.jar' % currentdir,
+        'compressor': {
+            'yuicompressor': '%s/engine/plugin/compressor/yuicompressor-2.4.8.jar' % current_dir,
+            'uglifyjs': '%s/engine/plugin/compressor/uglifyjs2/bin/uglifyjs' % current_dir,
+        },
         'debug': tornado.options.options.debug,
         'gzip': tornado.options.options.gzip,
         'cookie_secret': get_config(config, 'cookie_secret', default='default_cookie_secret'),

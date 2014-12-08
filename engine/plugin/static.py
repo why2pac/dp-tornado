@@ -95,7 +95,10 @@ class Compressor(dpEngine):
             os.makedirs(combined_dir)
 
         for f in os.listdir(combined_dir):
-            os.remove('%s/%s' % (combined_dir, f))
+            path = '%s/%s' % (combined_dir, f)
+
+            if not os.path.isdir(path):
+                os.remove(path)
 
 
 class StaticURL(tornado.web.UIModule):

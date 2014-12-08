@@ -51,7 +51,7 @@ class EngineSingleton(metaclass=dpSingleton):
     def logger(self):
         if not hasattr(self, '_logger'):
             from .logger import Logger as dpLogger
-            self._logger = dpLogger()
+            self._logger = dpLogger(self)
 
         return self._logger
 
@@ -80,3 +80,7 @@ class Engine(object):
     @property
     def logger(self):
         return EngineSingleton().logger
+
+    @property
+    def logging(self):
+        return self.logger

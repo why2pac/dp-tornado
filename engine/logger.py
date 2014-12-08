@@ -12,7 +12,12 @@ from .singleton import Singleton
 
 
 class Logger(object, metaclass=Singleton):
+    def __init__(self, engine=None):
+        self.engine = engine
+
     def _stripped_msg(self, msg, strip=False):
+        msg = self.engine.helper.string.to_str(msg)
+
         if not strip:
             return msg
 

@@ -16,7 +16,7 @@ class Logger(object, metaclass=Singleton):
         self.engine = engine
 
     def _stripped_msg(self, msg, strip=False):
-        msg = self.engine.helper.string.to_str(msg)
+        msg = self.engine.helper.string.to_unicode(msg)
 
         if not strip:
             return msg

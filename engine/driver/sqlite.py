@@ -49,14 +49,16 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             1: str,
             2: int,
             3: list,
-            4: dict
+            4: tuple,
+            5: dict
         }
 
     @staticmethod
     def _types_required_json():
         return {
             3: list,
-            4: dict
+            4: tuple,
+            5: dict
         }
 
     @staticmethod
@@ -148,7 +150,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
         val_type = SqliteCacheDriver._val_to_type(val)
 
-        if isinstance(val, (list, dict)):
+        if isinstance(val, (list, tuple, dict)):
             import json
             val = json.dumps(val, separators=(',', ':'))
 

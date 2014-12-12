@@ -10,5 +10,5 @@ from .namer import Namer as dpNamer
 from .singleton import Singleton as dpSingleton
 
 
-class Config(dpNamer, metaclass=dpSingleton):
+class Config(dpNamer, dpSingleton):
     pass

@@ -69,7 +69,10 @@ class Compressor(dpEngine):
         if stderr:
             raise Exception('An error has occurred from compressor. (%s)' % stderr.decode())
 
-        return stdout.decode()
+        if self.helper.system.py_version <= 2:
+            return stdout
+        else:
+            return stdout.decode()
 
     def _read(self, location):
         f = open(location, 'r')

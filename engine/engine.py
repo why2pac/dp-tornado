@@ -10,7 +10,7 @@ from .singleton import Singleton as dpSingleton
 from .loader import Loader as dpLoader
 
 
-class EngineSingleton(metaclass=dpSingleton):
+class EngineSingleton(dpSingleton):
     @property
     def config(self):
         if not hasattr(self, '_config'):

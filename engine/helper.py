@@ -10,5 +10,5 @@ from .singleton import Singleton as dpSingleton
 from .engine import Engine as dpEngine
 
 
-class Helper(dpEngine, metaclass=dpSingleton):
+class Helper(dpEngine, dpSingleton):
     pass

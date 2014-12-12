@@ -20,7 +20,11 @@ import multiprocessing
 import importlib
 
 import application
-import configparser
+
+try:
+    import configparser
+except:
+    import ConfigParser as configparser
 
 from engine.plugin.static import Compressor
 from engine.plugin.static import StaticURL

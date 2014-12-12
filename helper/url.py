@@ -10,6 +10,11 @@ from engine.helper import Helper as dpHelper
 
 import urllib
 
+try:
+    import urlparse
+except:
+    pass
+
 
 class UrlParse(object):
     def __init__(self, request=None, scheme='', netloc='', path='', params=None, query='', framgment=''):
@@ -32,13 +37,23 @@ class UrlParse(object):
 
 class UrlHelper(dpHelper):
     def quote(self, s):
-        return urllib.parse.quote_plus(s)
+        if self.helper.system.py_version <= 2:
+            return urllib.quote_plus(s)
+        else:
+            return urllib.parse.quote_plus(s)
 
     def build(self, url, params):
-        return '%s?%s' % (url, urllib.parse.urlencode(params))
+        if self.helper.system.py_version <= 2:
+            return '%s?%s' % (url, urllib.urlencode(params))
+        else:
+            return '%s?%s' % (url, urllib.parse.urlencode(params))
 
     def parse(self, request):
-        p = urllib.parse.urlparse(request.uri)
-        query = dict(urllib.parse.parse_qsl(p.query, keep_blank_values=True))
+        if self.helper.system.py_version <= 2:
+            p = urlparse.urlparse(request.uri)
+            query = dict(urlparse.parse_qsl(p.query, keep_blank_values=True))
+        else:
+            p = urllib.parse.urlparse(request.uri)
+            query = dict(urllib.parse.parse_qsl(p.query, keep_blank_values=True))
 
         return UrlParse(request, p.scheme, p.netloc, p.path, p.params, query, p.fragment)

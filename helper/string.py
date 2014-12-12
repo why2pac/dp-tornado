@@ -10,16 +10,21 @@ from __future__ import absolute_import
 from engine.helper import Helper as dpHelper
 
 import string
-import random
-import sys
 
-py_version = sys.version_info[0]
 unicode_type = type(u'')
 
 
 class StringHelper(dpHelper):
+    @property
+    def ascii_uppercase(self):
+        return string.ascii_uppercase
+
+    @property
+    def ascii_letters(self):
+        return string.ascii_letters
+
     def is_string(self, s):
-        if py_version == 2:
+        if self.helper.system.py_version <= 2:
             types = basestring,
         else:
             types = str,
@@ -27,7 +32,7 @@ class StringHelper(dpHelper):
         return True if isinstance(s, types) else False
 
     def random_string(self, length):
-        return ''.join(random.sample(string.ascii_letters, length))
+        return ''.join(self.helper.random.sample(self.ascii_letters, length))
 
     def username_from_email(self, email):
         pos = email.find('@')

@@ -15,7 +15,7 @@ import json
 class JsonHelper(dpHelper):
     def serialize(self, a, raise_exception=False):
         try:
-            return json.dumps(a)
+            return self.dumps(a)
         except Exception as e:
             if raise_exception:
                 raise e
@@ -24,9 +24,15 @@ class JsonHelper(dpHelper):
 
     def deserialize(self, a, raise_exception=False):
         try:
-            return json.loads(a)
+            return self.loads(a)
         except Exception as e:
             if raise_exception:
                 raise e
 
             return False
+
+    def dumps(self, a, separators=None):
+        return json.dumps(a, separators=separators)
+
+    def loads(self, a):
+        return json.loads(a)

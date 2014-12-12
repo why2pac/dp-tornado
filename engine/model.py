@@ -40,7 +40,7 @@ class InValueModelConfig(object):
                % (self.driver, self.user, self.password, self.host, self.port, self.database, self.path, self.pure)
 
 
-class ModelSingleton(dpEngine, metaclass=dpSingleton):
+class ModelSingleton(dpEngine, dpSingleton):
     _lock = threading.Lock()
 
     @property

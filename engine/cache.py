@@ -100,7 +100,7 @@ class Cache(dpEngine):
 
         if not key in self.pools:
             if conf.driver == 'redis':
-                from .driver.redis import RedisCacheDriver as dpRedisCacheDriver
+                from .driver.redis_driver import RedisCacheDriver as dpRedisCacheDriver
 
                 self.pools[key] = dpRedisCacheDriver.getpool(
                     key,
@@ -111,14 +111,14 @@ class Cache(dpEngine):
                     conf.password)
 
             elif conf.driver == 'memory':
-                from .driver.memory import MemoryCacheDriver as dpMemoryCacheDriver
+                from .driver.memory_driver import MemoryCacheDriver as dpMemoryCacheDriver
 
                 self.pools[key] = dpMemoryCacheDriver.getpool(
                     key
                 )
 
             elif conf.driver == 'sqlite':
-                from .driver.sqlite import SqliteCacheDriver as dpSqliteCacheDriver
+                from .driver.sqlite_driver import SqliteCacheDriver as dpSqliteCacheDriver
 
                 self.pools[key] = dpSqliteCacheDriver.getpool(
                     conf

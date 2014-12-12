@@ -18,3 +18,9 @@ class RandomHelper(dpHelper):
 
     def choice(self, seq):
         return random.choice(seq)
+
+    def numeric(self, length=6):
+        return random.randint(10 ** (length - 1), (10 ** length) - 1)
+
+    def sample(self, population, k):
+        return random.sample(population, k)

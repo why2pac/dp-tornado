@@ -9,10 +9,10 @@
 import logging
 import traceback
 
-from .singleton import Singleton
+from .singleton import Singleton as dpSingleton
 
 
-class Logger(object, metaclass=Singleton):
+class Logger(dpSingleton):
     def __init__(self, engine=None):
         self.engine = engine
 

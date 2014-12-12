@@ -12,7 +12,8 @@ import smtplib
 
 
 class MailSender(object):
-    def __init__(self, host=None, port=None, userid=None, password=None, ehlo=None, tls=False):
+    def __init__(self, e, host=None, port=None, userid=None, password=None, ehlo=None, tls=False):
+        self.e = e
         self.host = host
         self.port = port
         self.userid = userid
@@ -40,7 +41,11 @@ class MailSender(object):
         if self.connected:
             from email.mime.text import MIMEText
 
-            msg = MIMEText('%s\n' % content)
+            if self.e.helper.system.py_version <= 2:
+                msg = MIMEText('%s\n' % content, 'html' if html else 'plain', 'UTF-8')
+            else:
+                msg = MIMEText('%s\n' % content)
+
             msg['Subject'] = subject
             msg['From'] = from_user
             msg['To'] = to_user
@@ -48,7 +53,10 @@ class MailSender(object):
             if html:
                 msg['Content-Type'] = 'text/html; charset=utf-8'
 
-            self.connection.send_message(msg)
+            if self.e.helper.system.py_version <= 2:
+                self.connection.sendmail(from_user, to_user, msg.as_string())
+            else:
+                self.connection.send_message(msg)
 
         return False
 
@@ -62,7 +70,7 @@ class MailSender(object):
 class MailHelper(dpHelper):
     def send(self, to_user, subject, content, from_user=None, cc=None, attach=None,
              host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True):
-        s = MailSender(host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
+        s = MailSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
         s.connect()
         s.send(subject=subject, content=content, from_user=from_user, to_user=to_user, html=html)
         s.quit()

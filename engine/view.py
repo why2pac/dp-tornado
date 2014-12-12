@@ -6,10 +6,13 @@
 #
 
 
-from .singleton import Singleton
+from .singleton import Singleton as dpSingleton
+from .engine import Engine as dpEngine
+
+engine = dpEngine()
 
 
-class View(object, metaclass=Singleton):
+class View(dpSingleton):
     @staticmethod
     def render(controller, template_name, kwargs=None):
         if kwargs:
@@ -19,10 +22,16 @@ class View(object, metaclass=Singleton):
 
     @staticmethod
     def render_string(controller, template_name, kwargs=None):
-        if kwargs:
-            return str(controller.parent.render_string(template_name, **kwargs), 'UTF-8')
+        if engine.helper.system.py_version <= 2:
+            if kwargs:
+                return engine.helper.string.to_str(controller.parent.render_string(template_name, **kwargs))
+            else:
+                return engine.helper.string.to_str(controller.parent.render_string(template_name))
         else:
-            return str(controller.parent.render_string(template_name), 'UTF-8')
+            if kwargs:
+                return str(controller.parent.render_string(template_name, **kwargs), 'UTF-8')
+            else:
+                return str(controller.parent.render_string(template_name), 'UTF-8')
 
     @staticmethod
     def write(controller, chunk):

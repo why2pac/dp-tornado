@@ -39,15 +39,18 @@ class Pagination(tornado.web.UIModule, dpEngine):
         url = uri.path
         params = uri.query
 
-        last_page = self.helper.math.ceil(total_count / rpp)
+        last_page = self.helper.math.ceil(total_count * 1.0 / rpp * 1.0)
 
         if page < 1:
             page = 1
         elif page > last_page:
             page = last_page
 
-        current_block = self.helper.math.ceil(page / rpb)
-        last_block = self.helper.math.ceil(last_page / rpb)
+        current_block = int(self.helper.math.ceil(page * 1.0 / rpb * 1.0))
+        last_block = int(self.helper.math.ceil(last_page * 1.0 / rpb * 1.0))
+
+        current_block = int(current_block)
+        last_block = int(last_block)
 
         output = ''
         output = '%s<%s class="%s">' % (output, self.region_tag, self.region_class)

@@ -15,13 +15,13 @@ import datetime
 
 class DatetimeHelper(dpHelper):
     def current_time(self):
-        return int(time.time())
+        return self.helper.numeric.long(time.time())
 
     def time(self, dt=None):
         return self.current_time() if dt is None else self.timestamp_from_datetime(dt, False)
 
     def current_time_millis(self):
-        return int(round(time.time() * 1000))
+        return self.helper.numeric.long(round(time.time() * 1000))
 
     def mtime(self, dt=None):
         return self.current_time_millis() if dt is None else self.timestamp_from_datetime(dt, True)
@@ -112,7 +112,7 @@ class DatetimeHelper(dpHelper):
 
     def datetime(self, ts=None):
         if ts:  # from timestamp
-            ts = int(ts)
+            ts = self.helper.numeric.long(ts)
 
             if ts > 9999999999:  # with microseconds
                 return datetime.datetime.fromtimestamp(ts // 1000).replace(microsecond=ts % 1000 * 1000)
@@ -128,7 +128,7 @@ class DatetimeHelper(dpHelper):
         return self.mktime(dst.year, dst.month, dst.day, dst.hour, 0, 0, millisecs=True) - from_time
 
     def secs_to_next_hour(self, from_time=None):
-        return int(self.millisecs_to_next_hour(from_time=from_time) / 1000)
+        return self.helper.numeric.long(self.millisecs_to_next_hour(from_time=from_time) / 1000)
 
     def millisecs_to_tomorrow(self, from_time=None):
         dst = self.today() + self.timedelta(days=1)
@@ -137,16 +137,16 @@ class DatetimeHelper(dpHelper):
         return self.mktime(dst.year, dst.month, dst.day, 0, 0, 0, millisecs=True) - from_time
 
     def secs_to_tomorrow(self, from_time=None):
-        return int(self.millisecs_to_tomorrow(from_time=from_time) / 1000)
+        return self.helper.numeric.long(self.millisecs_to_tomorrow(from_time=from_time) / 1000)
 
     def timedelta(self, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
         return datetime.timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
 
     def mktime(self, year=1970, month=1, day=1, hour=0, mins=0, sec=0, millisecs=False):
-        return int(time.mktime((year, month, day, hour, mins, sec, 0, 0, 0))) * (1000 if millisecs else 1)
+        return self.helper.numeric.long(time.mktime((year, month, day, hour, mins, sec, 0, 0, 0))) * (1000 if millisecs else 1)
 
     def timestamp_from_datetime(self, dt, millisecs=False):
         if not isinstance(dt, datetime.datetime):
             return None
 
-        return int(dt.timestamp() * (1000 if millisecs else 1))
+        return self.helper.numeric.long(dt.timestamp() * (1000 if millisecs else 1))

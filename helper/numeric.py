@@ -10,14 +10,11 @@ from __future__ import absolute_import
 from engine.helper import Helper as dpHelper
 
 import re
-import sys
-
-py_version = sys.version_info[0]
 
 
 class NumericHelper(dpHelper):
     def extract_numbers(self, string):
-        if py_version == 2:
+        if self.helper.system.py_version <= 2:
             types = basestring,
         else:
             types = str,
@@ -58,3 +55,15 @@ class NumericHelper(dpHelper):
             s = s[:-3]
 
         return lhs + splt[:-1] + rhs
+
+    def int(self, a):
+        if self.helper.system.py_version <= 2:
+            return int(a)
+        else:
+            return int(a)
+
+    def long(self, a):
+        if self.helper.system.py_version <= 2:
+            return long(a)
+        else:
+            return int(a)

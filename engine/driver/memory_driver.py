@@ -6,7 +6,7 @@
 #
 
 
-from .sqlite import SqliteCacheDriver as dpSqliteCacheDriver
+from .sqlite_driver import SqliteCacheDriver as dpSqliteCacheDriver
 
 
 class MemoryCacheDriver(dpSqliteCacheDriver):

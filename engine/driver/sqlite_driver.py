@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 #   dp for Tornado
-#      YoungYong Park (youngyongpark@gmail.com)
-#      2014.10.23
+#     YoungYong Park (youngyongpark@gmail.com)
+#     2014.10.23
 #
 
+
+import cPickle
 
 from engine.cache import CacheDriver as dpCacheDriver
 from ..model import ModelSingleton as dpModelSingleton
 from ..engine import Engine as dpEngine
 from sqlalchemy.exc import OperationalError
+
+class _Empty(): pass
+class _Pickled(): pass
+
+pickled = _Pickled()
+empty = _Empty()
 
 
 class SqliteCacheDriver(dpEngine, dpCacheDriver):
@@ -48,18 +56,22 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
     def _types():
         return {
             1: str,
-            2: int,
-            3: list,
-            4: tuple,
-            5: dict
+            2: unicode,
+            3: int,
+            4: long,
+            5: float,
+            6: list,
+            7: tuple,
+            8: dict,
+            9: pickled
         }
 
     @staticmethod
-    def _types_required_json():
+    def _types_required_serialize():
         return {
-            3: list,
-            4: tuple,
-            5: dict
+            6: list,
+            7: tuple,
+            8: dict
         }
 
     @staticmethod
@@ -107,11 +119,11 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                 '   * '
                 'FROM {table_name} WHERE key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
                 key, self._config_dsn, cache=True)
-        except OperationalError as e:
+        except OperationalError, e:
             # Retry (hack for sqlite database locking)
             if retry_count:
                 import time
-                time.sleep(0.05)
+                time.sleep(0.02)
 
                 try:
                     self.create_table(self._config_dsn)
@@ -131,13 +143,44 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             if result['expire_at'] and result['expire_at'] < self.helper.datetime.current_time():
                 return None
             else:
-                if result['type'] in SqliteCacheDriver._types_required_json():
-                    try:
-                        import json
-                        return json.loads(result['val'])
+                type = self._key_to_type(result['type'])
 
-                    except ValueError:
-                        return False
+                if result['type'] in self._types_required_serialize():
+                    try:
+                        ret = self.helper.json.deserialize(result['val'], raise_exception=True)
+
+                        if type is tuple:
+                            return tuple(ret)
+
+                        else:
+                            return ret
+
+                    except:  # Failed to json deserialization
+                        self.logger.exception(result)
+                        return None
+
+                elif type is pickled:
+                    try:
+                        return cPickle.loads(self.helper.string.to_str(result['val']))
+
+                    except:  # Failed to unpickling
+                        self.logger.exception(result)
+                        return None
+
+                elif type is str:
+                    return self.helper.string.to_str(result['val'])
+
+                elif type is unicode:
+                    return self.helper.string.to_unicode(result['val'])
+
+                elif type is int:
+                    return int(result['val'])
+
+                elif type is long:
+                    return long(result['val'])
+
+                elif type is float:
+                    return float(result['val'])
 
                 else:
                     return result['val']
@@ -149,11 +192,30 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         if expire_in is not None:
             expire_in = self.helper.datetime.current_time() + expire_in
 
-        val_type = SqliteCacheDriver._val_to_type(val)
+        type = self._val_to_type(val)
+        val_serialized = empty
 
-        if isinstance(val, (list, tuple, dict)):
-            import json
-            val = json.dumps(val, separators=(',', ':'))
+        if not type or type in self._types_required_serialize():
+            try:
+                try:
+                    if type:
+                        val_serialized = self.helper.json.serialize(val, raise_exception=True)
+
+                    else:
+                        raise
+
+                except:
+                    val_serialized = cPickle.dumps(val)
+                    type = self._type_to_key(pickled)
+
+            except:
+                pass
+
+        else:
+            val_serialized = str(val)
+
+        if val_serialized == empty:
+            return False
 
         try:
             if expire_in:
@@ -161,14 +223,14 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                     'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
                     '   VALUES (?, ?, ?, ?)'
                     .replace('{table_name}', self._table_name(self._config_dsn)),
-                    (key, val, val_type, expire_in), self._config_dsn, cache=True)
+                    (key, val_serialized, type, expire_in), self._config_dsn, cache=True)
 
             else:
                 ret = dpModelSingleton().execute(
                     'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
                     '   VALUES (?, ?, ?, (SELECT expire_at FROM {table_name} WHERE key = ?))'
                     .replace('{table_name}', self._table_name(self._config_dsn)),
-                    (key, val, val_type, key), self._config_dsn, cache=True)
+                    (key, val_serialized, type, key), self._config_dsn, cache=True)
 
             return ret
 
@@ -176,7 +238,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             # Retry (hack for sqlite database locking)
             if retry_count:
                 import time
-                time.sleep(0.05)
+                time.sleep(0.02)
 
                 try:
                     self.create_table(self._config_dsn)

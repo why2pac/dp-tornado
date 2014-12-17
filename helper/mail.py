@@ -41,11 +41,7 @@ class MailSender(object):
         if self.connected:
             from email.mime.text import MIMEText
 
-            if self.e.helper.system.py_version <= 2:
-                msg = MIMEText('%s\n' % content, 'html' if html else 'plain', 'UTF-8')
-            else:
-                msg = MIMEText('%s\n' % content)
-
+            msg = MIMEText('%s\n' % content, 'html' if html else 'plain', 'UTF-8')
             msg['Subject'] = subject
             msg['From'] = from_user
             msg['To'] = to_user

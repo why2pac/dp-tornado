@@ -142,12 +142,17 @@ class StaticURL(tornado.web.UIModule):
                 cached = self.handler.cache.get(cache_key, dsn_or_conn=StaticURL.cache_config)
 
                 if not cached:
-                    c = self.compressor.compress('%s/%s' % (self.static_path, path))
-                    g = self.compressor.generate(c, self.combined_path, path)
-                    x = '%s%s' % (self.combined_prefix, g)
+                    if self.handler.settings.get('debug'):
+                        h = self.handler.helper.datetime.current_time()
+                        h = self.handler.helper.crypto.md5_hash('%s / %s' % (static_path, h))
+                        x = '%s?%s' % (static_path, h)
+
+                    else:
+                        c = self.compressor.compress('%s/%s' % (self.static_path, path))
+                        g = self.compressor.generate(c, self.combined_path, path)
+                        x = '%s%s' % (self.combined_prefix, g)
 
                     self.handler.cache.set(cache_key, x, dsn_or_conn=StaticURL.cache_config)
-
                     StaticURL.compiled[static_path] = x
 
                 else:

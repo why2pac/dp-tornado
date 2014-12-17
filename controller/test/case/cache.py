@@ -19,8 +19,16 @@ except:
         def __str__(self):
             return str(self.object_id)
 
+        def __eq__(self, other):
+            return True if self.object_id == other.object_id else False
+
         def __cmp__(self, other):
             return 0 if self.object_id == other.object_id else 1
+
+try:
+    long = long
+except:
+    long = int
 
 
 class CacheController(dpController, dpModel):
@@ -39,11 +47,14 @@ class CacheController(dpController, dpModel):
             ('ObjectId_dict_value', {'x':'b', 'd': 345, 'l': ObjectId('5490160353286b8984a956e4')})
         )
 
+        pm = self.helper.performance.start()
+
         for k in x:
             key = k[0]
             val = k[1]
 
-            print 'Key : %s -> Val : %s (%s)' % (key, val, type(val))
+            print('Key : %s -> Val : %s (%s)' % (key, val, type(val)))
+
             self.cache.set(key, val, 'test.case.cache/memory')
             get = self.cache.get(key, 'test.case.cache/memory')
             get_type = type(self.cache.get(key, 'test.case.cache/memory'))
@@ -51,6 +62,6 @@ class CacheController(dpController, dpModel):
             assert(get_type == type(val))
             assert(val == get)
 
-            print '------------'
+            print('------------')
 
         self.finish('test > case > cache controller.')

@@ -6,7 +6,20 @@
 #
 
 
-import cPickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+try:
+    unicode = unicode
+except NameError:
+    unicode = str
+
+try:
+    long = long
+except NameError:
+    long = int
 
 from engine.cache import CacheDriver as dpCacheDriver
 from ..model import ModelSingleton as dpModelSingleton
@@ -119,7 +132,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                 '   * '
                 'FROM {table_name} WHERE key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
                 key, self._config_dsn, cache=True)
-        except OperationalError, e:
+        except OperationalError as e:
             # Retry (hack for sqlite database locking)
             if retry_count:
                 import time
@@ -161,7 +174,10 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
                 elif type is pickled:
                     try:
-                        return cPickle.loads(self.helper.string.to_str(result['val']))
+                        if self.helper.system.py_version <= 2:
+                            return pickle.loads(self.helper.string.to_str(result['val']))
+                        else:
+                            return pickle.loads(result['val'])
 
                     except:  # Failed to unpickling
                         self.logger.exception(result)
@@ -202,10 +218,10 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                         val_serialized = self.helper.json.serialize(val, raise_exception=True)
 
                     else:
-                        raise
+                        raise Exception()
 
                 except:
-                    val_serialized = cPickle.dumps(val)
+                    val_serialized = pickle.dumps(val)
                     type = self._type_to_key(pickled)
 
             except:

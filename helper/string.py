@@ -78,7 +78,10 @@ class StringHelper(dpHelper):
             s = str(s)
 
         if type(s) == unicode_type:
-            return s.encode('UTF-8')
+            if self.helper.system.py_version <= 2:
+                return s.encode('UTF-8')
+            else:
+                return s
         else:
             return s
 

@@ -24,3 +24,6 @@ class RandomHelper(dpHelper):
 
     def sample(self, population, k):
         return random.sample(population, k)
+
+    def uuid(self):  # make a UUID based on the host ID and current time
+        return str(uuid.uuid1())

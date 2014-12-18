@@ -34,22 +34,6 @@ class StringHelper(dpHelper):
     def random_string(self, length):
         return ''.join(self.helper.random.sample(self.ascii_letters, length))
 
-    def username_from_email(self, email):
-        pos = email.find('@')
-
-        if pos != -1:
-            return email[:pos]
-        else:
-            return None
-
-    def check_username_length_from_email(self, email, length):
-        username = self.username_from_email(email)
-
-        if username:
-            return True if len(username) <= length else False
-        else:
-            return False
-
     def check_exist_repeated_text(self, s, criteria=3):
         if not self.is_string(s):
             return None

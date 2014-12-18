@@ -11,7 +11,7 @@ from engine.helper import Helper as dpHelper
 import smtplib
 
 
-class MailSender(object):
+class SmtpSender(object):
     def __init__(self, e, host=None, port=None, userid=None, password=None, ehlo=None, tls=False):
         self.e = e
         self.host = host
@@ -63,10 +63,10 @@ class MailSender(object):
         return False
 
 
-class MailHelper(dpHelper):
+class SmtpHelper(dpHelper):
     def send(self, to_user, subject, content, from_user=None, cc=None, attach=None,
              host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True):
-        s = MailSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
+        s = SmtpSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
         s.connect()
         s.send(subject=subject, content=content, from_user=from_user, to_user=to_user, html=html)
         s.quit()

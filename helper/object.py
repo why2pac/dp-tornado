@@ -8,6 +8,11 @@
 
 from engine.helper import Helper as dpHelper
 
+try:
+    import cPickle as cpickle
+except:
+    import cpickle
+
 
 class _DynamicObject(object):
     def __init__(self):
@@ -75,3 +80,15 @@ class _DynamicObject(object):
 class ObjectHelper(dpHelper):
     def create(self):
         return _DynamicObject()
+
+    def pickle(self, o):
+        try:
+            return cpickle.dumps(o)
+        except:
+            return False
+
+    def unpickle(self, o):
+        try:
+            return cpickle.loads(o)
+        except:
+            return False

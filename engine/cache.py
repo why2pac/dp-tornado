@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 #   dp for Tornado
-#      YoungYong Park (youngyongpark@gmail.com)
-#      2014.10.23
+#     YoungYong Park (youngyongpark@gmail.com)
+#     2014.10.23
 #
 
 
@@ -33,14 +33,47 @@ class CacheDriver(object):
     def getconn(self):
         pass
 
-    def get(self, key):
-        pass
+    def get(self, key, expire_in):
+        raise NotImplementedError
 
     def set(self, key, val, expire_in):
-        pass
+        raise NotImplementedError
+
+    def delete(self, key):
+        raise NotImplementedError
 
     def increase(self, key, amount, expire_in):
-        pass
+        raise NotImplementedError
+
+    def queue(self, key, start, stop):
+        raise NotImplementedError
+
+    def enqueue(self, key, value, expire_in):
+        raise NotImplementedError
+
+    def dequeue(self, key):
+        raise NotImplementedError
+
+    def stack(self, key, start, stop):
+        raise NotImplementedError
+
+    def push(self, key, value, expire_in):
+        raise NotImplementedError
+
+    def pop(self, key):
+        raise NotImplementedError
+
+    def list(self, key):
+        raise NotImplementedError
+
+    def len(self, key):
+        raise NotImplementedError
+
+    def add(self, key, value, expire_in):
+        raise NotImplementedError
+
+    def delete_value(self, key, value):
+        raise NotImplementedError
 
 
 class Cache(dpEngine):
@@ -167,11 +200,11 @@ class Cache(dpEngine):
 
         return driver.getconn()
 
-    def get(self, key, dsn_or_conn):
+    def get(self, key, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.get(key)
+        return conn.get(key, expire_in)
 
     def set(self, key, val, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
@@ -180,9 +213,75 @@ class Cache(dpEngine):
         assert(expire_in is None or int(expire_in) >= 0)
         return conn.set(key, val, expire_in)
 
+    def delete(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.delete(key)
+
     def increase(self, key, amount, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         assert(expire_in is None or int(expire_in) >= 0)
         return conn.increase(key, amount, expire_in)
+
+    def queue(self, key, start, stop, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.queue(key, start, stop)
+
+    def enqueue(self, key, value, dsn_or_conn, expire_in=None):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.enqueue(key, value, expire_in)
+
+    def dequeue(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.dequeue(key)
+
+    def stack(self, key, start, stop, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.stack(key, start, stop)
+
+    def push(self, key, value, dsn_or_conn, expire_in=None):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.push(key, value, expire_in)
+
+    def pop(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.pop(key)
+
+    def list(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.list(key)
+
+    def len(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.len(key)
+
+    def add(self, key, value, dsn_or_conn, expire_in=None):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.add(key, value, expire_in)
+
+    def delete_value(self, key, value, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.delete_value(key, value)

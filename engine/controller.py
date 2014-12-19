@@ -44,7 +44,7 @@ class Controller(dpEngine):
 
     def get_user_agent(self, parsed=True):
         if not parsed:
-            return self.parent.request.headers["User-Agent"]
+            return self.parent.request.headers['User-Agent'] if 'User-Agent' in self.parent.request.headers else ''
 
         else:
             from .plugin import http_agent_parser

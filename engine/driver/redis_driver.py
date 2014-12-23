@@ -98,8 +98,20 @@ class RedisCacheDriver(dpCacheDriver):
     def list(self, key):
         return self.conn.smembers(key)
 
-    def len(self, key):
-        return self.conn.scard(key)
+    def len(self, key, expire_in):
+        if expire_in is None:
+            return self.conn.scard(key)
+
+        else:
+            p = self.conn.pipeline()
+            p.scard(key)
+            p.expire(key, int(expire_in))
+            ret = p.execute()
+
+            if ret:
+                return ret[0]
+            else:
+                return False
 
     def add(self, key, value, expire_in):
         if expire_in is None:

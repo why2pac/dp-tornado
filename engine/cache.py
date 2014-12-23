@@ -66,7 +66,7 @@ class CacheDriver(object):
     def list(self, key):
         raise NotImplementedError
 
-    def len(self, key):
+    def len(self, key, expire_in):
         raise NotImplementedError
 
     def add(self, key, value, expire_in):
@@ -268,11 +268,11 @@ class Cache(dpEngine):
 
         return conn.list(key)
 
-    def len(self, key, dsn_or_conn):
+    def len(self, key, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.len(key)
+        return conn.len(key, expire_in)
 
     def add(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

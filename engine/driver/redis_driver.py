@@ -128,3 +128,6 @@ class RedisCacheDriver(dpCacheDriver):
             return self.conn.srem(key, value)
         else:
             return self.conn.spop(key)
+
+    def publish(self, channel, message):
+        return self.conn.publish(channel, message)

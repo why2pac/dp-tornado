@@ -75,6 +75,9 @@ class CacheDriver(object):
     def delete_value(self, key, value):
         raise NotImplementedError
 
+    def publish(self, channel, message):
+        raise NotImplementedError
+
 
 class Cache(dpEngine):
     server_startup_at = None
@@ -285,3 +288,9 @@ class Cache(dpEngine):
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.delete_value(key, value)
+
+    def publish(self, channel, message, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.publish(channel, message)

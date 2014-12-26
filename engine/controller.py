@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 #   dp for Tornado
-#      YoungYong Park (youngyongpark@gmail.com)
-#      2014.10.23
+#     YoungYong Park (youngyongpark@gmail.com)
+#     2014.10.23
 #
 
 
@@ -72,6 +72,9 @@ class Controller(dpEngine):
             os = '_o-%s-%s' % (os_name, os_version)
             os = os.lower().replace(' ', '-').replace('.', '-')
 
+            os_name = '_o-%s' % os_name
+            os_name = os_name.lower().replace(' ', '-').replace('.', '-')
+
             browser_name = ua['browser']['name'] if 'browser' in ua and 'name' in ua['browser'] else 'Unknown'
             browser_version = ua['browser']['version'] if 'browser' in ua and 'version' in ua['browser'] else 'Unknown'
 
@@ -92,6 +95,7 @@ class Controller(dpEngine):
             ua['platform_str'] = platform
             ua['platform_major_str'] = platform_major
             ua['os_str'] = os
+            ua['os_name_str'] = os_name
             ua['browser_str'] = browser
             ua['browser_major_str'] = browser_major
             ua['browser_type_str'] = browser_type

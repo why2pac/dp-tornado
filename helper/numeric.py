@@ -67,3 +67,33 @@ class NumericHelper(dpHelper):
             return long(a)
         else:
             return int(a)
+
+    @property
+    def xxx(self):
+        return 'ABtQR5JxfghijN_qrb4KSy9-Uuvw6ZVcLnpMFGkeTPd3WXYEHCDma78sz12'
+
+    def to_xxx(self, x):
+        __ = self.xxx
+        _ = ''
+
+        while (True):
+            if x <= 0:
+                break
+
+            k = x % len(__)
+            _ = '%s%s' % (__[k:k+1], _)
+            x = self.long(x / len(__))
+
+        return _
+
+    def from_xxx(self, x):
+        __ = self.xxx
+        _ = 0
+        c = 0
+
+        for i in reversed(str(x)):
+            i = __.find(i)
+            _ += i * (len(__) ** c)
+            c += 1
+
+        return _

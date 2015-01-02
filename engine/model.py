@@ -231,6 +231,17 @@ class ModelSingleton(dpEngine, dpSingleton):
 
         return rows
 
+    def scalar(self, sql, bind=None, dsn_or_conn=None, cache=False):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
+        conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
+        result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
+        value = result.scalar() if result else None
+
+        if config_dsn:
+            conn.close()
+
+        return value
+
 
 class ModelProxy(object):
     def __init__(self, connection, transaction):
@@ -263,6 +274,9 @@ class ModelProxy(object):
     def rows(self, sql, bind=None, dsn_or_conn=None):
         return ModelSingleton().rows(sql, bind, dsn_or_conn or self)
 
+    def scalar(self, sql, bind=None, dsn_or_conn=None):
+        return ModelSingleton().scalar(sql, bind, dsn_or_conn or self)
+
 
 class Model(dpEngine, dpLoader):
     def _getconn(self, config_dsn):
@@ -288,3 +302,6 @@ class Model(dpEngine, dpLoader):
 
     def rows(self, sql, bind=None, dsn_or_conn=None):
         return ModelSingleton().rows(sql, bind, dsn_or_conn)
+
+    def scalar(self, sql, bind=None, dsn_or_conn=None):
+        return ModelSingleton().scalar(sql, bind, dsn_or_conn)

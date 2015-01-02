@@ -8,7 +8,10 @@
 
 from engine.helper import Helper as dpHelper
 
-import urllib
+try:
+    import urllib.parse as _parse
+except:
+    import urllib as _parse
 
 try:
     import urlparse
@@ -38,22 +41,22 @@ class UrlParse(object):
 class UrlHelper(dpHelper):
     def quote(self, s):
         if self.helper.system.py_version <= 2:
-            return urllib.quote_plus(s)
+            return _parse.quote_plus(s)
         else:
-            return urllib.parse.quote_plus(s)
+            return _parse.quote_plus(s)
 
     def build(self, url, params):
         if self.helper.system.py_version <= 2:
-            return '%s?%s' % (url, urllib.urlencode(params))
+            return '%s?%s' % (url, _parse.urlencode(params))
         else:
-            return '%s?%s' % (url, urllib.parse.urlencode(params))
+            return '%s?%s' % (url, _parse.urlencode(params))
 
     def parse(self, request):
         if self.helper.system.py_version <= 2:
             p = urlparse.urlparse(request.uri)
             query = dict(urlparse.parse_qsl(p.query, keep_blank_values=True))
         else:
-            p = urllib.parse.urlparse(request.uri)
-            query = dict(urllib.parse.parse_qsl(p.query, keep_blank_values=True))
+            p = _parse.urlparse(request.uri)
+            query = dict(_parse.parse_qsl(p.query, keep_blank_values=True))
 
         return UrlParse(request, p.scheme, p.netloc, p.path, p.params, query, p.fragment)

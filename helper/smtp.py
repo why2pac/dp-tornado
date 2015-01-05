@@ -6,6 +6,7 @@
 #
 
 
+from __future__ import absolute_import
 from engine.helper import Helper as dpHelper
 
 import smtplib

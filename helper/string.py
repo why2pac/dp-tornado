@@ -77,6 +77,6 @@ class StringHelper(dpHelper):
             s = str(s)
 
         if type(s) != unicode_type:
-            return s.decode('unicode-escape')
+            return s.decode('UTF-8')
         else:
             return s

@@ -13,6 +13,9 @@ def trim(c, t):
     return t.strip()
 
 def nl2br(c, t, escape=True):
+    if not t:
+        return ''
+
     t = tornado.escape.xhtml_escape(t) if escape else t
     return t.replace('\r\n', '<br />').replace('\r', '<br />').replace('\n', '<br />')
 

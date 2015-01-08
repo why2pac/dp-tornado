@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 #   dp for Tornado
-#      YoungYong Park (youngyongpark@gmail.com)
-#      2014.11.11
+#     YoungYong Park (youngyongpark@gmail.com)
+#     2014.11.11
 #
 
 
@@ -34,5 +34,5 @@ class JsonHelper(dpHelper):
     def dumps(self, a, separators=None):
         return json.dumps(a, separators=separators)
 
-    def loads(self, a):
-        return json.loads(a)
+    def loads(self, a, encoding='utf8'):
+        return json.loads(a, encoding=encoding)

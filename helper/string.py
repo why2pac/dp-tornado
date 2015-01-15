@@ -23,6 +23,9 @@ class StringHelper(dpHelper):
     def ascii_letters(self):
         return string.ascii_letters
 
+    def is_str(self, s):
+        return self.is_string(s)
+
     def is_string(self, s):
         if self.helper.system.py_version <= 2:
             types = basestring,

@@ -20,8 +20,8 @@ except:
 
 
 class UrlParse(object):
-    def __init__(self, request=None, scheme='', netloc='', path='', params=None, query='', framgment=''):
-        if 'X-Proxy-Prefix' in request.headers:
+    def __init__(self, request=None, scheme='', netloc='', path='', params=None, query=None, framgment=''):
+        if request and 'X-Proxy-Prefix' in request.headers:
             if path.startswith(request.headers['X-Proxy-Prefix']):
                 path = path[(len(request.headers['X-Proxy-Prefix']) - 1):]
 
@@ -30,7 +30,7 @@ class UrlParse(object):
         self.netloc = netloc
         self.path = path
         self.params = params if params else {}
-        self.query = query
+        self.query = query or ''
         self.fragment = framgment
 
     def __str__(self):
@@ -52,11 +52,18 @@ class UrlHelper(dpHelper):
             return '%s?%s' % (url, _parse.urlencode(params))
 
     def parse(self, request):
+        if self.helper.string.is_str(request):
+            uri = self.helper.string.to_str(request)
+            request = None
+        else:
+            uri = request.uri
+            request = request
+
         if self.helper.system.py_version <= 2:
-            p = urlparse.urlparse(request.uri)
+            p = urlparse.urlparse(uri)
             query = dict(urlparse.parse_qsl(p.query, keep_blank_values=True))
         else:
-            p = _parse.urlparse(request.uri)
+            p = _parse.urlparse(uri)
             query = dict(_parse.parse_qsl(p.query, keep_blank_values=True))
 
         return UrlParse(request, p.scheme, p.netloc, p.path, p.params, query, p.fragment)

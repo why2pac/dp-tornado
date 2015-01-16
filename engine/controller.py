@@ -129,8 +129,12 @@ class Controller(dpEngine):
 
     def set_sessionid(self, sessionid=None):
         if not sessionid:
-            sessionid_from_cookie = self.get_secure_cookie('PSESSIONID')
-            sessionid = sessionid_from_cookie
+            try:
+                sessionid_from_cookie = self.get_secure_cookie('PSESSIONID')
+                sessionid = self.helper.string.to_str(sessionid_from_cookie)
+
+            except:
+                sessionid = None
 
         sessionid = sessionid or self.helper.crypto.md5_hash(self.helper.datetime.current_time_millis())
         self.set_secure_cookie('PSESSIONID', sessionid)

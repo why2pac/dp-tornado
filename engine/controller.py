@@ -133,6 +133,9 @@ class Controller(dpEngine):
                 sessionid_from_cookie = self.get_secure_cookie('PSESSIONID')
                 sessionid = self.helper.string.to_str(sessionid_from_cookie)
 
+                if not sessionid.isalnum():
+                    sessionid = None
+
             except:
                 sessionid = None
 

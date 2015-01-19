@@ -112,3 +112,6 @@ class CryptoHelper(dpHelper):
 
     def md5_hash(self, plain):
         return hashlib.md5(str(plain).encode()).hexdigest()
+
+    def sha224_hash(self, plain):
+        return hashlib.sha224(str(plain).encode()).hexdigest()

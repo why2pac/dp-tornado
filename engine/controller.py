@@ -139,7 +139,7 @@ class Controller(dpEngine):
             except:
                 sessionid = None
 
-        sessionid = sessionid or self.helper.crypto.md5_hash(self.helper.datetime.current_time_millis())
+        sessionid = sessionid or self.helper.crypto.sha224_hash(self.helper.datetime.current_time_millis())
         self.set_secure_cookie('PSESSIONID', sessionid)
         self._sessionid = sessionid
 

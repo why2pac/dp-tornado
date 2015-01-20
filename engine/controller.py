@@ -164,7 +164,12 @@ class Controller(dpEngine):
         else:
             return self.get_session_value(name)
 
-    def redirect(self, url, permanent=False, status=None):
+    def redirect(self, url, prefix=False, permanent=False, status=None):
+        if prefix:
+            if 'X-Proxy-Prefix' in self.request.headers:
+                if url.startswith(self.request.headers['X-Proxy-Prefix']):
+                    url = url[(len(self.request.headers['X-Proxy-Prefix']) - 1):]
+
         self.parent.redirect(url, permanent, status)
 
     def render(self, template_name, kwargs=None):

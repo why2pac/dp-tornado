@@ -6,6 +6,8 @@
 #
 
 
+import tornado.options
+
 from .engine import Engine as dpEngine
 from .model import InValueModelConfig as dpInValueModelConfig
 
@@ -29,7 +31,8 @@ class Controller(dpEngine):
         self.put_requested = False
 
         self._sessionid = None
-        self._sessiondb = dpInValueModelConfig(driver='sqlite', database='session')
+        self._sessiondb = tornado.options.options.session_dsn or \
+                          dpInValueModelConfig(driver='sqlite', database='session')
 
     def initialize(self, prefix, parent=None):
         self.prefix = prefix

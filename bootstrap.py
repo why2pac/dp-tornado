@@ -74,6 +74,7 @@ if __name__ == '__main__':
     tornado.options.define('debug', default=get_config(config, 'debug', default=False))
     tornado.options.define('gzip', default=get_config(config, 'gzip', default=True))
     tornado.options.define('crypto_key', default=get_config(config, 'key', section='crypto', default='CRy$t0-$CR@T'))
+    tornado.options.define('session_dsn', default=get_config(config, 'dsn', section='session', default=None))
 
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')

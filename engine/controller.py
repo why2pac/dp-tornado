@@ -11,6 +11,8 @@ import tornado.options
 from .engine import Engine as dpEngine
 from .model import InValueModelConfig as dpInValueModelConfig
 
+session_default_expire_in = tornado.options.options.session_expire_in or 7200
+
 
 class Controller(dpEngine):
     def __init__(self, application, request, **kwargs):
@@ -154,15 +156,15 @@ class Controller(dpEngine):
 
         return self.cache.get(key, self._sessiondb)
 
-    def set_session_value(self, name, value):
+    def set_session_value(self, name, value, expire_in=session_default_expire_in):
         sessionid = self.get_sessionid()
         key = '%s_%s' % (sessionid, name)
 
-        return self.cache.set(key, value, self._sessiondb, expire_in=3600*24*31)
+        return self.cache.set(key, value, self._sessiondb, expire_in=expire_in)
 
-    def session(self, name, value=None):
+    def session(self, name, value=None, expire_in=session_default_expire_in):
         if value is not None:
-            return self.set_session_value(name, value)
+            return self.set_session_value(name, value, expire_in=expire_in)
 
         else:
             return self.get_session_value(name)

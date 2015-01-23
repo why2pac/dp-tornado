@@ -110,8 +110,23 @@ class DatetimeHelper(dpHelper):
 
         return self.datetime(d).isoweekday() if isoweekday else self.datetime(d).weekday()
 
-    def datetime(self, ts=None):
-        if ts:  # from timestamp
+    def datetime(self, ts=None, yyyymmdd=None):
+        if yyyymmdd:
+            yyyymmdd = int(yyyymmdd)
+
+            if yyyymmdd >= 19700000 and yyyymmdd <= 99999999:
+                yyyymmdd = str(yyyymmdd)
+                y = int(yyyymmdd[0:4])
+                m = int(yyyymmdd[4:6])
+                d = int(yyyymmdd[6:8])
+                v = self.datetime(self.mktime(y, m , d))
+
+                if v.year == y and v.month == m and v.day == d:
+                    return v
+
+            raise ValueError
+
+        elif ts:  # from timestamp
             ts = self.helper.numeric.long(ts)
 
             if ts > 9999999999:  # with microseconds

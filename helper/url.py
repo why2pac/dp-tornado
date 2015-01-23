@@ -29,8 +29,8 @@ class UrlParse(object):
         self.scheme = scheme
         self.netloc = netloc
         self.path = path
-        self.params = params if params else {}
-        self.query = query or ''
+        self.params = params or {}
+        self.query = query or {}
         self.fragment = framgment
 
     def __str__(self):

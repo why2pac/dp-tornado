@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 #   dp for Tornado
-#      YoungYong Park (youngyongpark@gmail.com)
-#      2014.12.17
+#     YoungYong Park (youngyongpark@gmail.com)
+#     2014.12.17
 #
 
 

@@ -110,16 +110,20 @@ class DatetimeHelper(dpHelper):
 
         return self.datetime(d).isoweekday() if isoweekday else self.datetime(d).weekday()
 
-    def datetime(self, ts=None, yyyymmdd=None):
+    def datetime(self, ts=None, yyyymmdd=None, hhiiss='000000'):
         if yyyymmdd:
             yyyymmdd = int(yyyymmdd)
 
             if yyyymmdd >= 19700000 and yyyymmdd <= 99999999:
                 yyyymmdd = str(yyyymmdd)
+                hhiiss = str(hhiiss)
                 y = int(yyyymmdd[0:4])
                 m = int(yyyymmdd[4:6])
                 d = int(yyyymmdd[6:8])
-                v = self.datetime(self.mktime(y, m , d))
+                h = int(hhiiss[0:2])
+                i = int(hhiiss[2:4])
+                s = int(hhiiss[4:6])
+                v = self.datetime(self.mktime(y, m , d, h, i, s))
 
                 if v.year == y and v.month == m and v.day == d:
                     return v

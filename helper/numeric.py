@@ -16,8 +16,13 @@ class NumericHelper(dpHelper):
     def extract_numbers(self, string):
         if self.helper.system.py_version <= 2:
             types = basestring,
+            types_num = (int, long)
         else:
             types = str,
+            types_num = (int, )
+
+        if isinstance(string, types_num):
+            return str(string)
 
         if not isinstance(string, types):
             return None

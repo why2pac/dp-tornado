@@ -166,35 +166,6 @@ def validate_email(email, check_mx=False, verify=False, debug=False, smtp_timeou
         return None
     return True
 
-if __name__ == "__main__":
-    import time
-    while True:
-        email = raw_input('Enter email for validation: ')
-
-        mx = raw_input('Validate MX record? [yN] ')
-        if mx.strip().lower() == 'y':
-            mx = True
-        else:
-            mx = False
-
-        validate = raw_input('Try to contact server for address validation? [yN] ')
-        if validate.strip().lower() == 'y':
-            validate = True
-        else:
-            validate = False
-
-        logging.basicConfig()
-
-        result = validate_email(email, mx, validate, debug=True, smtp_timeout=1)
-        if result:
-            print "Valid!"
-        elif result is None:
-            print "I'm not sure."
-        else:
-            print "Invalid!"
-
-        time.sleep(1)
-
 
 # import sys
 

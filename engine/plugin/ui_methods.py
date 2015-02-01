@@ -29,5 +29,17 @@ def hhiiss(c, t, s=':'):
     return c.helper.datetime.hhiiss(s=s, d=t)
 
 
+def hhii(c, t, s=':'):
+    return c.helper.datetime.hhii(s=s, d=t)
+
+
+def weekday(c, t):
+    return c.helper.datetime.weekday(d=t)
+
+
 def request_uri(c, s=False, d=' ', p='_'):
     return ('%s%s' % (d, p)).join(c.request.uri.split('/')).strip() if s else c.request.uri
+
+
+def i18n(c):
+    return c.helper.i18n

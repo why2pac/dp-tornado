@@ -76,6 +76,12 @@ class DatetimeHelper(dpHelper):
 
         return '%02d%s%02d%s%02d' % (d.hour, s, d.minute, s, d.second)
 
+    def hhii(self, s='', d=None):
+        if not isinstance(d, datetime.datetime):
+            d = self.datetime(d)
+
+        return '%02d%s%02d' % (d.hour, s, d.minute)
+
     def hour(self, s='', d=None):
         if isinstance(d, datetime.datetime):
             return d.hour

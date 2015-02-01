@@ -63,15 +63,15 @@ class NumericHelper(dpHelper):
 
     def int(self, a):
         if self.helper.system.py_version <= 2:
-            return int(a)
+            return int(a) if a else 0
         else:
-            return int(a)
+            return int(a) if a else 0
 
     def long(self, a):
         if self.helper.system.py_version <= 2:
-            return long(a)
+            return long(a) if a else long(0)
         else:
-            return int(a)
+            return int(a) if a else 0
 
     @property
     def xxx(self):

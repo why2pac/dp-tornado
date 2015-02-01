@@ -37,8 +37,9 @@ def weekday(c, t):
     return c.helper.datetime.weekday(d=t)
 
 
-def request_uri(c, s=False, d=' ', p='_'):
-    return ('%s%s' % (d, p)).join(c.request.uri.split('/')).strip() if s else c.request.uri
+def request_uri(c, s=False, d=' ', p='_', e=False):
+    r = ('%s%s' % (d, p)).join(c.request.uri.split('/')).strip() if s else c.request.uri
+    return c.helper.url.quote(r) if e else r
 
 
 def i18n(c):

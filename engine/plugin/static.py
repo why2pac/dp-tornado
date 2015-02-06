@@ -122,18 +122,23 @@ class StaticURL(tornado.web.UIModule):
             self.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
 
         html = []
+        auto_import = options['auto_import'] if 'auto_import' in options else True
 
         for path in static_urls:
             extension = path.split('.')[-1]
 
-            if extension == 'css':
-                template = '<link rel="stylesheet" type="text/css" href="%(url)s" />'
+            if auto_import:
+                if extension == 'css':
+                    template = '<link rel="stylesheet" type="text/css" href="%(url)s" />'
 
-            elif extension == 'js':
-                template = '<script type="text/javascript" src="%(url)s"></script>'
+                elif extension == 'js':
+                    template = '<script type="text/javascript" src="%(url)s"></script>'
+
+                else:
+                    raise NotImplementedError
 
             else:
-                raise NotImplementedError
+                template = '%(url)s'
 
             static_path = '%s%s' % (self.static_prefix, path)
 

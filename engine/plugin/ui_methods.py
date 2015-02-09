@@ -44,3 +44,7 @@ def request_uri(c, s=False, d=' ', p='_', e=False):
 
 def i18n(c):
     return c.helper.i18n
+
+
+def c(c):
+    return c

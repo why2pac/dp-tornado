@@ -76,6 +76,7 @@ if __name__ == '__main__':
     tornado.options.define('crypto_key', default=get_config(config, 'key', section='crypto', default='CRy$t0-$CR@T'))
     tornado.options.define('session_dsn', default=get_config(config, 'dsn', section='session', default=None))
     tornado.options.define('session_expire_in', default=get_config(config,'expire_in',section='session',default=7200))
+    tornado.options.define('max_body_size', default=get_config(config,'max_body_size',default=1024*1024*10))
 
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
@@ -130,7 +131,10 @@ if __name__ == '__main__':
     logging.info('---------------------------------')
 
     application = RestfulApplication(services, settings)
-    service = tornado.httpserver.HTTPServer(application, xheaders=True)
+    service = tornado.httpserver.HTTPServer(
+        application,
+        xheaders=True,
+        max_body_size=tornado.options.options.max_body_size)
     service.bind(tornado.options.options.port, '')
     service.start(tornado.options.options.num_processes)
 

@@ -172,8 +172,11 @@ class Controller(dpEngine):
     def redirect(self, url, prefix=False, permanent=False, status=None):
         if prefix:
             if 'X-Proxy-Prefix' in self.request.headers:
-                if url.startswith(self.request.headers['X-Proxy-Prefix']):
-                    url = url[(len(self.request.headers['X-Proxy-Prefix']) - 1):]
+                prefix = self.request.headers['X-Proxy-Prefix']
+                prefix = prefix[:-1] if prefix.endswith('/') else prefix
+
+                if url.startswith(prefix):
+                    url = url[len(prefix):] or '/'
 
         self.parent.redirect(url, permanent, status)
 

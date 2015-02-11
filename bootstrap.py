@@ -49,6 +49,9 @@ if __name__ == '__main__':
     config = configparser.RawConfigParser()
     config.read('%s/config.ini' % (os.path.dirname(os.path.realpath(__file__)), ))
 
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    combined_dir = '%s/static/combined' % current_dir
+
     def get_config(c, option, section='server', default=None):
         try:
             get = c.get(section, option)
@@ -77,6 +80,7 @@ if __name__ == '__main__':
     tornado.options.define('session_dsn', default=get_config(config, 'dsn', section='session', default=None))
     tornado.options.define('session_expire_in', default=get_config(config,'expire_in',section='session',default=7200))
     tornado.options.define('max_body_size', default=get_config(config,'max_body_size',default=1024*1024*10))
+    tornado.options.define('dp_path', current_dir)
 
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
@@ -96,9 +100,6 @@ if __name__ == '__main__':
         handler = getattr(handler_module, class_name)
 
         services.append((service[0], handler, dict(prefix=module_path)))
-
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    combined_dir = '%s/static/combined' % current_dir
 
     # Clear combined files
     Compressor.clear(combined_dir)

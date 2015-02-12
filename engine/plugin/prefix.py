@@ -12,8 +12,11 @@ import tornado.web
 class PrefixURL(tornado.web.UIModule):
     def render(self, static_url, **options):
         if 'X-Proxy-Prefix' in self.handler.request.headers:
-            if static_url.startswith(self.handler.request.headers['X-Proxy-Prefix']):
-                return static_url[(len(self.handler.request.headers['X-Proxy-Prefix']) - 1):]
+            prefix = self.handler.request.headers['X-Proxy-Prefix']
+            prefix = prefix[:-1] if prefix.endswith('/') else prefix
+
+            if static_url.startswith(prefix):
+                return static_url[len(prefix):]
 
             return static_url
         else:

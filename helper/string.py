@@ -20,8 +20,24 @@ class StringHelper(dpHelper):
         return string.ascii_uppercase
 
     @property
+    def ascii_lowercase(self):
+        return string.ascii_lowercase
+
+    @property
     def ascii_letters(self):
         return string.ascii_letters
+
+    @property
+    def letters(self):
+        return string.letters
+
+    @property
+    def punctuation(self):
+        return string.punctuation
+
+    @property
+    def digits(self):
+        return string.digits
 
     def is_str(self, s):
         return self.is_string(s)
@@ -83,3 +99,18 @@ class StringHelper(dpHelper):
             return s.decode('UTF-8')
         else:
             return s
+
+    def check_alphanumericpunc(self, val, add=None):
+        add = add if add else ''
+        v = any(char not in set(c for c in self.digits + self.letters + self.punctuation + add) for char in val)
+        return True if not v else False
+
+    def check_alphanumeric(self, val, add=None):
+        add = add if add else ''
+        v = any(char not in set(c for c in self.digits + self.letters + add) for char in val)
+        return True if not v else False
+
+    def check_alphabet(self, val, add=None):
+        add = add if add else ''
+        v = any(char not in set(c for c in self.letters + add) for char in val)
+        return True if not v else False

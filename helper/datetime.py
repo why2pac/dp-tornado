@@ -70,6 +70,12 @@ class DatetimeHelper(dpHelper):
 
         return '%04d%s%02d%s%02d' % (d.year, s, d.month, s, d.day)
 
+    def mmdd(self, s='', d=None):
+        if not isinstance(d, datetime.datetime):
+            d = self.datetime(d)
+
+        return '%02d%s%02d' % (d.month, s, d.day)
+
     def hhiiss(self, s='', d=None):
         if not isinstance(d, datetime.datetime):
             d = self.datetime(d)

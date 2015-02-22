@@ -25,6 +25,10 @@ def yyyymmdd(c, t, s='.'):
     return c.helper.datetime.yyyymmdd(s=s, d=t)
 
 
+def mmdd(c, t, s='.'):
+    return c.helper.datetime.mmdd(s=s, d=t)
+
+
 def hhiiss(c, t, s=':'):
     return c.helper.datetime.hhiiss(s=s, d=t)
 

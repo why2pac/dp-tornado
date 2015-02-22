@@ -173,11 +173,15 @@ class DatetimeHelper(dpHelper):
     def timedelta(self, days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
         return datetime.timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
 
-    def mktime(self, year=1970, month=1, day=1, hour=0, mins=0, sec=0, millisecs=False):
-        return self.helper.numeric.long(time.mktime((year, month, day, hour, mins, sec, 0, 0, 0))) * (1000 if millisecs else 1)
+    def mktime(self, year=1970, month=1, day=1, hour=0, mins=0, sec=0, millisecs=False, tuple=None):
+        ts = self.helper.numeric.long(time.mktime(tuple if tuple else (year, month, day, hour, mins, sec, 0, 0, 0)))
+        return ts * (1000 if millisecs else 1)
 
     def timestamp_from_datetime(self, dt, millisecs=False):
         if not isinstance(dt, datetime.datetime):
             return None
 
-        return self.helper.numeric.long(dt.timestamp() * (1000 if millisecs else 1))
+        if getattr(dt, 'timestamp', None):
+            return self.helper.numeric.long(dt.timestamp() * (1000 if millisecs else 1))
+        else:
+            return self.mktime(tuple=dt.utctimetuple(), millisecs=millisecs)

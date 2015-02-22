@@ -114,3 +114,7 @@ class StringHelper(dpHelper):
         add = add if add else ''
         v = any(char not in set(c for c in self.letters + add) for char in val)
         return True if not v else False
+
+    def strip_xss(self, html, whitelist=None, replacement=''):
+        import htmltag
+        return htmltag.strip_xss(html, whitelist, replacement)

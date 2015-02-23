@@ -42,6 +42,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         current_tag = options['current_tag'] if 'current_tag' in options else self.current_tag
         current_class = options['current_class'] if 'current_class' in options else self.current_class
         space = options['space'] if 'space' in options else self.space
+        space_block = options['space_block'] if 'space_block' in options else space
         prev_btn = options['prev'] if 'prev' in options else self.prev
         prev_class = options['prev_class'] if 'prev_class' in options else self.prev_class
         next_btn = options['next'] if 'next' in options else self.next
@@ -79,7 +80,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
             params['page'] = ((current_block - 2) * rpb) + 1
             s = self.helper.url.build(url, params)
             output = ('%s<%s href="%s%s" class="%s">%s</%s>%s'
-                      % (output, self.link_tag, link_prefix, s, prev_block_class, prev_block, self.link_tag, space))
+                      % (output, self.link_tag, link_prefix, s, prev_block_class, prev_block, self.link_tag, space_block))
 
         # Prev Button
         if current_block > 1:
@@ -131,7 +132,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
             s = self.helper.url.build(url, params)
 
             output = ('%s%s<%s href="%s%s" class="%s">%s</%s>'
-                      % (output, space, self.link_tag, link_prefix, s, next_block_class, next_block, self.link_tag))
+                      % (output, space_block, self.link_tag, link_prefix, s, next_block_class, next_block, self.link_tag))
 
         if region_tag:
             output = '%s</%s">' % (output, self.region_tag)

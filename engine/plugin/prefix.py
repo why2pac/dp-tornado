@@ -8,9 +8,24 @@
 
 import tornado.web
 
+from engine.engine import Engine as dpEngine
 
-class PrefixURL(tornado.web.UIModule):
-    def render(self, static_url, **options):
+
+class PrefixURL(tornado.web.UIModule, dpEngine):
+    def render(self, static_url, query=None):
+        if query and isinstance(query, dict):
+            uri = self.helper.url.parse(static_url)
+
+            for k in query.keys():
+                v = query[k]
+
+                if v is None and k in uri.query:
+                    del uri.query[k]
+                else:
+                    uri.query[k] = v
+
+            static_url = self.helper.url.build(uri.path, uri.query)
+
         if 'X-Proxy-Prefix' in self.handler.request.headers:
             prefix = self.handler.request.headers['X-Proxy-Prefix']
             prefix = prefix[:-1] if prefix.endswith('/') else prefix

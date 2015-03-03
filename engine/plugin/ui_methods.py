@@ -52,3 +52,12 @@ def i18n(c):
 
 def c(c):
     return c
+
+
+def get(c, arg):
+    uri = c.helper.url.parse(c.request.uri)
+    return uri.query[arg] if uri.query and arg in uri.query else None
+
+
+def number_format(c, val):
+    return "{:,}".format(val)

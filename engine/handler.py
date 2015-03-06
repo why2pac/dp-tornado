@@ -42,7 +42,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     @tornado.concurrent.run_on_executor
     def route(self, method, path):
         module_path = '%s.%s' % (self.prefix, path.replace('/', '.'))
-        module_paths = str.split(str(module_path), '.')
+        module_paths = str.split(self.helper.string.to_str(module_path), '.')
         parameters = []
         previous = None
 

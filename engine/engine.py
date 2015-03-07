@@ -56,6 +56,14 @@ class EngineSingleton(dpSingleton):
 
         return self._logger
 
+    @property
+    def vars(self):
+        if not hasattr(self, '_vars'):
+            from .variable import Variable as dpVariable
+            self._vars = dpVariable(self)
+
+        return self._vars
+
 
 class Engine(object):
     @property
@@ -85,3 +93,7 @@ class Engine(object):
     @property
     def logging(self):
         return self.logger
+
+    @property
+    def vars(self):
+        return EngineSingleton().vars

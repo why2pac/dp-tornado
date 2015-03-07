@@ -55,9 +55,9 @@ def c(c):
     return c
 
 
-def get(c, arg):
+def get(c, arg, default=None):
     uri = c.helper.url.parse(c.request.uri)
-    return uri.query[arg] if uri.query and arg in uri.query else None
+    return uri.query[arg] if uri.query and arg in uri.query else default
 
 
 def number_format(c, val):

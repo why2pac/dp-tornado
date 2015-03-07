@@ -107,6 +107,7 @@ class Compressor(dpEngine):
 
 class StaticURL(tornado.web.UIModule):
     compiled = {}
+    generated = {}
     compressor = None
     static_path = None
     static_prefix = None
@@ -122,23 +123,50 @@ class StaticURL(tornado.web.UIModule):
             self.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
 
         html = []
-        auto_import = options['auto_import'] if 'auto_import' in options else True
+        combined = False
+        key = str(static_urls)
+
+        if key in self.generated:
+            return self.generated[key]
+
+        if len(static_urls) > 1 and not self.handler.settings.get('debug'):
+            exts = {}
+
+            for path in static_urls:
+                ext = path.split('.')[-1]
+
+                if ext not in exts:
+                    exts[ext] = [path, ]
+                else:
+                    exts[ext].append(path)
+
+            import tempfile
+            combined_static_urls = []
+
+            for ext in exts.keys():
+                tmp = tempfile.NamedTemporaryFile(suffix='.%s' % ext)
+
+                for path in exts[ext]:
+                    with open('%s/%s' % (self.static_path, path)) as fp:
+                        tmp.write(fp.read())
+
+                tmp.flush()
+                combined_static_urls.append(tmp.name)
+
+            static_urls = combined_static_urls
+            combined = True
 
         for path in static_urls:
             extension = path.split('.')[-1]
 
-            if auto_import:
-                if extension == 'css':
-                    template = '<link rel="stylesheet" type="text/css" href="%(url)s" />'
+            if extension == 'css':
+                template = '<link rel="stylesheet" type="text/css" href="%(url)s" />'
 
-                elif extension == 'js':
-                    template = '<script type="text/javascript" src="%(url)s"></script>'
-
-                else:
-                    raise NotImplementedError
+            elif extension == 'js':
+                template = '<script type="text/javascript" src="%(url)s"></script>'
 
             else:
-                template = '%(url)s'
+                raise NotImplementedError
 
             static_path = '%s%s' % (self.static_prefix, path)
 
@@ -147,15 +175,21 @@ class StaticURL(tornado.web.UIModule):
                 cached = self.handler.cache.get(cache_key, dsn_or_conn=StaticURL.cache_config)
 
                 if not cached:
-                    if self.handler.settings.get('debug'):
-                        h = self.handler.helper.datetime.current_time()
-                        h = self.handler.helper.crypto.md5_hash('%s / %s' % (static_path, h))
-                        x = '%s?%s' % (static_path, h)
-
-                    else:
-                        c = self.compressor.compress('%s/%s' % (self.static_path, path))
+                    if combined:
+                        c = self.compressor.compress('%s' % path)
                         g = self.compressor.generate(c, self.combined_path, path)
                         x = '%s%s' % (self.combined_prefix, g)
+
+                    else:
+                        if self.handler.settings.get('debug'):
+                            h = self.handler.helper.datetime.current_time()
+                            h = self.handler.helper.crypto.md5_hash('%s / %s' % (static_path, h))
+                            x = '%s?%s' % (static_path, h)
+
+                        else:
+                            c = self.compressor.compress('%s/%s' % (self.static_path, path))
+                            g = self.compressor.generate(c, self.combined_path, path)
+                            x = '%s%s' % (self.combined_prefix, g)
 
                     self.handler.cache.set(cache_key, x, dsn_or_conn=StaticURL.cache_config)
                     StaticURL.compiled[static_path] = x
@@ -166,4 +200,7 @@ class StaticURL(tornado.web.UIModule):
             static_path = '%s' % StaticURL.compiled[static_path]
             html.append(template % {'url': static_path})
 
-        return '\n'.join(html)
+        generated = '\n'.join(html)
+        self.generated[key] = generated
+
+        return generated

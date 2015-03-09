@@ -87,7 +87,7 @@ class Compressor(dpEngine):
         ext = path.split('.')[-1:][0]
         filename = '%s.%s' % (hash, ext)
 
-        f = open('%s/%s' % (combined_path, filename), 'w')
+        f = open(os.path.join(combined_path, filename), 'w')
         f.write(code)
         f.close()
 
@@ -99,7 +99,7 @@ class Compressor(dpEngine):
             os.makedirs(combined_dir)
 
         for f in os.listdir(combined_dir):
-            path = '%s/%s' % (combined_dir, f)
+            path = os.path.join(combined_dir, f)
 
             if not os.path.isdir(path):
                 os.remove(path)
@@ -147,7 +147,7 @@ class StaticURL(tornado.web.UIModule):
                 tmp = tempfile.NamedTemporaryFile(suffix='.%s' % ext)
 
                 for path in exts[ext]:
-                    with open('%s/%s' % (self.static_path, path)) as fp:
+                    with open(os.path.join(self.static_path, path)) as fp:
                         tmp.write(fp.read())
 
                 tmp.flush()
@@ -187,7 +187,7 @@ class StaticURL(tornado.web.UIModule):
                             x = '%s?%s' % (static_path, h)
 
                         else:
-                            c = self.compressor.compress('%s/%s' % (self.static_path, path))
+                            c = self.compressor.compress(os.path.join(self.static_path, path))
                             g = self.compressor.generate(c, self.combined_path, path)
                             x = '%s%s' % (self.combined_prefix, g)
 

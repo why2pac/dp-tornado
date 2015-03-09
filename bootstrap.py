@@ -49,10 +49,10 @@ class RestfulApplication(tornado.web.Application):
 if __name__ == '__main__':
     # INI
     config = configparser.RawConfigParser()
-    config.read('%s/config.ini' % (os.path.dirname(os.path.realpath(__file__)), ))
+    config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.ini'))
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    combined_dir = '%s/static/combined' % current_dir
+    combined_dir = os.path.join(current_dir, 'static', 'combined')
 
     def get_config(c, option, section='server', default=None):
         try:
@@ -108,14 +108,14 @@ if __name__ == '__main__':
     Compressor.clear(combined_dir)
 
     settings = {
-        'template_path': '%s/view' % current_dir,
-        'static_path': '%s/static' % current_dir,
+        'template_path': os.path.join(current_dir, 'view'),
+        'static_path': os.path.join(current_dir, 'static'),
         'static_url_prefix': '/s/',
         'combined_static_path': combined_dir,
         'combined_static_url_prefix': '/s/combined/',
         'compressor': {
-            'yuicompressor': '%s/engine/plugin/compressor/yuicompressor-2.4.8.jar' % current_dir,
-            'uglifyjs': '%s/engine/plugin/compressor/uglifyjs2/bin/uglifyjs' % current_dir,
+            'yuicompressor': os.path.join(current_dir, 'engine', 'plugin', 'compressor', 'yuicompressor-2.4.8.jar'),
+            'uglifyjs': os.path.join(current_dir, 'engine', 'plugin', 'compressor', 'uglifyjs2', 'bin', 'uglifyjs'),
         },
         'debug': tornado.options.options.debug,
         'gzip': tornado.options.options.gzip,

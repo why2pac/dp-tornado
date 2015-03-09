@@ -11,6 +11,7 @@ MVC Web Application Framework with Tornado, Python 3
 * [SQLAlchemy](http://www.sqlalchemy.org) Model Implementation
 * [hiredis](https://pypi.python.org/pypi/hiredis) Redis
 * [BeautifulSoup4](http://www.crummy.com/software/BeautifulSoup/bs4) Screen Scrapping.
+* [Croniter](https://pypi.python.org/pypi/croniter/) Croniter
 * [Node.js](http://www.nodejs.org) Node.JS, UglifyJS (Optional)
 * [Java](http://www.java.com) Java, YUICompressor (Optional)
 
@@ -55,6 +56,7 @@ MVC Web Application Framework with Tornado, Python 3
 	pip install cxOracle
 	pip install hiredis
 	pip install beautifulsoup4
+	pip install croniter
 
 ### Execution
 

@@ -12,3 +12,7 @@ services = [
     (r"/a/(.*)", 'controller.StarterController'),
     (r"/b/(.*)", 'controller.StarterController'),
 ]
+
+schedules = [
+    ('* * * * *', 'scheduler.foo')
+]

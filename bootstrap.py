@@ -26,6 +26,8 @@ try:
 except:
     import ConfigParser as configparser
 
+from engine.scheduler import Scheduler
+
 from engine.plugin.static import Compressor
 from engine.plugin.static import StaticURL
 from engine.plugin.prefix import PrefixURL
@@ -81,6 +83,7 @@ if __name__ == '__main__':
     tornado.options.define('session_expire_in', default=get_config(config,'expire_in',section='session',default=7200))
     tornado.options.define('max_body_size', default=get_config(config,'max_body_size',default=1024*1024*10))
     tornado.options.define('dp_path', current_dir)
+    tornado.options.define('python', default=get_config(config, 'python', default='python'))
 
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
@@ -131,6 +134,9 @@ if __name__ == '__main__':
     logging.info('CPU Count   : %d' % multiprocessing.cpu_count())
     logging.info('---------------------------------')
 
+    scheduler = Scheduler(application.schedules)
+    scheduler.start()
+
     application = RestfulApplication(services, settings)
     service = tornado.httpserver.HTTPServer(
         application,
@@ -147,4 +153,4 @@ if __name__ == '__main__':
         instance.__setattr__('startup_at', getattr(application, 'startup_at'))
         instance.start()
     except KeyboardInterrupt:
-        pass
+        scheduler.interrupted = True

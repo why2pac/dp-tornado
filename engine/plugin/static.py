@@ -7,6 +7,7 @@
 
 
 import os
+import requests
 import tornado.web
 import subprocess
 
@@ -82,10 +83,10 @@ class Compressor(dpEngine):
         return ''.join(r)
 
     def generate(self, code, combined_path, path):
-        hash = self.handler.helper.datetime.current_time()
-        hash = self.handler.helper.crypto.md5_hash('%s / %s' % (path, hash))
+        key = self.handler.helper.datetime.current_time()
+        key = self.handler.helper.crypto.md5_hash('%s / %s' % (path, key))
         ext = path.split('.')[-1:][0]
-        filename = '%s.%s' % (hash, ext)
+        filename = '%s.%s' % (key, ext)
 
         f = open(os.path.join(combined_path, filename), 'w')
         f.write(code)
@@ -147,8 +148,12 @@ class StaticURL(tornado.web.UIModule):
                 tmp = tempfile.NamedTemporaryFile(suffix='.%s' % ext)
 
                 for path in exts[ext]:
-                    with open(os.path.join(self.static_path, path)) as fp:
-                        tmp.write(fp.read())
+                    if path.find('http') == 0:
+                        rq = requests.get(path)
+                        tmp.write(rq.text.encode('utf8'))
+                    else:
+                        with open(os.path.join(self.static_path, path)) as fp:
+                            tmp.write(fp.read())
 
                 tmp.flush()
                 combined_static_urls.append(tmp.name)
@@ -168,7 +173,25 @@ class StaticURL(tornado.web.UIModule):
             else:
                 raise NotImplementedError
 
-            static_path = '%s%s' % (self.static_prefix, path)
+            if path.find('http') == 0:
+                if self.handler.settings.get('debug'):
+                    static_path = path
+
+                else:
+                    filename = path.split('/')[-1:][0]
+
+                    tmp_name = os.path.join(self.combined_path, 'temporary', filename)
+                    static_path = '%s%s/%s' % (self.static_prefix, 'temporary', filename)
+
+                    fp = open(tmp_name, 'w')
+                    rq = requests.get(path)
+                    fp.write(rq.text.encode('utf8'))
+                    fp.close()
+
+                    path = tmp_name
+
+            else:
+                static_path = '%s%s' % (self.static_prefix, path)
 
             if static_path not in StaticURL.compiled:
                 cache_key = '%s-%s' % (static_path, self.handler.application.startup_at)
@@ -187,7 +210,8 @@ class StaticURL(tornado.web.UIModule):
                             x = '%s?%s' % (static_path, h)
 
                         else:
-                            c = self.compressor.compress(os.path.join(self.static_path, path))
+                            u = path if path.find('http') == 0 else os.path.join(self.static_path, path)
+                            c = self.compressor.compress(u)
                             g = self.compressor.generate(c, self.combined_path, path)
                             x = '%s%s' % (self.combined_prefix, g)
 

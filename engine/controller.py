@@ -109,7 +109,8 @@ class Controller(dpEngine):
 
     @property
     def remote_ip(self):
-        return self.parent.request.remote_ip
+        return self.parent.request.headers['X-Forwarded-For'] \
+            if 'X-Forwarded-For' in self.parent.request.headers else self.parent.request.remote_ip
 
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
         secure_cookie = self.helper.crypto.encrypt(value, True, 0, self.parent.request.headers["User-Agent"])

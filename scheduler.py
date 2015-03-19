@@ -31,4 +31,9 @@ if __name__ == '__main__':
         print 'The specified scheduler module is not implemented. (%s)' % module
         exit(1)
 
-    runner.run()
+    try:
+        runner.run()
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()

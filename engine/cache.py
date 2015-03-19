@@ -45,37 +45,43 @@ class CacheDriver(object):
     def increase(self, key, amount, expire_in):
         raise NotImplementedError
 
-    def queue(self, key, start, stop):
+    def lrange(self, key, start, stop):
         raise NotImplementedError
 
-    def enqueue(self, key, value, expire_in):
+    def rpush(self, key, value, expire_in):
         raise NotImplementedError
 
-    def dequeue(self, key):
+    def lpop(self, key):
         raise NotImplementedError
 
-    def stack(self, key, start, stop):
+    def blpop(self, key, timeout):
         raise NotImplementedError
 
-    def push(self, key, value, expire_in):
+    def lpush(self, key, value, expire_in):
         raise NotImplementedError
 
-    def pop(self, key):
+    def rpop(self, key):
         raise NotImplementedError
 
-    def list(self, key):
+    def smembers(self, key):
         raise NotImplementedError
 
-    def len(self, key, expire_in):
+    def scard(self, key, expire_in):
         raise NotImplementedError
 
-    def add(self, key, value, expire_in):
+    def sadd(self, key, value, expire_in):
         raise NotImplementedError
 
-    def delete_value(self, key, value):
+    def srem(self, key, value):
         raise NotImplementedError
 
     def publish(self, channel, message):
+        raise NotImplementedError
+
+    def hlen(self, key, expire_in):
+        raise NotImplementedError
+
+    def keys(self, pattern):
         raise NotImplementedError
 
 
@@ -229,68 +235,80 @@ class Cache(dpEngine):
         assert(expire_in is None or int(expire_in) >= 0)
         return conn.increase(key, amount, expire_in)
 
-    def queue(self, key, start, stop, dsn_or_conn):
+    def lrange(self, key, start, stop, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.queue(key, start, stop)
+        return conn.lrange(key, start, stop)
 
-    def enqueue(self, key, value, dsn_or_conn, expire_in=None):
+    def rpush(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.enqueue(key, value, expire_in)
+        return conn.rpush(key, value, expire_in)
 
-    def dequeue(self, key, dsn_or_conn):
+    def lpop(self, key, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.dequeue(key)
+        return conn.lpop(key)
 
-    def stack(self, key, start, stop, dsn_or_conn):
+    def blpop(self, key, timeout, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.stack(key, start, stop)
+        return conn.blpop(key, timeout)
 
-    def push(self, key, value, dsn_or_conn, expire_in=None):
+    def lpush(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.push(key, value, expire_in)
+        return conn.lpush(key, value, expire_in)
 
-    def pop(self, key, dsn_or_conn):
+    def rpop(self, key, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.pop(key)
+        return conn.rpop(key)
 
-    def list(self, key, dsn_or_conn):
+    def smembers(self, key, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.list(key)
+        return conn.smembers(key)
 
-    def len(self, key, dsn_or_conn, expire_in=None):
+    def scard(self, key, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.len(key, expire_in)
+        return conn.scard(key, expire_in)
 
-    def add(self, key, value, dsn_or_conn, expire_in=None):
+    def sadd(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.add(key, value, expire_in)
+        return conn.sadd(key, value, expire_in)
 
-    def delete_value(self, key, value, dsn_or_conn):
+    def srem(self, key, value, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.delete_value(key, value)
+        return conn.srem(key, value)
 
     def publish(self, channel, message, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.publish(channel, message)
+
+    def hlen(self, key, dsn_or_conn, expire_in=None):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.hlen(key, expire_in)
+
+    def keys(self, pattern, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.keys(pattern)

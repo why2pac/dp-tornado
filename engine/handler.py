@@ -17,6 +17,10 @@ import importlib
 
 from .response import Response as dpResponse
 from .engine import Engine as dpEngine
+from .model import InValueModelConfig as dpInValueModelConfig
+
+
+session_default_expire_in = tornado.options.options.session_expire_in or 7200
 
 
 class Handler(tornado.web.RequestHandler, dpEngine):
@@ -28,6 +32,12 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.prefix = self.prefix
         self.parent = None
         self.routed = None
+        self.blocked = False
+
+        session_dsn = tornado.options.options.session_dsn
+
+        self._sessionid = None
+        self._sessiondb = session_dsn or dpInValueModelConfig(driver='sqlite', database='session')
 
     def initialize(self, prefix=None):
         self.prefix = prefix
@@ -41,6 +51,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     @tornado.concurrent.run_on_executor
     def route(self, method, path):
+        if self.blocked:
+            self.finish_with_error(404, 'Page Not Found')
+            return False
+
         module_path = '%s.%s' % (self.prefix, path.replace('/', '.'))
         module_paths = str.split(self.helper.string.to_str(module_path), '.')
         parameters = []
@@ -68,7 +82,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 handler.prefix = self.prefix
                 handler.parent = self
 
-            except (AttributeError, ImportError):
+            except (KeyError, ValueError, AttributeError, ImportError):
                 try:
                     class_name = '%sController' % (self.capitalized_method_name(previous))
                     handler = getattr(handler_module, class_name)
@@ -261,3 +275,66 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def __put(self, path=None):
         x = yield self.route('put', path)
         self.postprocess(x)
+
+    @property
+    def remote_ip(self):
+        return self.request.headers['X-Forwarded-For'] \
+            if 'X-Forwarded-For' in self.request.headers else self.request.remote_ip
+
+    def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
+        secure_cookie = self.helper.crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])
+        return super(Handler, self).set_secure_cookie(name, secure_cookie, expires_days, version, **kwargs)
+
+    def get_secure_cookie(self, name, value=None, max_age_days=31, min_version=None):
+        secure_cookie = super(Handler, self).get_secure_cookie(name, value, max_age_days, min_version)
+
+        if secure_cookie:
+            try:
+                secure_cookie = self.helper.crypto.decrypt(secure_cookie, self.request.headers["User-Agent"])
+            except:
+                secure_cookie = None
+
+            return secure_cookie if secure_cookie else None
+
+        else:
+            return None
+
+    def get_sessionid(self):
+        return self._sessionid if self._sessionid else self.set_sessionid()
+
+    def set_sessionid(self, sessionid=None):
+        if not sessionid:
+            try:
+                sessionid_from_cookie = self.get_secure_cookie('PSESSIONID')
+                sessionid = self.helper.string.to_str(sessionid_from_cookie)
+
+                if not sessionid.isalnum():
+                    sessionid = None
+
+            except:
+                sessionid = None
+
+        sessionid = sessionid or self.helper.crypto.sha224_hash(self.helper.datetime.current_time_millis())
+        self.set_secure_cookie('PSESSIONID', sessionid)
+        self._sessionid = sessionid
+
+        return sessionid
+
+    def get_session_value(self, name, expire_in=None):
+        sessionid = self.get_sessionid()
+        key = '%s:%s' % (sessionid, name)
+
+        return self.cache.get(key, self._sessiondb, expire_in=expire_in)
+
+    def set_session_value(self, name, value, expire_in=session_default_expire_in):
+        sessionid = self.get_sessionid()
+        key = '%s:%s' % (sessionid, name)
+
+        return self.cache.set(key, value, self._sessiondb, expire_in=expire_in)
+
+    def session(self, name, value=None, expire_in=session_default_expire_in):
+        if value is not None:
+            return self.set_session_value(name, value, expire_in=expire_in)
+
+        else:
+            return self.get_session_value(name)

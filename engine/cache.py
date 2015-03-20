@@ -33,7 +33,7 @@ class CacheDriver(object):
     def getconn(self):
         pass
 
-    def get(self, key, expire_in):
+    def get(self, key, expire_in, delete):
         raise NotImplementedError
 
     def set(self, key, val, expire_in):
@@ -209,11 +209,11 @@ class Cache(dpEngine):
 
         return driver.getconn()
 
-    def get(self, key, dsn_or_conn, expire_in=None):
+    def get(self, key, dsn_or_conn, expire_in=None, delete=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.get(key, expire_in)
+        return conn.get(key, expire_in, delete)
 
     def set(self, key, val, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

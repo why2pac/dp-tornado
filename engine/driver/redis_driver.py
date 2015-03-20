@@ -25,14 +25,20 @@ class RedisCacheDriver(dpCacheDriver):
     def getconn(self):
         return RedisCacheDriver(self.pool, redis.Redis(connection_pool=self.pool))
 
-    def get(self, key, expire_in):
-        if expire_in is None:
+    def get(self, key, expire_in, delete):
+        if expire_in is None and not delete:
             return self.conn.get(key)
 
         else:
             p = self.conn.pipeline()
             p.get(key)
-            p.expire(key, int(expire_in))
+
+            if expire_in is not None:
+                p.expire(key, int(expire_in))
+
+            if delete:
+                p.delete(key)
+
             ret = p.execute()
 
             if ret:

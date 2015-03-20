@@ -33,6 +33,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.parent = None
         self.routed = None
         self.blocked = False
+        self.interrupted = False
 
         session_dsn = tornado.options.options.session_dsn
 
@@ -51,6 +52,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     @tornado.concurrent.run_on_executor
     def route(self, method, path):
+        if self.interrupted:
+            self.on_interrupt()
+            return False
+
         if self.blocked:
             self.finish_with_error(404, 'Page Not Found')
             return False
@@ -233,7 +238,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.finish(x._finish)
 
     def postprocess(self, x):
-        if x._render:
+        if not x:
+            return
+        elif x._render:
             self.__render(x)
         elif x._finish:
             self.__finish(x)
@@ -338,3 +345,6 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         else:
             return self.get_session_value(name)
+
+    def on_interrupt(self):
+        pass

@@ -6,8 +6,14 @@
 #
 
 
+import os
 import sys
+import inspect
 import importlib
+
+
+path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+sys.path.append(path)
 
 
 if __name__ == '__main__':

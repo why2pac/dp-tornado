@@ -31,7 +31,7 @@ class Scheduler(threading.Thread, dpEngine):
         self.path = os.path.join(self.path, 'scheduler.py')
         self.python = tornado.options.options.python
         self.ts = self.helper.datetime.time()
-        self.support_bg = False if platform.system() == 'Windows' else True
+        self.close_fds = False if subprocess.mswindows else True
 
         for e in schedules:
             i = e[2] if len(e) >= 3 and isinstance(e[2], int) else 1
@@ -56,12 +56,13 @@ class Scheduler(threading.Thread, dpEngine):
 
             for e in self.schedules:
                 if ts >= e['n']:
-                    e['n'] = ts + e['s'] if isinstance(e['s'], int) else e['s'].get_next()
+                    try:
+                        e['n'] = ts + e['s'] if isinstance(e['s'], int) else e['s'].get_next()
+                        command = [self.python, self.path, e['c']]
+                        subprocess.Popen(' '.join(command), shell=True, close_fds=self.close_fds)
 
-                    if not self.support_bg:
-                        subprocess.Popen([self.python, self.path, e['c']])
-                    else:
-                        os.system('%s %s %s &' % (self.python, self.path, e['c']))
+                    except:
+                        pass
 
             time.sleep(2)
 

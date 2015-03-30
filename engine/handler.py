@@ -285,8 +285,14 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     @property
     def remote_ip(self):
-        return self.request.headers['X-Forwarded-For'] \
-            if 'X-Forwarded-For' in self.request.headers else self.request.remote_ip
+        if 'X-Forwarded-For' in self.request.headers:
+            x = self.request.headers['X-Forwarded-For']
+            x = x.split(',') if x else None
+
+            return x[0] if x else None
+
+        else:
+            return self.request.remote_ip
 
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
         secure_cookie = self.helper.crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])

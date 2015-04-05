@@ -84,6 +84,9 @@ class CacheDriver(object):
     def keys(self, pattern):
         raise NotImplementedError
 
+    def dbsize(self):
+        raise NotImplementedError
+
 
 class Cache(dpEngine):
     server_startup_at = None
@@ -312,3 +315,9 @@ class Cache(dpEngine):
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.keys(pattern)
+
+    def dbsize(self, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.dbsize()

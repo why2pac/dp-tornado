@@ -49,7 +49,7 @@ class Compressor(dpEngine):
             c = self._compress(c, location)
             return c
         except Exception as e:
-            self.logger.error(e)
+            self.logger.exception(e)
             return self._read(location)
 
     def _compressor(self, location, options=''):

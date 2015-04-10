@@ -57,6 +57,9 @@ class CacheDriver(object):
     def blpop(self, key, timeout):
         raise NotImplementedError
 
+    def brpop(self, key, timeout):
+        raise NotImplementedError
+
     def lpush(self, key, value, expire_in):
         raise NotImplementedError
 
@@ -79,6 +82,15 @@ class CacheDriver(object):
         raise NotImplementedError
 
     def hlen(self, key, expire_in):
+        raise NotImplementedError
+
+    def hgetall(self, key):
+        raise NotImplementedError
+
+    def hget(self, key):
+        raise NotImplementedError
+
+    def hdel(self, key, val):
         raise NotImplementedError
 
     def keys(self, pattern):
@@ -262,6 +274,12 @@ class Cache(dpEngine):
 
         return conn.blpop(key, timeout)
 
+    def brpop(self, key, timeout, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.brpop(key, timeout)
+
     def lpush(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
@@ -309,6 +327,24 @@ class Cache(dpEngine):
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.hlen(key, expire_in)
+
+    def hgetall(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.hgetall(key)
+
+    def hget(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.hget(key)
+
+    def hdel(self, key, val, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.hdel(key, val)
 
     def keys(self, pattern, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

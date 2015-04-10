@@ -89,6 +89,10 @@ class RedisCacheDriver(dpCacheDriver):
         blpop = self.conn.blpop(key, timeout)
         return blpop[1] if blpop else None
 
+    def brpop(self, key, timeout):
+        brpop = self.conn.brpop(key, timeout)
+        return brpop[1] if brpop else None
+
     def lpush(self, key, value, expire_in):
         if expire_in is None:
             return self.conn.lpush(key, value)
@@ -153,6 +157,15 @@ class RedisCacheDriver(dpCacheDriver):
                 return ret[0]
             else:
                 return False
+
+    def hgetall(self, key):
+        return self.conn.hgetall(key)
+
+    def hget(self, key):
+        return self.conn.hget(key)
+
+    def hdel(self, key, val):
+        return self.conn.hdel(key, val)
 
     def keys(self, pattern):
         return self.conn.keys(pattern)

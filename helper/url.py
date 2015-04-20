@@ -47,9 +47,9 @@ class UrlHelper(dpHelper):
 
     def build(self, url, params):
         if self.helper.system.py_version <= 2:
-            return '%s?%s' % (url, _parse.urlencode(params))
+            return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
         else:
-            return '%s?%s' % (url, _parse.urlencode(params))
+            return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
 
     def parse(self, request):
         if self.helper.string.is_str(request):

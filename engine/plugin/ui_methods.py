@@ -21,6 +21,13 @@ def nl2br(c, t, escape=True):
     return t.replace('\r\n', '<br />').replace('\r', '<br />').replace('\n', '<br />')
 
 
+def truncate(c, t, l, s='..'):
+    if len(t) > l:
+        return '%s%s' % (t[0:l], s)
+
+    return t
+
+
 def yyyymmdd(c, t, s='.'):
     return c.helper.datetime.yyyymmdd(s=s, d=t)
 

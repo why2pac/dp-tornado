@@ -60,6 +60,19 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             self.finish_with_error(404, 'Page Not Found')
             return False
 
+        temp_paths = {}
+        paths = []
+
+        for e in path.split('/'):
+            if e.find('.') != -1:
+                uniqid = self.helper.random.uuid()
+                paths.append(uniqid)
+                temp_paths[uniqid] = e
+            else:
+                paths.append(e)
+
+        path = '/'.join(paths)
+
         module_path = '%s.%s' % (self.prefix, path.replace('/', '.'))
         module_paths = str.split(self.helper.string.to_str(module_path), '.')
         parameters = []
@@ -118,7 +131,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             parameters.reverse()
 
             try:
-                method(*parameters)
+                method(*[temp_paths[x] if x in temp_paths else x for x in parameters])
                 return handler
 
             except tornado.web.HTTPError as e:

@@ -146,9 +146,9 @@ class StaticURL(tornado.web.UIModule):
 
             if len(extensions) > 1:
                 options['separate'] = False
-                return '\n'.join(self.render(*static, **options) for static in extensions.values())
+                return '\n'.join(self.render(*static, **options) for static in list(extensions.values()))
             else:
-                statics = extensions.values()[0]
+                statics = list(extensions.values())[0]
 
         template = self._template(statics[0], replaced=False)
         ext = statics[0].split('.')[-1].lower()

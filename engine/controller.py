@@ -9,7 +9,6 @@
 import tornado.options
 
 from .engine import Engine as dpEngine
-from .model import InValueModelConfig as dpInValueModelConfig
 
 session_default_expire_in = tornado.options.options.session_expire_in or 7200
 
@@ -40,68 +39,34 @@ class Controller(dpEngine):
     def request(self):
         return self.parent.request
 
-    def get_argument(self, name, default=None, strip=True):
-        return self.parent.get_argument(name, default, strip)
+    def get_argument(self, name, default=None, strip=True, cast=None, fmt=None):
+        ret = self.parent.get_argument(name, default, strip)
+
+        try:
+            if ret and cast == int and fmt == 'yyyymmdd':
+                try:
+
+                    return self.helper.datetime.time(
+                        self.helper.datetime.datetime(
+                            yyyymmdd=self.helper.numeric.extract_numbers(ret or '')))
+
+                except:
+                    return False
+
+            elif ret and cast == int:
+                return int(ret)
+            elif ret and cast == long:
+                return long(ret)
+            elif ret and cast == float:
+                return float(ret)
+
+        except ValueError:
+            return default
+
+        return ret
 
     def get_user_agent(self, parsed=True):
-        if not parsed:
-            return self.parent.request.headers['User-Agent'] if 'User-Agent' in self.parent.request.headers else ''
-
-        else:
-            from .plugin import http_agent_parser
-
-            ua = self.get_user_agent(False)
-            ua = http_agent_parser.detect(ua)
-
-            p_name = ua['platform']['name'] if 'platform' in ua and 'name' in ua['platform'] else 'Unknown'
-            p_version = ua['platform']['version'] if 'platform' in ua and 'version' in ua['platform'] else 'Unknown'
-
-            try:
-                p_version_major = int(float(p_version.split('.')[0])) if p_version else 0
-            except ValueError:
-                p_version_major = 0
-
-            platform = '_p-%s-%s' % (p_name, p_version)
-            platform = platform.lower().replace(' ', '-').replace('.', '-')
-
-            platform_major = '_p-%s-%s' % (p_name, p_version_major)
-            platform_major = platform_major.lower().replace(' ', '-').replace('.', '-')
-
-            os_name = ua['os']['name'] if 'os' in ua and 'name' in ua['os'] else 'Unknown'
-            os_version = ua['os']['version'] if 'os' in ua and 'version' in ua['os'] else 'Unknown'
-
-            os = '_o-%s-%s' % (os_name, os_version)
-            os = os.lower().replace(' ', '-').replace('.', '-')
-
-            os_name = '_o-%s' % os_name
-            os_name = os_name.lower().replace(' ', '-').replace('.', '-')
-
-            browser_name = ua['browser']['name'] if 'browser' in ua and 'name' in ua['browser'] else 'Unknown'
-            browser_version = ua['browser']['version'] if 'browser' in ua and 'version' in ua['browser'] else 'Unknown'
-
-            try:
-                browser_version_major = int(float(browser_version.split('.')[0]))
-            except ValueError:
-                browser_version_major = 0
-
-            browser = '_b-%s-%s' % (browser_name, browser_version)
-            browser = browser.lower().replace(' ', '-').replace('.', '-')
-
-            browser_major = '_b-%s-%s' % (browser_name, browser_version_major)
-            browser_major = browser_major.lower().replace(' ', '-').replace('.', '-')
-
-            browser_type = '_b-%s' % browser_name
-            browser_type = browser_type.lower().replace(' ', '-').replace('.', '-')
-
-            ua['platform_str'] = platform
-            ua['platform_major_str'] = platform_major
-            ua['os_str'] = os
-            ua['os_name_str'] = os_name
-            ua['browser_str'] = browser
-            ua['browser_major_str'] = browser_major
-            ua['browser_type_str'] = browser_type
-
-            return ua
+        return self.parent.get_user_agent(parsed=parsed)
 
     @property
     def remote_ip(self):
@@ -119,8 +84,11 @@ class Controller(dpEngine):
     def set_sessionid(self, sessionid=None):
         return self.parent.set_sessionid(sessionid=sessionid)
 
-    def get_session_value(self, name, expire_in=None):
-        return self.parent.get_session_value(name, expire_in=expire_in)
+    def get_session_value(self, name, expire_in=None, sessionid=None):
+        return self.parent.get_session_value(name, expire_in=expire_in, sessionid=sessionid)
+
+    def get_session_value_ttl(self, name):
+        return self.parent.get_session_value_ttl(name)
 
     def set_session_value(self, name, value, expire_in=session_default_expire_in):
         return self.parent.set_session_value(name, value, expire_in=expire_in)
@@ -128,16 +96,24 @@ class Controller(dpEngine):
     def session(self, name, value=None, expire_in=session_default_expire_in):
         return self.parent.session(name, value=value, expire_in=expire_in)
 
+    def _prefix(self, url):
+        if 'X-Proxy-Prefix' in self.request.headers:
+            prefix = self.request.headers['X-Proxy-Prefix']
+            prefix = prefix[:-1] if prefix.endswith('/') else prefix
+
+            if url.startswith(prefix):
+                url = url[len(prefix):] or '/'
+
+        return url
+
     def redirect(self, url, prefix=False, permanent=False, status=None):
         if prefix:
-            if 'X-Proxy-Prefix' in self.request.headers:
-                prefix = self.request.headers['X-Proxy-Prefix']
-                prefix = prefix[:-1] if prefix.endswith('/') else prefix
+            url = self._prefix(url)
 
-                if url.startswith(prefix):
-                    url = url[len(prefix):] or '/'
-
-        self.parent.redirect(url, permanent, status)
+        try:
+            self.parent.redirect(url, permanent, status)
+        except (AttributeError, TypeError):
+            pass
 
     def render(self, template_name, kwargs=None):
         self._render = {'t': template_name, 'k': kwargs}

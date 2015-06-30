@@ -50,7 +50,6 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return ''.join(x)
 
-    @tornado.concurrent.run_on_executor
     def route(self, method, path):
         if self.interrupted:
             self.on_interrupt()
@@ -175,7 +174,11 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         finish = '%s, %s' % (status_code, reason)
 
         self.set_status(status_code)
-        self.finish(finish)
+
+        if status_code == 404:
+            return self.render('system/http/pp_404.html')
+
+        return self.render('system/http/pp_5xx.html')
 
     def head(self, path=None):
         if path and not self.routed:
@@ -260,40 +263,28 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         elif x._write:
             self.__write(x)
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def __head(self, path=None):
-        x = yield self.route('head', path)
+        x = self.route('head', path)
         self.postprocess(x)
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def __get(self, path=None):
-        x = yield self.route('get', path)
+        x = self.route('get', path)
         self.postprocess(x)
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def __post(self, path=None):
-        x = yield self.route('post', path)
+        x = self.route('post', path)
         self.postprocess(x)
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def __delete(self, path=None):
-        x = yield self.route('delete', path)
+        x = self.route('delete', path)
         self.postprocess(x)
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def __patch(self, path=None):
-        x = yield self.route('patch', path)
+        x = self.route('patch', path)
         self.postprocess(x)
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
     def __put(self, path=None):
-        x = yield self.route('put', path)
+        x = self.route('put', path)
         self.postprocess(x)
 
     @property
@@ -308,7 +299,12 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             return self.request.remote_ip
 
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
-        secure_cookie = self.helper.crypto.encrypt(value, True, 0, self.request.headers["User-Agent"])
+        secure_cookie = self.helper.crypto.encrypt(
+            value,
+            True,
+            0,
+            self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else 'unknown')
+
         return super(Handler, self).set_secure_cookie(name, secure_cookie, expires_days, version, **kwargs)
 
     def get_secure_cookie(self, name, value=None, max_age_days=31, min_version=None):
@@ -316,7 +312,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         if secure_cookie:
             try:
-                secure_cookie = self.helper.crypto.decrypt(secure_cookie, self.request.headers["User-Agent"])
+                secure_cookie = self.helper.crypto.decrypt(
+                    secure_cookie,
+                    self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else 'unknown')
             except:
                 secure_cookie = None
 
@@ -346,11 +344,17 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return sessionid
 
-    def get_session_value(self, name, expire_in=None):
-        sessionid = self.get_sessionid()
+    def get_session_value(self, name, expire_in=None, sessionid=None):
+        sessionid = self.get_sessionid() if not sessionid else sessionid
         key = '%s:%s' % (sessionid, name)
 
         return self.cache.get(key, self._sessiondb, expire_in=expire_in)
+
+    def get_session_value_ttl(self, name):
+        sessionid = self.get_sessionid()
+        key = '%s:%s' % (sessionid, name)
+
+        return self.cache.ttl(key, self._sessiondb)
 
     def set_session_value(self, name, value, expire_in=session_default_expire_in):
         sessionid = self.get_sessionid()
@@ -364,6 +368,72 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         else:
             return self.get_session_value(name)
+
+    def redirect(self, url, permanent=False, status=None):
+        try:
+            super(Handler, self).redirect(url, permanent, status)
+        except (AttributeError, TypeError):
+            pass
+
+    def get_user_agent(self, parsed=True):
+        if not parsed:
+            return self.request.headers['User-Agent'] if 'User-Agent' in self.request.headers else ''
+
+        else:
+            from .plugin import http_agent_parser
+
+            ua = self.get_user_agent(False)
+            ua = http_agent_parser.detect(ua)
+
+            p_name = ua['platform']['name'] if 'platform' in ua and 'name' in ua['platform'] else 'Unknown'
+            p_version = ua['platform']['version'] if 'platform' in ua and 'version' in ua['platform'] else 'Unknown'
+
+            try:
+                p_version_major = int(float(p_version.split('.')[0])) if p_version else 0
+            except ValueError:
+                p_version_major = 0
+
+            platform = '_p-%s-%s' % (p_name, p_version)
+            platform = platform.lower().replace(' ', '-').replace('.', '-')
+
+            platform_major = '_p-%s-%s' % (p_name, p_version_major)
+            platform_major = platform_major.lower().replace(' ', '-').replace('.', '-')
+
+            os_name = ua['os']['name'] if 'os' in ua and 'name' in ua['os'] else 'Unknown'
+            os_version = ua['os']['version'] if 'os' in ua and 'version' in ua['os'] else 'Unknown'
+
+            os = '_o-%s-%s' % (os_name, os_version)
+            os = os.lower().replace(' ', '-').replace('.', '-')
+
+            os_name = '_o-%s' % os_name
+            os_name = os_name.lower().replace(' ', '-').replace('.', '-')
+
+            browser_name = ua['browser']['name'] if 'browser' in ua and 'name' in ua['browser'] else 'Unknown'
+            browser_version = ua['browser']['version'] if 'browser' in ua and 'version' in ua['browser'] else 'Unknown'
+
+            try:
+                browser_version_major = int(float(browser_version.split('.')[0]))
+            except ValueError:
+                browser_version_major = 0
+
+            browser = '_b-%s-%s' % (browser_name, browser_version)
+            browser = browser.lower().replace(' ', '-').replace('.', '-')
+
+            browser_major = '_b-%s-%s' % (browser_name, browser_version_major)
+            browser_major = browser_major.lower().replace(' ', '-').replace('.', '-')
+
+            browser_type = '_b-%s' % browser_name
+            browser_type = browser_type.lower().replace(' ', '-').replace('.', '-')
+
+            ua['platform_str'] = platform
+            ua['platform_major_str'] = platform_major
+            ua['os_str'] = os
+            ua['os_name_str'] = os_name
+            ua['browser_str'] = browser
+            ua['browser_major_str'] = browser_major
+            ua['browser_type_str'] = browser_type
+
+            return ua
 
     def on_interrupt(self):
         pass

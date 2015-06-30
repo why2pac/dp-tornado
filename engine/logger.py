@@ -16,42 +16,22 @@ class Logger(dpSingleton):
     def __init__(self, engine=None):
         self.engine = engine
 
-    def _stripped_msg(self, msg, strip=False):
-        msg = self.engine.helper.string.to_unicode(msg)
-
-        if not strip:
-            return msg
-
-        msg = msg.strip()
-
-        __ = (
-            '\n', '\\n',
-            '       ', '       ',
-            '      ', '      ',
-            '     ', '     ',
-            '    ', '    ',
-            '   ', '   ',
-            '  ', '  '
-        )
-
-        for _ in __:
-            msg = msg.replace(_, ' ')
-
-        return msg
+    def strip(self, msg, strip=False):
+        return msg.strip() if strip else msg
 
     def exception(self, exception, *args, **kwargs):
         traceback.print_exc()
 
-        logging.exception(self._stripped_msg(str(exception), True), *args, **kwargs)
+        logging.exception(self.strip(str(exception), True), *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        logging.error(self._stripped_msg(msg, True), *args, **kwargs)
+        logging.error(self.strip(msg, True), *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
-        logging.info(self._stripped_msg(msg), *args, **kwargs)
+        logging.info(self.strip(msg), *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
-        logging.warning(self._stripped_msg(msg), *args, **kwargs)
+        logging.warning(self.strip(msg), *args, **kwargs)
 
     def debug(self, msg, *args, **kwargs):
-        logging.debug(self._stripped_msg(msg), *args, **kwargs)
+        logging.debug(self.strip(msg), *args, **kwargs)

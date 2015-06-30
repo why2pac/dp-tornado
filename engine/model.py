@@ -134,15 +134,15 @@ class ModelSingleton(dpEngine, dpSingleton):
                     charset)
 
             params = {
-                'convert_unicode':conf.convert_unicode if conf.convert_unicode is not None else True,
-                'echo':conf.echo if conf.echo is not None else False,
-                'echo_pool':conf.echo_pool if conf.echo_pool is not None else False,
-                'pool_size':conf.pool_size if conf.pool_size is not None else 16,
-                'poolclass':QueuePool,
-                'pool_recycle':conf.pool_recycle if conf.pool_recycle is not None else 3600,
-                'max_overflow':conf.max_overflow if conf.max_overflow is not None else -1,
-                'pool_timeout':conf.pool_timeout if conf.pool_timeout is not None else 30,
-                'connect_args':connection_args
+                'convert_unicode': conf.convert_unicode if conf.convert_unicode is not None else True,
+                'echo': conf.echo if conf.echo is not None else False,
+                'echo_pool': conf.echo_pool if conf.echo_pool is not None else False,
+                'pool_size': conf.pool_size if conf.pool_size is not None else 16,
+                'poolclass': QueuePool,
+                'pool_recycle': conf.pool_recycle if conf.pool_recycle is not None else 3600,
+                'max_overflow': conf.max_overflow if conf.max_overflow is not None else -1,
+                'pool_timeout': conf.pool_timeout if conf.pool_timeout is not None else 30,
+                'connect_args': connection_args
             }
 
             if conf.isolation_level is not None:

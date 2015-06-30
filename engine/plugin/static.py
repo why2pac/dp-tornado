@@ -9,9 +9,11 @@
 import os
 import requests
 import tornado.web
+import tornado.options
 import subprocess
+import tempfile
 
-from engine.model import InValueModelConfig as dpInValueModelConfig
+from engine.cache import dpInValueModelConfig
 from engine.engine import Engine as dpEngine
 
 
@@ -82,18 +84,6 @@ class Compressor(dpEngine):
 
         return ''.join(r)
 
-    def generate(self, code, combined_path, path):
-        key = self.handler.helper.datetime.current_time()
-        key = self.handler.helper.crypto.md5_hash('%s / %s' % (path, key))
-        ext = path.split('.')[-1:][0]
-        filename = '%s.%s' % (key, ext)
-
-        f = open(os.path.join(combined_path, filename), 'w')
-        f.write(code)
-        f.close()
-
-        return filename
-
     @staticmethod
     def clear(combined_dir):
         if not os.path.isdir(combined_dir):
@@ -107,124 +97,125 @@ class Compressor(dpEngine):
 
 
 class StaticURL(tornado.web.UIModule):
-    compiled = {}
-    generated = {}
-    compressor = None
-    static_path = None
-    static_prefix = None
-    combined_path = None
-    cache_config = dpInValueModelConfig(driver='sqlite', database='static_url_compiled', pure=True)
+    def render(self, *statics, **options):
+        if not self.handler.vars.compressor:
+            self.handler.vars.compressor = Compressor(self.handler)
+            self.handler.vars.static.path = self.handler.settings.get('static_path')
+            self.handler.vars.static.prefix = self.handler.settings.get('static_url_prefix')
+            self.handler.vars.static.combined_path = self.handler.settings.get('combined_static_path')
+            self.handler.vars.static.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
+            self.handler.vars.static.cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
 
-    def render(self, *static_urls, **options):
-        if not self.compressor:
-            self.compressor = Compressor(self.handler)
-            self.static_path = self.handler.settings.get('static_path')
-            self.static_prefix = self.handler.settings.get('static_url_prefix')
-            self.combined_path = self.handler.settings.get('combined_static_path')
-            self.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
+            self.handler.vars.static.aws_id = tornado.options.options.static_aws_id
+            self.handler.vars.static.aws_secret = tornado.options.options.static_aws_secret
+            self.handler.vars.static.aws_bucket = tornado.options.options.static_aws_bucket
+            self.handler.vars.static.aws_endpoint = tornado.options.options.static_aws_endpoint
 
-        html = []
-        combined = False
-        key = str(static_urls)
+            self.handler.vars.static.aws_configured = True if (self.handler.vars.static.aws_id and
+                                                               self.handler.vars.static.aws_secret and
+                                                               self.handler.vars.static.aws_bucket and
+                                                               self.handler.vars.static.aws_endpoint) else False
 
-        if key in self.generated:
-            return self.generated[key]
+        # for Debugging Mode, do not minify css or js.
+        if self.handler.settings.get('debug'):
+            return '\n'.join(
+                [self._template('%s?%s' % (t, self.handler.vars.compressor.helper.datetime.mtime())) for t in statics])
+        elif (options and 'proxy' in options and options['proxy']) or not self.handler.vars.static.aws_configured:
+            return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 
-        if len(static_urls) > 1 and not self.handler.settings.get('debug'):
-            exts = {}
+        cache_key = 'key_%s_%s' % (len(statics), self.handler.helper.crypto.sha224_hash('/'.join(sorted(statics))))
+        prepared = (self.handler.vars.static.prepared.__getattr__(cache_key) or
+                    self.handler.cache.get(cache_key, dsn_or_conn=self.handler.vars.static.cache_config))
 
-            for path in static_urls:
-                ext = path.split('.')[-1]
+        if prepared:
+            return prepared
 
-                if ext not in exts:
-                    exts[ext] = [path, ]
-                else:
-                    exts[ext].append(path)
+        if 'separate' not in options or not options['separate']:
+            extensions = {}
 
-            import tempfile
-            combined_static_urls = []
+            for static in statics:
+                ext = static.split('?')[0].split('.')[-1].lower()
 
-            for ext in exts.keys():
-                tmp = tempfile.NamedTemporaryFile(suffix='.%s' % ext)
+                if ext not in extensions:
+                    extensions[ext] = []
 
-                for path in exts[ext]:
-                    if path.find('http') == 0:
-                        rq = requests.get(path)
-                        tmp.write(rq.text.encode('utf8'))
-                    else:
-                        with open(os.path.join(self.static_path, path)) as fp:
-                            tmp.write(fp.read())
+                extensions[ext].append(static)
 
-                tmp.flush()
-                combined_static_urls.append(tmp.name)
+            if not extensions:
+                return ''
 
-            static_urls = combined_static_urls
-            combined = True
-
-        for path in static_urls:
-            extension = path.split('.')[-1]
-
-            if extension == 'css':
-                template = '<link rel="stylesheet" type="text/css" href="%(url)s" />'
-
-            elif extension == 'js':
-                template = '<script type="text/javascript" src="%(url)s"></script>'
-
+            if len(extensions) > 1:
+                options['separate'] = False
+                return '\n'.join(self.render(*static, **options) for static in extensions.values())
             else:
-                raise NotImplementedError
+                statics = extensions.values()[0]
 
-            if path.find('http') == 0:
-                if self.handler.settings.get('debug'):
-                    static_path = path
+        template = self._template(statics[0], replaced=False)
+        ext = statics[0].split('.')[-1].lower()
 
-                else:
-                    filename = path.split('/')[-1:][0]
+        if not template:
+            return ''
 
-                    tmp_name = os.path.join(self.combined_path, 'temporary', filename)
-                    static_path = '%s%s/%s' % (self.static_prefix, 'temporary', filename)
+        acquire_key = 'job/%s' % cache_key
+        acquire_identifier = self.handler.helper.random.uuid()
 
-                    fp = open(tmp_name, 'w')
-                    rq = requests.get(path)
-                    fp.write(rq.text.encode('utf8'))
-                    fp.close()
+        if not self.handler.cache.get(acquire_key, dsn_or_conn=self.handler.vars.static.cache_config):
+            self.handler.cache.set(
+                acquire_key,
+                acquire_identifier,
+                dsn_or_conn=self.handler.vars.static.cache_config,
+                expire_in=60*3)
+        else:
+            options['proxy'] = True
+            return self.render(*statics, **options)
 
-                    path = tmp_name
+        fp = tempfile.NamedTemporaryFile(mode='w', suffix='.%s' % ext, delete=False)
+        filename = '%s.%s' % (self.handler.helper.crypto.sha224_hash(self.handler.helper.random.uuid()), ext)
+        content_length = 0
 
-            else:
-                static_path = '%s%s' % (self.static_prefix, path)
+        for static in statics:
+            compiled = self.handler.vars.compressor.compress(os.path.join(self.handler.vars.static.path, static))
+            fp.write(compiled)
+            content_length += len(compiled)
 
-            if static_path not in StaticURL.compiled:
-                cache_key = '%s-%s' % (static_path, self.handler.application.startup_at)
-                cached = self.handler.cache.get(cache_key, dsn_or_conn=StaticURL.cache_config)
+        s3bridge = self.handler.helper.aws.s3.connect(
+            self.handler.vars.static.aws_id, self.handler.vars.static.aws_secret)
 
-                if not cached:
-                    if combined:
-                        c = self.compressor.compress('%s' % path)
-                        g = self.compressor.generate(c, self.combined_path, path)
-                        x = '%s%s' % (self.combined_prefix, g)
+        fp_name = fp.name
 
-                    else:
-                        if self.handler.settings.get('debug'):
-                            h = self.handler.helper.datetime.current_time()
-                            h = self.handler.helper.crypto.md5_hash('%s / %s' % (static_path, h))
-                            x = '%s?%s' % (static_path, h)
+        fp.close()
+        fp = open(fp_name, 'r')
 
-                        else:
-                            u = path if path.find('http') == 0 else os.path.join(self.static_path, path)
-                            c = self.compressor.compress(u)
-                            g = self.compressor.generate(c, self.combined_path, path)
-                            x = '%s%s' % (self.combined_prefix, g)
+        s3bridge.set_contents_from_file(self.handler.vars.static.aws_bucket, filename, fp)
 
-                    self.handler.cache.set(cache_key, x, dsn_or_conn=StaticURL.cache_config)
-                    StaticURL.compiled[static_path] = x
+        fp.close()
+        os.remove(fp_name)
 
-                else:
-                    StaticURL.compiled[static_path] = cached
+        prepared_url = '%s/%s' % (self.handler.vars.static.aws_endpoint, filename)
+        prepared = template % {'url': prepared_url}
 
-            static_path = '%s' % StaticURL.compiled[static_path]
-            html.append(template % {'url': static_path})
+        test = requests.get(prepared_url)
 
-        generated = '\n'.join(html)
-        self.generated[key] = generated
+        if self.handler.cache.get(acquire_key, dsn_or_conn=self.handler.vars.static.cache_config) == acquire_identifier:
+            if test.status_code != 200 or (content_length and not len(test.text.strip())):
+                options['proxy'] = True
+                return self.render(*statics, **options)
 
-        return generated
+            self.handler.vars.static.prepared.__setattr__(cache_key, prepared)
+            self.handler.cache.set(cache_key, prepared, dsn_or_conn=self.handler.vars.static.cache_config)
+
+        return prepared
+
+    def _template(self, path, replaced=True):
+        if replaced:
+            url = self.handler.vars.compressor.helper.url.urlparse.urljoin(self.handler.vars.static.prefix, path)
+            return self._template(path, replaced=False) % {'url': url}
+
+        extension = path.split('?')[0].split('.')[-1].lower()
+
+        if extension == 'css':
+            return '<link rel="stylesheet" type="text/css" href="%(url)s" />'
+        elif extension == 'js':
+            return '<script type="text/javascript" src="%(url)s"></script>'
+        else:
+            raise NotImplementedError

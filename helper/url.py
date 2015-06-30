@@ -15,8 +15,8 @@ except:
 
 try:
     import urlparse
-except:
-    pass
+except ImportError:
+    import urllib.parse as urlparse
 
 
 class UrlParse(object):
@@ -39,6 +39,10 @@ class UrlParse(object):
 
 
 class UrlHelper(dpHelper):
+    @property
+    def urlparse(self):
+        return urlparse
+
     def quote(self, s):
         if self.helper.system.py_version <= 2:
             return _parse.quote_plus(s)

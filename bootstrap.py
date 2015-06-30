@@ -85,6 +85,12 @@ if __name__ == '__main__':
     tornado.options.define('dp_path', current_dir)
     tornado.options.define('python', default=get_config(config, 'python', default='python'))
 
+    # Static AWS
+    tornado.options.define('static_aws_id', default=get_config(config, 'aws_id', section='static'))
+    tornado.options.define('static_aws_secret', default=get_config(config, 'aws_secret', section='static'))
+    tornado.options.define('static_aws_bucket', default=get_config(config, 'aws_bucket', section='static'))
+    tornado.options.define('static_aws_endpoint', default=get_config(config, 'aws_endpoint', section='static'))
+
     # Initialize Logging
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
 

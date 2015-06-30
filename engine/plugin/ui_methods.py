@@ -69,3 +69,38 @@ def get(c, arg, default=None):
 
 def number_format(c, val):
     return "{:,}".format(val)
+
+
+def prefix(c, static_url, query=None, combine_request_query=False):
+    if combine_request_query:
+        uri = c.helper.url.parse(c.request.uri)
+
+        if query and isinstance(query, dict):
+            query = dict(uri.query, **query)
+
+        elif not query:
+            query = uri.query
+
+    if query and isinstance(query, dict):
+        uri = c.helper.url.parse(static_url)
+
+        for k in query.keys():
+            v = query[k]
+
+            if v is None and k in uri.query:
+                del uri.query[k]
+            elif v is not None:
+                uri.query[k] = v
+
+        static_url = c.helper.url.build(uri.path, uri.query)
+
+    if 'X-Proxy-Prefix' in c.request.headers:
+        p = c.request.headers['X-Proxy-Prefix']
+        p = p[:-1] if p.endswith('/') else p
+
+        if static_url.startswith(p):
+            return static_url[len(p):]
+
+        return static_url
+    else:
+        return static_url

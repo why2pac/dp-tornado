@@ -1,8 +1,8 @@
 # dp-tornado
 
-MVC Web Application Framework with Tornado, Python 3
+MVC Web Application Framework with Tornado, Python 2 and 3
 
-* Python 3.4
+* Python 2.7+ / 3.4+
 * Linux Kernel 2.5.44+ (Epoll Required)
 
 ## Dependencies
@@ -12,6 +12,8 @@ MVC Web Application Framework with Tornado, Python 3
 * [hiredis](https://pypi.python.org/pypi/hiredis) Redis
 * [BeautifulSoup4](http://www.crummy.com/software/BeautifulSoup/bs4) Screen Scrapping.
 * [Croniter](https://pypi.python.org/pypi/croniter/) Croniter
+* [Boto](http://docs.pythonboto.org) Boto
+* [Requests](http://docs.python-requests.org) Reuqests
 * [Node.js](http://www.nodejs.org) Node.JS, UglifyJS (Optional)
 * [Java](http://www.java.com) Java, YUICompressor (Optional)
 
@@ -57,6 +59,8 @@ MVC Web Application Framework with Tornado, Python 3
 	pip install hiredis
 	pip install beautifulsoup4
 	pip install croniter
+	pip install boto
+	pip install requests
 
 ### Execution
 

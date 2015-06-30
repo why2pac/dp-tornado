@@ -292,3 +292,20 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                 '   WHERE '
                 '       key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
                 (amount, key), self._config_dsn, cache=True)
+
+    def ttl(self, key):
+        record = dpModelSingleton().row("""
+                SELECT
+                    *
+                FROM
+                    {table_name}
+                WHERE
+                    key = ?""".replace('{table_name}',
+                                       self._table_name(self._config_dsn)), key, self._config_dsn, cache=True)
+
+        if not record:
+            return -2
+        elif not record['expire_at']:
+            return -1
+        else:
+            return record['expire_at'] - self.helper.datetime.time()

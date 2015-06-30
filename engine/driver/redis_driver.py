@@ -172,3 +172,6 @@ class RedisCacheDriver(dpCacheDriver):
 
     def dbsize(self):
         return self.conn.dbsize()
+
+    def ttl(self, key):
+        return self.conn.ttl(key)

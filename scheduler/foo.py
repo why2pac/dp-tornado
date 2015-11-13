@@ -14,3 +14,5 @@ class Scheduler(dpProcessor):
         fp = open('scheduler_%s' % self.helper.datetime.time(), 'w')
         fp.write('scheduler %s' % self.helper.datetime.time())
         fp.close()
+
+        print('foo scheduler done')

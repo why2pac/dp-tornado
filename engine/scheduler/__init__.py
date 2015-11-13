@@ -9,10 +9,8 @@
 import os
 import time
 import threading
-import platform
-import subprocess
 import tornado.options
-
+import engine.scheduler.tornado_subprocess
 from ..engine import Engine as dpEngine
 
 try:
@@ -31,7 +29,7 @@ class Scheduler(threading.Thread, dpEngine):
         self.path = os.path.join(self.path, 'scheduler.py')
         self.python = tornado.options.options.python
         self.ts = self.helper.datetime.time()
-        self.close_fds = False if subprocess.mswindows else True
+        self.reference_count = 0
 
         for e in schedules:
             i = e[2] if len(e) >= 3 and isinstance(e[2], int) else 1
@@ -58,13 +56,50 @@ class Scheduler(threading.Thread, dpEngine):
                 if ts >= e['n']:
                     try:
                         e['n'] = ts + e['s'] if isinstance(e['s'], int) else e['s'].get_next()
-                        command = [self.python, self.path, e['c']]
-                        subprocess.Popen(' '.join(command), shell=True, close_fds=self.close_fds)
+                        args = [self.python, self.path, e['c']]
+                        self.reference_count += 1
 
-                    except:
-                        pass
+                        h = SchedulerHandler()
+                        h.attach(args=args, timeout=0, ref=self.reference_count)
+
+                    except Exception as e:
+                        self.logging.exception(e)
 
             time.sleep(2)
+
+
+class SchedulerHandler(dpEngine):
+    args = None
+    ref = 0
+
+    def on_done(self, status, stdout, stderr, has_timed_out):
+        if has_timed_out:
+            self.logging.info('Scheduler done with timed out [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+            self.logging.info(stdout)
+            self.logging.info(stderr)
+            return
+
+        if stdout:
+            self.logging.info('Scheduler done with stdout [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+            self.logging.info(stdout)
+            return
+
+        if stderr:
+            self.logging.info('Scheduler done with stderr [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+            self.logging.info(stderr)
+            return
+
+        self.logging.info('Scheduler done [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+
+    def attach(self, args, timeout=0, ref=None):
+        self.args = args
+        self.ref = ref
+        self.logging.info('Scheduler attach [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+
+        tornado_subprocess.Subprocess(
+            callback=self.on_done,
+            timeout=timeout or 3600*24*7,
+            args=self.args).start()
 
 
 class Processor(dpEngine):

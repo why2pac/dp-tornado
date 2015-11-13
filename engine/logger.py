@@ -25,7 +25,7 @@ class Logger(dpSingleton):
         logging.exception(self.strip(str(exception), True), *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        logging.error(self.strip(msg, True), *args, **kwargs)
+        logging.error(self.strip(str(msg), True), *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         logging.info(self.strip(msg), *args, **kwargs)

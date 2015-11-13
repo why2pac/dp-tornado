@@ -27,14 +27,14 @@ if __name__ == '__main__':
         module = importlib.import_module(module)
 
     except ImportError as e:
-        print 'The specified scheduler module is invalid. (%s)' % module
+        print('The specified scheduler module is invalid. (%s)' % module)
         exit(1)
 
     try:
         runner = getattr(module, 'Scheduler')(timeout)
 
     except AttributeError:
-        print 'The specified scheduler module is not implemented. (%s)' % module
+        print('The specified scheduler module is not implemented. (%s)' % module)
         exit(1)
 
     try:

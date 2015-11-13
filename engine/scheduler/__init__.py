@@ -74,9 +74,13 @@ class SchedulerHandler(dpEngine):
 
     def on_done(self, status, stdout, stderr, has_timed_out):
         if has_timed_out:
-            self.logging.info('Scheduler done with timed out [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-            self.logging.info(stdout)
-            self.logging.info(stderr)
+            self.logging.error('Scheduler done with timed out [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+
+            if stdout:
+                self.logging.error(stdout)
+            if stderr:
+                self.logging.error(stderr)
+
             return
 
         if stdout:
@@ -85,8 +89,8 @@ class SchedulerHandler(dpEngine):
             return
 
         if stderr:
-            self.logging.info('Scheduler done with stderr [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-            self.logging.info(stderr)
+            self.logging.error('Scheduler done with stderr [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
+            self.logging.error(stderr)
             return
 
         self.logging.info('Scheduler done [%s] (%s)' % (' '.join(self.args[2:]), self.ref))

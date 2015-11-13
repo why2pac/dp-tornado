@@ -45,6 +45,9 @@ class CacheDriver(object):
     def increase(self, key, amount, expire_in):
         raise NotImplementedError
 
+    def llen(self, key):
+        raise NotImplementedError
+
     def lrange(self, key, start, stop):
         raise NotImplementedError
 
@@ -87,10 +90,13 @@ class CacheDriver(object):
     def hgetall(self, key):
         raise NotImplementedError
 
-    def hget(self, key):
+    def hget(self, key, field):
         raise NotImplementedError
 
-    def hdel(self, key, val):
+    def hset(self, key, field, val):
+        raise NotImplementedError
+
+    def hdel(self, key, field):
         raise NotImplementedError
 
     def keys(self, pattern):
@@ -253,6 +259,12 @@ class Cache(dpEngine):
         assert(expire_in is None or int(expire_in) >= 0)
         return conn.increase(key, amount, expire_in)
 
+    def llen(self, key, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.llen(key)
+
     def lrange(self, key, start, stop, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
@@ -337,11 +349,17 @@ class Cache(dpEngine):
 
         return conn.hgetall(key)
 
-    def hget(self, key, dsn_or_conn):
+    def hget(self, key, field, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.hget(key)
+        return conn.hget(key, field)
+
+    def hset(self, key, field, val, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.hset(key, field, val)
 
     def hdel(self, key, val, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

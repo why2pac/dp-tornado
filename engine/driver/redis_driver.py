@@ -69,6 +69,9 @@ class RedisCacheDriver(dpCacheDriver):
             p.expire(key, int(expire_in))
             return p.execute()
 
+    def llen(self, key):
+        return self.conn.llen(key)
+
     def lrange(self, key, start, stop):
         return self.conn.lrange(key, start, stop)
 
@@ -161,11 +164,14 @@ class RedisCacheDriver(dpCacheDriver):
     def hgetall(self, key):
         return self.conn.hgetall(key)
 
-    def hget(self, key):
-        return self.conn.hget(key)
+    def hget(self, key, field):
+        return self.conn.hget(key, field)
 
-    def hdel(self, key, val):
-        return self.conn.hdel(key, val)
+    def hset(self, key, field, val):
+        return self.conn.hset(key, field, val)
+
+    def hdel(self, key, field):
+        return self.conn.hdel(key, field)
 
     def keys(self, pattern):
         return self.conn.keys(pattern)

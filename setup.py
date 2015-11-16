@@ -1,36 +1,34 @@
 import os
 
-from dp_tornado import __version__
-
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-with open(os.path.join(os.path.dirname(__file__), 'README.md')) as README:
-    long_description = README.read()
+description = 'MVC Web Application Framework with Tornado.'
+
+if os.path.exists('README.txt'):
+    long_description = open('README.md').read()
+else:
+    long_description = description
 
 setup(
     name='dp-tornado',
-    version=__version__,
+    version="0.0.9",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',
     author_email='youngyongpark@gmail.com',
     maintainer='YoungYong Park',
     maintainer_email='youngyongpark@gmail.com',
-    description='MVC Web Application Framework with Tornado.',
+    description=description,
     long_description=long_description,
     packages=[
         'dp_tornado',
         'dp_tornado/engine',
         'dp_tornado/engine/driver',
-        'dp_tornado/engine/plugin',
-        'dp_tornado/engine/plugin/compressor',
-        'dp_tornado/engine/plugin/compressor/uglifyjs2',
-        'dp_tornado/engine/plugin/compressor/uglifyjs2/bin',
-        'dp_tornado/engine/plugin/compressor/uglifyjs2/lib',
         'dp_tornado/engine/scheduler',
+        'dp_tornado/engine/plugin',
         'dp_tornado/helper',
         'dp_tornado/helper/archive',
         'dp_tornado/helper/aws',

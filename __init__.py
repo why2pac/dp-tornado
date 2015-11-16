@@ -10,8 +10,3 @@
   Copyright (c) 2015, why2pac <youngyongpark@gmail.com>
 
 """
-
-
-from dp_tornado import __version__ as ___version___
-
-__version__ = ___version___

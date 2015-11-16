@@ -40,7 +40,7 @@ from dp_tornado.engine.plugin.pagination import Pagination
 from dp_tornado.engine.plugin import ui_methods
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 class RestfulApplication(tornado.web.Application):

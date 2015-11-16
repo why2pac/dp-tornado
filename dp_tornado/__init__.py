@@ -12,6 +12,4 @@
 """
 
 
-from dp_tornado import __version__ as ___version___
-
-__version__ = ___version___
+__version__ = "0.0.1"

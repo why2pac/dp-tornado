@@ -42,7 +42,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return ''.join(x)
 
-    def route(self, method, path):
+    def route(self, method, path, initialize=None):
         if self.interrupted:
             self.on_interrupt()
             return False
@@ -62,6 +62,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             else:
                 paths.append(e)
 
+        paths_req = path.split('/')
         path = '/'.join(paths)
 
         module_path = '%s%s' % (self.prefix, '.%s' % path.replace('/', '.') if path else '')
@@ -91,6 +92,8 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
             except (KeyError, ValueError, AttributeError, ImportError):
                 try:
+                    paths_req.pop()
+
                     class_name = '%sController' % (self.capitalized_method_name(previous))
                     handler = getattr(handler_module, class_name)
                     handler = handler(self.application, self.request, prefix=self.prefix, parent=self)
@@ -102,6 +105,32 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                     previous = pop
                     parameters.append(pop)
                     continue
+
+            on_prepare = getattr(handler, 'on_prepare', None)
+            on_prepare = on_prepare() if on_prepare else None
+
+            if on_prepare is False:
+                on_interrupt = getattr(handler, 'on_interrupt', None)
+
+                if not on_interrupt:
+                    self.finish_with_error(500, 'An error has occurred')
+                else:
+                    on_interrupt()
+
+                return handler
+            elif on_prepare is not True and paths_req:
+                paths_req.pop()
+                paths_req = '/'.join(paths_req)
+
+                if initialize is not False:
+                    routed = self.route(method, paths_req, True if paths_req else False)
+
+                    if isinstance(routed, dpEngine):
+                        self.postprocess(routed)
+                        return False
+
+            if initialize is not None:
+                return False
 
             method = getattr(handler, method, None)
 

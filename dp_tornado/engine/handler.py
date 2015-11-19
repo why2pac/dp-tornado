@@ -26,6 +26,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.routed = None
         self.blocked = False
         self.interrupted = False
+        self.handlers = []
 
         session_dsn = tornado.options.options.session_dsn
 
@@ -105,6 +106,8 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                     previous = pop
                     parameters.append(pop)
                     continue
+
+            self.handlers.append(handler)
 
             on_prepare = getattr(handler, 'on_prepare', None)
             on_prepare = on_prepare() if on_prepare else None
@@ -190,9 +193,15 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         error = kwargs.get('exc_info', None)
         error = error[1] if error else None
         reason = error.reason if error and getattr(error, 'reason', None) else 'An error has occurred'
-        finish = '%s, %s' % (status_code, reason)
 
         self.set_status(status_code)
+
+        for handler in self.handlers:
+            on_error = getattr(handler, 'on_error', None)
+
+            if on_error:
+                on_error(status_code, reason)
+                return self.postprocess(handler)
 
         if status_code == 404:
             return self.render('system/http/pp_404.html')

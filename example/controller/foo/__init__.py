@@ -10,9 +10,12 @@ class FooController(Controller):
 
         # If return value is True, then on_prepare functions are not called recursively.
         # If return value is False, then on_interrupt function or HTTPError(500) is called
-        return True
+        return False
 
-    def on_interrupt(self):
+    def on_error(self, status_code, reason):
+        self.finish('An error has occurred.')
+
+    def on_interruptt(self):
         print('on_interrupt from FooController')
         self.finish('An error has occurred!')
 

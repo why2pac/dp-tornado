@@ -62,7 +62,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             else:
                 paths.append(e)
 
-        paths_req = path.split('/')
+        paths_req = path.split('/') if path else None
         path = '/'.join(paths)
 
         module_path = '%s%s' % (self.prefix, '.%s' % path.replace('/', '.') if path else '')

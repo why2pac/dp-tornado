@@ -7,6 +7,27 @@ from .loader import Loader as dpLoader
 
 class EngineSingleton(dpSingleton):
     @property
+    def options(self):
+        if not hasattr(self, '_options'):
+            import tornado.options
+
+            class TornadoOptions(object):
+                _options = tornado.options.options
+
+                def __getattr__(self, item):
+                    try:
+                        return self._options.__getattr__(item)
+                    except AttributeError:
+                        return None
+
+            self._options = TornadoOptions()
+        
+        try:
+            return self._options
+        except AttributeError:
+            return None
+
+    @property
     def config(self):
         if not hasattr(self, '_config'):
             self._config = dpLoader('config')
@@ -61,6 +82,10 @@ class EngineSingleton(dpSingleton):
 
 
 class Engine(object):
+    @property
+    def options(self):
+        return EngineSingleton().options
+
     @property
     def config(self):
         return EngineSingleton().config

@@ -6,7 +6,7 @@ from dp_tornado.engine.config import Config
 
 class CacheConfig(Config):
     def index(self):
-        self.caches = {
+        self.conf.caches = {
             'store': {'driver': 'memory'},
             'memory': {'driver': 'memory', 'pure': True}
         }

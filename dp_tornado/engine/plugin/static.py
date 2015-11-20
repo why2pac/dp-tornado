@@ -15,45 +15,45 @@ from ..engine import Engine as dpEngine
 class Compressor(dpEngine):
     def __init__(self, handler):
         self.handler = handler
-        self.provider = handler.settings.get('compressor', False) if handler else None
+        self.compressors = handler.settings.get('compressors', False) if handler else None
+        self.provider = {
+            'minifier': 'minify'
+        }
 
-        if not self.provider:
-            raise Exception('No compressor provider specified.')
+        if self.compressors and 'minifier' in self.compressors and self.compressors['minifier']:
+            self.provider['minifier'] = self.compressors['minifier']
 
-        if not self.provider['yuicompressor']:
-            raise Exception('No YUICompress location specified.')
+    def _commands(self, path, files, ext, tempname):
+        files = [os.path.join(path, fn) for fn in files]
 
-        if not self.provider['uglifyjs']:
-            raise Exception('No UglifyJS location specified.')
+        if ext == 'js':
+            return [self.provider['minifier'], '--output', tempname] + files
+        elif ext == 'css':
+            return [self.provider['minifier'], '--output', tempname] + files
 
-    def already_compressed(self, location):
-        for k in ('-min-', '-min.', '.min.', '.minified.', '.pack.', '-jsmin.'):
-            if k in location:
-                return True
-
-        return False
-
-    def compress(self, location):
-        if self.already_compressed(location):
-            return self._read(location)
-
-        c = self._compressor(location)
-
-        if not c:
-            raise Exception('Not supported extension.')
+    def compress(self, path, files, ext, tempname):
+        commands = self._commands(path, files, ext, tempname)
 
         try:
-            c = self._compress(c, location)
-            return c
-        except Exception as e:
-            self.logger.exception(e)
-            return self._read(location)
+            subprocess.check_output(commands)
 
-    def _compressor(self, location, options=''):
-        if location.endswith('.js'):
-            return '%s %s %s' % (self.provider['uglifyjs'], options, location)
-        elif location.endswith('.css'):
-            return 'java -jar %s %s %s' % (self.provider['yuicompressor'], options, location)
+            return True
+
+        except subprocess.CalledProcessError as e:
+            self.logging.error('--------------------------------')
+            self.logging.error('Static file minification error :')
+            self.logging.error('Return code : %s' % e.returncode)
+            self.logging.error('Command : %s' % e.cmd)
+            self.logging.error('Output : %s' % e.output)
+            self.logging.error('--------------------------------')
+
+        except Exception as e:
+            self.logging.error('--------------------------------')
+            self.logging.error('Static file minification error :')
+            self.logging.error(e)
+            self.logging.error('--------------------------------')
+
+        return False
 
     def _compress(self, command, location):
         p = subprocess.Popen(
@@ -115,7 +115,7 @@ class StaticURL(tornado.web.UIModule):
         if self.handler.settings.get('debug'):
             return '\n'.join(
                 [self._template('%s?%s' % (t, self.handler.vars.compressor.helper.datetime.mtime())) for t in statics])
-        elif (options and 'proxy' in options and options['proxy']) or not self.handler.vars.static.aws_configured:
+        elif options and 'proxy' in options and options['proxy']:
             return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 
         cache_key = 'key_%s_%s' % (len(statics), self.handler.helper.crypto.sha224_hash('/'.join(sorted(statics))))
@@ -164,35 +164,54 @@ class StaticURL(tornado.web.UIModule):
             options['proxy'] = True
             return self.render(*statics, **options)
 
-        fp = tempfile.NamedTemporaryFile(mode='w', suffix='.%s' % ext, delete=False)
         filename = '%s.%s' % (self.handler.helper.crypto.sha224_hash(self.handler.helper.random.uuid()), ext)
-        content_length = 0
 
-        for static in statics:
-            compiled = self.handler.vars.compressor.compress(os.path.join(self.handler.vars.static.path, static))
-            fp.write(compiled)
-            content_length += len(compiled)
+        if not self.handler.vars.static.aws_configured:
+            output = open(os.path.join(self.handler.vars.static.combined_path, filename), 'w')
+            tempname = output.name
+            output.close()
+        else:
+            output = tempfile.NamedTemporaryFile(mode='w', prefix=filename, suffix='.%s' % ext, delete=False)
+            tempname = output.name
+            output.close()
 
-        s3bridge = self.handler.helper.aws.s3.connect(
-            self.handler.vars.static.aws_id, self.handler.vars.static.aws_secret)
+        compressed = self.handler.vars.compressor.compress(self.handler.vars.static.path, statics, ext, tempname)
 
-        fp_name = fp.name
+        # If failed compression.
+        if not compressed:
+            options['proxy'] = True
+            return self.render(*statics, **options)
 
-        fp.close()
-        fp = open(fp_name, 'r')
+        # AWS not configured, compressed files are stored local storage.
+        if not self.handler.vars.static.aws_configured:
+            prepared = template % {
+                'url': self.handler.vars.compressor.helper.url.urlparse.urljoin(
+                    self.handler.vars.static.combined_prefix, filename)}
 
-        s3bridge.set_contents_from_file(self.handler.vars.static.aws_bucket, filename, fp)
+            test = os.path.exists(tempname)
 
-        fp.close()
-        os.remove(fp_name)
+        # AWS configured, upload compressed files to S3.
+        else:
+            content_length = os.path.getsize(tempname)
+            fp = open(tempname, 'r')
 
-        prepared_url = '%s/%s' % (self.handler.vars.static.aws_endpoint, filename)
-        prepared = template % {'url': prepared_url}
+            s3bridge = self.handler.helper.aws.s3.connect(
+                self.handler.vars.static.aws_id, self.handler.vars.static.aws_secret)
 
-        test = requests.get(prepared_url)
+            s3bridge.set_contents_from_file(self.handler.vars.static.aws_bucket, filename, fp)
+
+            fp.close()
+            os.remove(tempname)
+
+            prepared_url = self.handler.vars.compressor.helper.url.urlparse.urljoin(
+                self.handler.vars.static.aws_endpoint, filename)
+            prepared = template % {'url': prepared_url}
+
+            test = requests.get(prepared_url)
+            test = False if test.status_code != 200  or (content_length and not len(test.text.strip())) else True
 
         if self.handler.cache.get(acquire_key, dsn_or_conn=self.handler.vars.static.cache_config) == acquire_identifier:
-            if test.status_code != 200 or (content_length and not len(test.text.strip())):
+            if not test:
                 options['proxy'] = True
                 return self.render(*statics, **options)
 

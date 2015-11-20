@@ -62,6 +62,7 @@ class Bootstrap(object):
         custom_service = kwargs['service'] if 'service' in kwargs else None
         custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else None
 
+        engine_path = os.path.join(os.path.dirname(os.path.realpath(__file__)))
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
         combined_path = os.path.join(application_path, 'static', 'combined')
 
@@ -143,7 +144,7 @@ class Bootstrap(object):
         # Clear combined files
         Compressor.clear(combined_path)
 
-        compressor_path = os.path.join(application_path, 'engine', 'plugin', 'compressor')
+        compressor_path = os.path.join(engine_path, 'engine', 'plugin', 'compressor')
 
         settings = {
             'template_path': os.path.join(application_path, 'view'),
@@ -151,9 +152,8 @@ class Bootstrap(object):
             'static_url_prefix': '/s/',
             'combined_static_path': combined_path,
             'combined_static_url_prefix': '/s/combined/',
-            'compressor': {
-                'yuicompressor': os.path.join(compressor_path, 'yuicompressor-2.4.8.jar'),
-                'uglifyjs': os.path.join(compressor_path, 'uglifyjs2', 'bin', 'uglifyjs'),
+            'compressors': {
+                'minifier': None
             },
             'debug': tornado.options.options.debug,
             'gzip': tornado.options.options.gzip,

@@ -7,7 +7,7 @@ except ImportError:
 
 description = 'MVC Web Application Framework with Tornado.'
 
-if os.path.exists('README.txt'):
+if os.path.exists('README.md'):
     long_description = open('README.md').read()
 else:
     long_description = description

@@ -89,6 +89,7 @@ class Bootstrap(object):
                 return default
 
         # Setup Options
+        tornado.options.define('max_worker', default=get_cfg(config, 'max_worker', default=1))
         tornado.options.define('num_processes', default=get_cfg(config, 'num_processes', default=0))
         tornado.options.define('port', default=get_cfg(config, 'port', default=8080))
         tornado.options.define('debug', default=get_cfg(config, 'debug', default=False))

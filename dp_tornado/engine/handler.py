@@ -16,8 +16,6 @@ from .model import InValueModelConfig as dpInValueModelConfig
 
 
 class Handler(tornado.web.RequestHandler, dpEngine):
-    #executor = tornado.concurrent.futures.ThreadPoolExecutor(tornado.options.options.max_worker)
-
     def __init__(self, application, request, **kwargs):
         super(Handler, self).__init__(application, request, **kwargs)
 
@@ -36,6 +34,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def initialize(self, prefix=None):
         self.prefix = prefix
 
+    @property
+    def executor(self):
+        return self._executor
+
     @staticmethod
     def capitalized_method_name(method_name):
         s = method_name.split('_')
@@ -43,6 +45,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return ''.join(x)
 
+    @tornado.concurrent.run_on_executor
     def route(self, method, path, initialize=None):
         if self.interrupted:
             self.on_interrupt()
@@ -210,27 +213,43 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     def head(self, path=None):
         self.routed = True
-        self.__head(path)
+        self.__processor('head', path)
 
     def get(self, path=None):
         self.routed = True
-        self.__get(path)
+        self.__processor('get', path)
 
     def post(self, path=None):
         self.routed = True
-        self.__post(path)
+        self.__processor('post', path)
 
     def delete(self, path=None):
         self.routed = True
-        self.__delete(path)
+        self.__processor('delete', path)
 
     def patch(self, path=None):
         self.routed = True
-        self.__patch(path)
+        self.__processor('patch', path)
 
     def put(self, path=None):
         self.routed = True
-        self.__put(path)
+        self.__processor('put', path)
+
+    def postprocess(self, x):
+        if not x:
+            return
+        elif x._render:
+            self.__render(x)
+        elif x._finish:
+            self.__finish(x)
+        elif x._write:
+            self.__write(x)
+
+    @tornado.web.asynchronous
+    @tornado.gen.coroutine
+    def __processor(self, method, path):
+        x = yield self.route(method, path)
+        self.postprocess(x)
 
     def __render(self, x):
         if not x._render:
@@ -256,40 +275,6 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             return
 
         self.finish(x._finish)
-
-    def postprocess(self, x):
-        if not x:
-            return
-        elif x._render:
-            self.__render(x)
-        elif x._finish:
-            self.__finish(x)
-        elif x._write:
-            self.__write(x)
-
-    def __head(self, path=None):
-        x = self.route('head', path)
-        self.postprocess(x)
-
-    def __get(self, path=None):
-        x = self.route('get', path)
-        self.postprocess(x)
-
-    def __post(self, path=None):
-        x = self.route('post', path)
-        self.postprocess(x)
-
-    def __delete(self, path=None):
-        x = self.route('delete', path)
-        self.postprocess(x)
-
-    def __patch(self, path=None):
-        x = self.route('patch', path)
-        self.postprocess(x)
-
-    def __put(self, path=None):
-        x = self.route('put', path)
-        self.postprocess(x)
 
     @property
     def remote_ip(self):

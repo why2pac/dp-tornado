@@ -80,6 +80,16 @@ class EngineSingleton(dpSingleton):
 
         return self._vars
 
+    @property
+    def executor(self):
+        if not hasattr(self, '_executor'):
+            import tornado.concurrent
+            import tornado.options
+
+            self._executor = tornado.concurrent.futures.ThreadPoolExecutor(self.options.max_worker or 1)
+
+        return self._executor
+
 
 class Engine(object):
     @property
@@ -117,3 +127,7 @@ class Engine(object):
     @property
     def vars(self):
         return EngineSingleton().vars
+
+    @property
+    def _executor(self):
+        return EngineSingleton().executor

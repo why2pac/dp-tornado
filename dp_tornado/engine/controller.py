@@ -102,6 +102,11 @@ class Controller(dpEngine):
         return url
 
     def redirect(self, url, prefix=False, permanent=False, status=None):
+        if hasattr(self.parent, '__postprocessed__'):
+            return
+
+        setattr(self.parent, '__postprocessed__', True)
+
         if prefix:
             url = self._prefix(url)
 

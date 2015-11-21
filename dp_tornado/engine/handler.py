@@ -244,6 +244,11 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.__processor('put', path)
 
     def postprocess(self, x):
+        if hasattr(self, '__postprocessed__'):
+            return
+
+        setattr(self, '__postprocessed__', True)
+
         if not x:
             return
         elif x._render:

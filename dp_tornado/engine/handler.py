@@ -47,6 +47,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     @tornado.concurrent.run_on_executor
     def route(self, method, path, initialize=None):
+        return self._route(method, path, initialize)
+
+    def _route(self, method, path, initialize=None):
         if self.interrupted:
             self.on_interrupt()
             return False
@@ -121,15 +124,20 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 if not on_interrupt:
                     self.finish_with_error(500, 'An error has occurred')
                 else:
-                    on_interrupt()
+                    try:
+                        on_interrupt()
+                    except Exception as e:
+                        self.logging.error(e)
+                        self.finish_with_error(500, 'An error has occurred')
 
                 return handler
+
             elif on_prepare is not True and paths_req:
                 paths_req.pop()
                 paths_req = '/'.join(paths_req)
 
                 if initialize is not False:
-                    routed = self.route(method, paths_req, True if paths_req else False)
+                    routed = self._route(method, paths_req, True if paths_req else False)
 
                     if isinstance(routed, dpEngine):
                         self.postprocess(routed)

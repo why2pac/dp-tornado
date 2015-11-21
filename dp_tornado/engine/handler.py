@@ -116,7 +116,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             self.handlers.append(handler)
 
             on_prepare = getattr(handler, 'on_prepare', None)
-            on_prepare = on_prepare() if on_prepare else None
+            on_prepare_sepc = inspect.getargspec(on_prepare) if on_prepare else None
+            on_prepare = (on_prepare() if len(on_prepare_sepc.args) == 1 else on_prepare(True if initialize else False)) \
+                if on_prepare else None
 
             if on_prepare is False:
                 on_interrupt = getattr(handler, 'on_interrupt', None)

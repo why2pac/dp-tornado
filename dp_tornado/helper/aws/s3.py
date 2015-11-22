@@ -5,6 +5,29 @@ from dp_tornado.engine.helper import Helper as dpHelper
 from dp_tornado.engine.engine import Engine as dpEngine
 
 
+_s3_connection_ = None
+
+
+def s3_connection():
+    global _s3_connection_
+
+    if _s3_connection_:
+        return _s3_connection_
+
+    try:
+        from boto.s3.connection import S3Connection
+
+        import logging
+        logging.getLogger('boto').setLevel(logging.CRITICAL)
+
+        _s3_connection_ = S3Connection
+
+    except ImportError as e:
+        raise e
+
+    return _s3_connection_
+
+
 class S3Bridge(dpEngine):
     def __init__(self, public, secret):
         try:
@@ -55,3 +78,29 @@ class S3Bridge(dpEngine):
 class S3Helper(dpHelper):
     def connect(self, public, secret):
         return S3Bridge(public, secret)
+
+    def prepare_post(self,
+                     aws_access_key_id,
+                     aws_secret_access_key,
+                     bucket_name,
+                     key,
+                     max_content_length=None,
+                     expires_in=6000,
+                     acl=None):
+        s3 = s3_connection()(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+
+        fields = [{"name": "success_action_status", "value": "201"}]
+        conditions = ['{"success_action_status": "201"}']
+
+        payload = s3.build_post_form_args(
+            bucket_name=bucket_name,
+            key=key,
+            expires_in=expires_in,
+            acl=acl,
+            max_content_length=max_content_length,
+            fields=fields,
+            conditions=conditions)
+
+        return payload

@@ -84,6 +84,7 @@ class S3Helper(dpHelper):
                      aws_secret_access_key,
                      bucket_name,
                      key,
+                     success_action_redirect=None,
                      max_content_length=None,
                      expires_in=6000,
                      acl=None):
@@ -91,8 +92,12 @@ class S3Helper(dpHelper):
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key)
 
-        fields = [{"name": "success_action_status", "value": "201"}]
-        conditions = ['{"success_action_status": "201"}']
+        if not success_action_redirect:
+            fields = [{"name": "success_action_status", "value": "201"}]
+            conditions = ['{"success_action_status": "201"}']
+        else:
+            fields = [{"name": "success_action_redirect", "value": success_action_redirect}]
+            conditions = ['{"success_action_redirect": "%s"}' % success_action_redirect]
 
         payload = s3.build_post_form_args(
             bucket_name=bucket_name,

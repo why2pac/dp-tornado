@@ -41,7 +41,8 @@ setup(
         'requests==2.8.1',
         'croniter==0.3.8',
         'boto==2.38.0',
-        'SQLAlchemy==1.0.9'
+        'SQLAlchemy==1.0.9',
+        'futures==3.0.3'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

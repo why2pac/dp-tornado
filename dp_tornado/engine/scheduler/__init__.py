@@ -4,6 +4,7 @@
 import os
 import time
 import threading
+import subprocess
 import tornado.options
 
 from dp_tornado.engine.scheduler import tornado_subprocess
@@ -55,8 +56,12 @@ class Scheduler(threading.Thread, Engine):
                         args = [self.python, self.path, self.application_path, e['c']]
                         self.reference_count += 1
 
-                        h = SchedulerHandler()
-                        h.attach(args=args, timeout=0, ref=self.reference_count)
+                        if subprocess.mswindows:
+                            subprocess.Popen(
+                                ' '.join(args), shell=True, close_fds=False if subprocess.mswindows else True)
+                        else:
+                            h = SchedulerHandler()
+                            h.attach(args=args, timeout=0, ref=self.reference_count)
 
                     except Exception as e:
                         self.logging.exception(e)

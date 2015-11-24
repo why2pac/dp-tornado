@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
 import tornado.options
 
 from .engine import Engine as dpEngine
 
 session_default_expire_in = tornado.options.options.session_exp_in or 7200
+py_version = sys.version_info[0]
+
+if py_version >= 3:
+    long = int
 
 
 class Controller(dpEngine):
@@ -54,6 +59,8 @@ class Controller(dpEngine):
                 return long(ret)
             elif ret and cast == float:
                 return float(ret)
+            elif ret and cast == bool:
+                return True if cast in ('1', 'yes', 'true', 'True', 'TRUE') else False
 
         except ValueError:
             return default

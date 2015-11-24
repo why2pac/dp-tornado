@@ -60,7 +60,7 @@ class Controller(dpEngine):
             elif ret and cast == float:
                 return float(ret)
             elif ret and cast == bool:
-                return True if cast in ('1', 'yes', 'true', 'True', 'TRUE') else False
+                return True if ret in ('1', 'yes', 'true', 'True', 'TRUE') else False
 
         except ValueError:
             return default

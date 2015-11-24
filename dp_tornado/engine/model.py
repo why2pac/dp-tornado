@@ -201,14 +201,16 @@ class ModelSingleton(dpEngine, dpSingleton):
 
         return result
 
-    def row(self, sql, bind=None, dsn_or_conn=None, cache=False):
+    def row(self, sql, bind=None, dsn_or_conn=None, cache=False, *args, **kwargs):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
+        to_dict = True if 'to_dict' in kwargs else False
+
         row = None
 
         for r in result:
-            row = r
+            row = r if not to_dict else dict(r.items())
             break
 
         if config_dsn:
@@ -216,15 +218,16 @@ class ModelSingleton(dpEngine, dpSingleton):
 
         return row
 
-    def rows(self, sql, bind=None, dsn_or_conn=None, cache=False):
+    def rows(self, sql, bind=None, dsn_or_conn=None, cache=False, *args, **kwargs):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         result = self.execute(sql, bind, dsn_or_conn=conn, cache=cache)
+        to_dict = True if 'to_dict' in kwargs else False
 
         rows = []
 
         for r in result:
-            rows.append(r)
+            rows.append(r if not to_dict else dict(r.items()))
 
         if config_dsn:
             conn.close()
@@ -297,11 +300,11 @@ class Model(dpEngine, dpLoader):
     def execute(self, sql, bind=None, dsn_or_conn=None):
         return ModelSingleton().execute(sql, bind, dsn_or_conn)
 
-    def row(self, sql, bind=None, dsn_or_conn=None):
-        return ModelSingleton().row(sql, bind, dsn_or_conn)
+    def row(self, sql, bind=None, dsn_or_conn=None, *args, **kwargs):
+        return ModelSingleton().row(sql, bind, dsn_or_conn, *args, **kwargs)
 
-    def rows(self, sql, bind=None, dsn_or_conn=None):
-        return ModelSingleton().rows(sql, bind, dsn_or_conn)
+    def rows(self, sql, bind=None, dsn_or_conn=None, *args, **kwargs):
+        return ModelSingleton().rows(sql, bind, dsn_or_conn, *args, **kwargs)
 
     def scalar(self, sql, bind=None, dsn_or_conn=None):
         return ModelSingleton().scalar(sql, bind, dsn_or_conn)

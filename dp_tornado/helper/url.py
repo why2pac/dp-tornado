@@ -50,6 +50,11 @@ class UrlHelper(dpHelper):
         else:
             return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
 
+    def urlencode(self, string):
+        import requests.utils
+
+        return requests.utils.quote(string)
+
     def parse(self, request):
         if self.helper.string.is_str(request):
             uri = self.helper.string.to_str(request)

@@ -109,3 +109,22 @@ class S3Helper(dpHelper):
             conditions=conditions)
 
         return payload
+
+    def generate_url_with_filename(self,
+                                   aws_access_key_id,
+                                   aws_secret_access_key,
+                                   bucket_name,
+                                   key,
+                                   file_name,
+                                   disposition='attachment',
+                                   expires_in=6000):
+        s3 = s3_connection()(
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+
+        response_headers = {
+            'response-content-disposition':
+                '%s; filename="%s"' % (disposition, self.helper.url.urlencode(self.helper.string.to_str(file_name)))
+        }
+
+        return s3.generate_url(expires_in, 'GET', bucket_name, key, response_headers=response_headers)

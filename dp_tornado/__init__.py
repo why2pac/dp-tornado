@@ -66,6 +66,28 @@ class Bootstrap(object):
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
         combined_path = os.path.join(application_path, 'static', 'combined')
 
+        if 'initialize' in kwargs and kwargs['initialize']:
+            import shutil
+
+            template_path = os.path.join(engine_path, 'engine', 'template')
+
+            for root, dirs, files in os.walk(template_path):
+                path = root[len(template_path)+1:]
+                app_path = os.path.join(application_path, path)
+
+                if path and os.path.isdir(app_path):
+                    continue
+
+                if not os.path.isdir(app_path):
+                    os.mkdir(app_path)
+
+                for file in files:
+                    src = os.path.join(root, file)
+                    dest = os.path.join(app_path, file)
+
+                    if not os.path.isfile(dest):
+                        shutil.copy(src, dest)
+
         # INI
         config = configparser.RawConfigParser()
         config.read(os.path.join(application_path, custom_config_file or 'config.ini'))

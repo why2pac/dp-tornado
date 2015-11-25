@@ -157,7 +157,8 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             req_param_count = len(spec.args) - 1
             def_param_count = len(spec.defaults) if spec.defaults else 0
 
-            if len(parameters) > req_param_count or req_param_count > len(parameters) + def_param_count:
+            if not spec.varargs \
+                    and (len(parameters) > req_param_count or req_param_count > len(parameters) + def_param_count):
                 self.finish_with_error(404, 'Page Not Found (Parameters are mismatched)')
 
                 return False

@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>dp for Tornado</title>
+    {% module Static(
+        '/s/default.css',
+        '/s/main.css') %}
+</head>
+<body>
+    <h2><a href="/">/</a></h2>
+    <h2><a href="/main">/main</a></h2>
+    <h2><a href="/main/view">/main/view</a></h2>
+    <h2><a href="/main/contact">/main/contact</a></h2>
+    <h2><a href="/main/contact/a">/main/contact/a</a></h2>
+    <h2><a href="/main/contact/a/b">/main/contact/a/b</a></h2>
+    <h2>model.calc.number.add(10, 20) : {{ model }}</h2>
+    <h2>helper.calc.number.div(20, 10) : {% raw helper %}</h2>
+</body>
+</html>

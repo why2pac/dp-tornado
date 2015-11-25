@@ -1,3 +1,2 @@
 # Assets Compressor
-recursive-include dp_tornado/engine/plugin/compressor *
 recursive-include dp_tornado/engine/template *

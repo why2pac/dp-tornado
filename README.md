@@ -5,6 +5,27 @@ MVC Web Application Framework with Tornado, Python 2 and 3
 To install the package run:
 
     pip install dp-tornado
+    
+    
+## Run
+
+    # -*- coding: utf-8 -*-
+    
+    
+    import os
+    
+    from dp_tornado import Bootstrap
+    
+    kwargs = {
+        'initialize': True,  # If this value specified True, create default directories and files.
+        'application_path': os.path.join(os.path.dirname(os.path.realpath(__file__))),
+        'scheduler': [
+            ('* * * * *', 'scheduler.foo')
+        ]
+    }
+    
+    bootstrap = Bootstrap()
+    bootstrap.run(**kwargs)
 
 
 ## Requisites
@@ -29,7 +50,7 @@ To install the package run:
 **NGINX Configuration**
 
     upstream dp_proxy {
-        server 127.0.0.1:22001;
+        server 127.0.0.1:8080;
     }
     
     server {
@@ -46,7 +67,7 @@ To install the package run:
             root    /data/dist/prepared-pages/;
         }
         
-        location ^~ /static/ {
+        location ^~ /s/ {
             access_log          off;
             log_not_found       off;
             expires             max;

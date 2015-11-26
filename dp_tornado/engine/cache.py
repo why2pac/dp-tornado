@@ -134,6 +134,10 @@ class Cache(dpEngine):
             return self.pools[config_dsn]
 
         config_dsn = config_dsn.split('/')
+
+        if not config_dsn or len(config_dsn) < 2:
+            raise Exception('The specified cache dsn is invalid.')
+
         config = config_dsn[0]
         database = config_dsn[1]
 

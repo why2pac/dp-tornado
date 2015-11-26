@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from dp_tornado.engine.controller import Controller
-from dp_tornado.engine.model import Model
+from dp_tornado.engine.controller import Controller as dpController
+from dp_tornado.engine.engine import EngineSingleton as dpEngineSingleton
 
 try:
     from bson.objectid import ObjectIdx
@@ -27,7 +27,7 @@ except:
     long = int
 
 
-class CacheController(Controller, Model):
+class CacheController(dpController):
     def get(self):
         x = (
             ('int_value', int(1234)),
@@ -51,9 +51,9 @@ class CacheController(Controller, Model):
 
             print('Key : %s -> Val : %s (%s)' % (key, val, type(val)))
 
-            self.cache.set(key, val, 'test.case.cache/memory')
-            get = self.cache.get(key, 'test.case.cache/memory')
-            get_type = type(self.cache.get(key, 'test.case.cache/memory'))
+            dpEngineSingleton().cache.set(key, val, 'test.case.cache/memory')
+            get = dpEngineSingleton().cache.get(key, 'test.case.cache/memory')
+            get_type = type(dpEngineSingleton().cache.get(key, 'test.case.cache/memory'))
 
             assert(get_type == type(val))
             assert(val == get)

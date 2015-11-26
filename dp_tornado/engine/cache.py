@@ -163,7 +163,7 @@ class Cache(dpEngine):
         if not conf:
             raise Exception('Cache configuration initialized failed.')
 
-        if not key in self.pools:
+        if key not in self.pools:
             if conf.driver == 'redis':
                 from .driver.redis_driver import RedisCacheDriver as dpRedisCacheDriver
 
@@ -192,7 +192,7 @@ class Cache(dpEngine):
             else:
                 raise NotImplementedError
 
-            if not key in self.flags:
+            if key not in self.flags:
                 self.flags[key] = True
 
                 if hasattr(self.pools[key], 'create_table'):

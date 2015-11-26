@@ -283,15 +283,15 @@ class ModelProxy(object):
 
 class Model(dpEngine, dpLoader):
     @staticmethod
-    def cache(*args, **kwargs):
+    def caching(*args, **kwargs):
         return ModelSingleton().cache.decorator(*args, **kwargs)
 
     @staticmethod
-    def cache_clear(method, *args, **kwargs):
+    def clear_cached(method, *args, **kwargs):
         return ModelSingleton().cache.clear(method, *args, **kwargs)
 
     @staticmethod
-    def cache_renew(method, *args, **kwargs):
+    def renew_cached(method, *args, **kwargs):
         return ModelSingleton().cache.renew(method, *args, **kwargs)
 
     def _getconn(self, config_dsn):

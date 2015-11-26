@@ -271,6 +271,13 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                 else:
                     return False
 
+    def delete(self, key):
+        return dpModelSingleton().execute("""
+            DELETE FROM {table_name}
+                WHERE
+                    key = ?""".replace('{table_name}', self._table_name(self._config_dsn)),
+            key, self._config_dsn, cache=True)
+
     def increase(self, key, amount, expire_in=None):
         if expire_in is not None:
             expire_in = self.helper.datetime.current_time() + expire_in

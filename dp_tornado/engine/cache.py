@@ -120,6 +120,11 @@ class Cache(dpEngine):
         cache_key = '%s-%s-%s-%s' % (method.__self__.__class__, method.__name__, args, kwargs)
         _lazy_clear_[cache_key] = True
 
+    @staticmethod
+    def renew(method, *args, **kwargs):
+        Cache.clear(method, *args, **kwargs)
+        return method(*args, **kwargs)
+
     @property
     def pools(self):
         if not hasattr(self, '_pools'):

@@ -290,6 +290,10 @@ class Model(dpEngine, dpLoader):
     def cache_clear(method, *args, **kwargs):
         return ModelSingleton().cache.clear(method, *args, **kwargs)
 
+    @staticmethod
+    def cache_renew(method, *args, **kwargs):
+        return ModelSingleton().cache.renew(method, *args, **kwargs)
+
     def _getconn(self, config_dsn):
         return ModelSingleton().getconn(config_dsn)
 

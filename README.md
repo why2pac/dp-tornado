@@ -7,9 +7,10 @@ To install the package run:
     pip install dp-tornado
     
     
-## Run
+## Bootstrap Code
 
     # -*- coding: utf-8 -*-
+    # __init__.py
     
     
     import os
@@ -26,6 +27,12 @@ To install the package run:
     
     bootstrap = Bootstrap()
     bootstrap.run(**kwargs)
+    
+    
+## Run
+
+    $ pip install dp-tornado
+    $ python __init__.py
 
 
 ## Requisites

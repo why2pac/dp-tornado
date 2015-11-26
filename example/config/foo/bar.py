@@ -10,3 +10,7 @@ class BarConfig(Config):
             'bar': {'driver': 'sqlite'},
             'local': {'driver': 'sqlite'}
         }
+
+        self.conf.caches = {
+            'memory': {'driver': 'memory'}
+        }

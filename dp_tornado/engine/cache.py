@@ -4,6 +4,7 @@
 from .engine import Engine as dpEngine
 from .engine import EngineSingleton as dpEngineSingleton
 from .model import InValueModelConfig as dpInValueModelConfig
+from functools import wraps
 
 
 class CacheDriver(object):
@@ -113,6 +114,11 @@ class Cache(dpEngine):
     @staticmethod
     def decorator(*args, **kwargs):
         return Decorator(*args, **kwargs)
+
+    @staticmethod
+    def clear(method, *args, **kwargs):
+        cache_key = '%s-%s-%s-%s' % (method.__self__.__class__, method.__name__, args, kwargs)
+        _lazy_clear_[cache_key] = True
 
     @property
     def pools(self):
@@ -395,6 +401,7 @@ class Storage(object):
 
 _engine_ = dpEngineSingleton()
 _cached_ = Storage()
+_lazy_clear_ = {}
 
 
 class Decorator(object):
@@ -411,8 +418,13 @@ class Decorator(object):
 
         self._dsn = dsn
         self._expire_in = expire_in
+        self._func_name = None
 
     def _cached(self, cache_key):
+        if cache_key in _lazy_clear_:
+            del _lazy_clear_[cache_key]
+            return None
+
         if self._dsn:
             cached = _engine_.cache.get(cache_key, self._dsn)
         else:
@@ -456,6 +468,7 @@ class Decorator(object):
         return True
 
     def __call__(self, f):
+        @wraps(f)
         def wrapped_f(*args, **kwargs):
             cache_key = '%s-%s-%s-%s' % (args[0].__class__, f.__name__, args[1:], kwargs)
             cached = self._cached(cache_key)
@@ -468,5 +481,7 @@ class Decorator(object):
             self._cache(cache_key, output)
 
             return output
+
+        self._func_name = f.__name__
 
         return wrapped_f

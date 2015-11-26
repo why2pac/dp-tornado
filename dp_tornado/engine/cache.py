@@ -423,6 +423,10 @@ class Decorator(object):
     def _cached(self, cache_key):
         if cache_key in _lazy_clear_:
             del _lazy_clear_[cache_key]
+
+            if self._dsn:
+                _engine_.cache.delete(cache_key, self._dsn)
+
             return None
 
         if self._dsn:

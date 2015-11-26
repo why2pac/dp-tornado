@@ -2,6 +2,7 @@
 
 
 from .engine import Engine as dpEngine
+from .engine import EngineSingleton as dpEngineSingleton
 from .model import InValueModelConfig as dpInValueModelConfig
 
 
@@ -108,6 +109,10 @@ class Cache(dpEngine):
     server_startup_at = None
     executed_pure = {}
     executed_pure_cache_config = dpInValueModelConfig(driver='sqlite', database='executed_pure_cache')
+
+    @staticmethod
+    def decorator(*args, **kwargs):
+        return Decorator(*args, **kwargs)
 
     @property
     def pools(self):
@@ -383,3 +388,85 @@ class Cache(dpEngine):
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.ttl(key)
+
+
+class Storage(object):
+    pass
+
+_engine_ = dpEngineSingleton()
+_cached_ = Storage()
+
+
+class Decorator(object):
+    def __init__(self, a=None, b=None, dsn=None, expire_in=None):
+        if a and b is None and isinstance(a, int):
+            dsn = dsn or None
+            expire_in = expire_in or a
+        elif a and b:
+            dsn = dsn or a
+            expire_in = expire_in or b
+
+        if expire_in is None:
+            expire_in = 3600*24*365
+
+        self._dsn = dsn
+        self._expire_in = expire_in
+
+    def _cached(self, cache_key):
+        if self._dsn:
+            cached = _engine_.cache.get(cache_key, self._dsn)
+        else:
+            if hasattr(_cached_, cache_key):
+                cached = getattr(_cached_, cache_key, None)
+            else:
+                cached = None
+
+        cached = _engine_.helper.json.deserialize(cached) if cached else None
+
+        if cached is False:
+            raise Exception('cached value deserialization failed.')
+
+        elif not cached:
+            return None
+
+        elif cached['exp'] and _engine_.helper.datetime.time() > cached['exp']:  # Value expired
+            if not self._dsn:
+                delattr(_cached_, cache_key)
+
+            return None
+
+        return cached['val']
+
+    def _cache(self, cache_key, value):
+        payload = {
+            'exp': _engine_.helper.datetime.time() + self._expire_in if self._expire_in else None,
+            'val': value
+        }
+
+        serialized = _engine_.helper.json.serialize(payload)
+
+        if not serialized:
+            raise Exception('cache decorator supported serializable value only.')
+
+        if not self._dsn:
+            setattr(_cached_, cache_key, serialized)
+        else:
+            _engine_.cache.set(cache_key, serialized, self._dsn, self._expire_in)
+
+        return True
+
+    def __call__(self, f):
+        def wrapped_f(*args, **kwargs):
+            cache_key = '%s-%s-%s-%s' % (args[0].__class__, f.__name__, args[1:], kwargs)
+            cached = self._cached(cache_key)
+
+            if cached:
+                return cached
+
+            output = f(*args, **kwargs)
+
+            self._cache(cache_key, output)
+
+            return output
+
+        return wrapped_f

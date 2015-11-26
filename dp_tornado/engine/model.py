@@ -282,6 +282,10 @@ class ModelProxy(object):
 
 
 class Model(dpEngine, dpLoader):
+    @staticmethod
+    def cache(*args, **kwargs):
+        return ModelSingleton().cache.decorator(*args, **kwargs)
+
     def _getconn(self, config_dsn):
         return ModelSingleton().getconn(config_dsn)
 

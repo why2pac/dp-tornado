@@ -50,3 +50,4 @@ To install the package run:
 * [Croniter](https://pypi.python.org/pypi/croniter/) Scheduler
 * [Boto](http://docs.pythonboto.org) AWS Helper
 * [Requests](http://docs.python-requests.org) HTTP Reuqest
+* [futures](https://pypi.python.org/pypi/futures) concurrent.futures

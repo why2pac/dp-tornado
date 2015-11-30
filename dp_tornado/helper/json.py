@@ -8,7 +8,7 @@ import json
 
 
 class JsonHelper(dpHelper):
-    def serialize(self, a, raise_exception=False, separators=None):
+    def serialize(self, a, raise_exception=False, separators=(',', ':')):
         try:
             return self.dumps(a, separators=separators)
         except Exception as e:

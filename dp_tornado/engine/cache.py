@@ -117,12 +117,12 @@ class Cache(dpEngine):
 
     @staticmethod
     def clear(method, *args, **kwargs):
-        cache_key = '%s-%s-%s-%s' % (method.__self__.__class__, method.__name__, args, kwargs)
-        _lazy_clear_[cache_key] = True
+        kwargs[__cache__clear__] = True
+        return method(*args, **kwargs)
 
     @staticmethod
     def renew(method, *args, **kwargs):
-        Cache.clear(method, *args, **kwargs)
+        kwargs[__cache__renew__] = True
         return method(*args, **kwargs)
 
     @property
@@ -406,7 +406,8 @@ class Storage(object):
 
 _engine_ = dpEngineSingleton()
 _cached_ = Storage()
-_lazy_clear_ = {}
+__cache__clear__ = '__cache__clear__'
+__cache__renew__ = '__cache__renew__'
 
 
 class Decorator(object):
@@ -426,14 +427,6 @@ class Decorator(object):
         self._func_name = None
 
     def _cached(self, cache_key):
-        if cache_key in _lazy_clear_:
-            del _lazy_clear_[cache_key]
-
-            if self._dsn:
-                _engine_.cache.delete(cache_key, self._dsn)
-
-            return None
-
         if self._dsn:
             cached = _engine_.cache.get(cache_key, self._dsn)
         else:
@@ -458,6 +451,15 @@ class Decorator(object):
 
         return cached['val']
 
+    def _clear(self, cache_key):
+        if not self._dsn:
+            if hasattr(_cached_, cache_key):
+                delattr(_cached_, cache_key)
+        else:
+            _engine_.cache.delete(cache_key, self._dsn)
+
+        return True
+
     def _cache(self, cache_key, value):
         payload = {
             'exp': _engine_.helper.datetime.time() + self._expire_in if self._expire_in else None,
@@ -479,7 +481,25 @@ class Decorator(object):
     def __call__(self, f):
         @wraps(f)
         def wrapped_f(*args, **kwargs):
+            cache_clear = False
+            cache_renew = False
+
+            if __cache__clear__ in kwargs:
+                del kwargs[__cache__clear__]
+                cache_clear = True
+
+            if __cache__renew__ in kwargs:
+                del kwargs[__cache__renew__]
+                cache_renew = True
+
             cache_key = '%s-%s-%s-%s' % (args[0].__class__, f.__name__, args[1:], kwargs)
+
+            if cache_renew:
+                self._clear(cache_key)
+            elif cache_clear:
+                self._clear(cache_key)
+                return True
+
             cached = self._cached(cache_key)
 
             if cached:

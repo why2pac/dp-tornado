@@ -56,17 +56,31 @@ class NumericHelper(dpHelper):
 
         return lhs + splt[:-1] + rhs
 
-    def int(self, a):
-        if self.helper.system.py_version <= 2:
-            return int(a) if a else 0
-        else:
-            return int(a) if a else 0
+    def int(self, a, raise_exception=True):
+        try:
+            if self.helper.system.py_version <= 2:
+                return int(a) if a else 0
+            else:
+                return int(a) if a else 0
 
-    def long(self, a):
-        if self.helper.system.py_version <= 2:
-            return long(a) if a else long(0)
-        else:
-            return int(a) if a else 0
+        except ValueError as e:
+            if raise_exception:
+                raise e
+
+            return False
+
+    def long(self, a, raise_exception=True):
+        try:
+            if self.helper.system.py_version <= 2:
+                return long(a) if a else long(0)
+            else:
+                return int(a) if a else 0
+
+        except ValueError as e:
+            if raise_exception:
+                raise e
+
+            return False
 
     @property
     def xxx(self):

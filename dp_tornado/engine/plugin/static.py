@@ -31,11 +31,40 @@ class Compressor(dpEngine):
         elif ext == 'css':
             return [self.provider['minifier'], '--output', tempname] + files
 
-    def compress(self, path, files, ext, tempname):
-        commands = self._commands(path, files, ext, tempname)
+    def _compress(self, path, files, ext, tempname):
+        tmpfiles = []
+        offset = 0
 
-        try:
+        for file in files:
+            offset += 1
+
+            tmpname = '%s_%s' % (tempname, offset)
+            tmp = open(tmpname, 'w')
+            tmp.close()
+
+            commands = self._commands(path, [file], ext, tmpname)
             subprocess.check_output(commands)
+
+            tmpfiles.append(tmpname)
+
+        with open(tempname, 'w') as outfile:
+            for tmpfile in tmpfiles:
+                with open(tmpfile) as infile:
+                    for line in infile:
+                        outfile.write(line)
+
+                os.remove(tmpfile)
+
+        return True
+
+    def compress(self, path, files, ext, tempname):
+        try:
+            if ext == 'js':
+                commands = self._commands(path, files, ext, tempname)
+                subprocess.check_output(commands)
+            else:
+                if not self._compress(path, files, ext, tempname):
+                    return False
 
             return True
 
@@ -54,23 +83,6 @@ class Compressor(dpEngine):
             self.logging.error('--------------------------------')
 
         return False
-
-    def _compress(self, command, location):
-        p = subprocess.Popen(
-            command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        try:
-            (stdout, stderr) = p.communicate()
-        except OSError as msg:
-            raise Exception('An error has occurred from OSError. (%s)' % msg)
-
-        if stderr:
-            raise Exception('An error has occurred from compressor. (%s)' % stderr.decode())
-
-        if self.helper.system.py_version <= 2:
-            return stdout
-        else:
-            return stdout.decode()
 
     def _read(self, location):
         f = open(location, 'r')
@@ -165,13 +177,14 @@ class StaticURL(tornado.web.UIModule):
             return self.render(*statics, **options)
 
         filename = '%s.%s' % (self.handler.helper.crypto.sha224_hash(self.handler.helper.random.uuid()), ext)
+        use_systmp = False
 
-        if not self.handler.vars.static.aws_configured:
-            output = open(os.path.join(self.handler.vars.static.combined_path, filename), 'w')
+        if use_systmp:
+            output = tempfile.NamedTemporaryFile(mode='w', prefix=filename, suffix='.%s' % ext, delete=False)
             tempname = output.name
             output.close()
         else:
-            output = tempfile.NamedTemporaryFile(mode='w', prefix=filename, suffix='.%s' % ext, delete=False)
+            output = open(os.path.join(self.handler.vars.static.combined_path, filename), 'w')
             tempname = output.name
             output.close()
 

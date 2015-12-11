@@ -478,21 +478,42 @@ class Decorator(object):
 
         return True
 
+    def _identifier_key(self, a, b):
+        return 'dp:cache:key:%s:%s' % (a, b)
+
+    def _identifier(self, identifier_key, ident_renew):
+        identifier = self._cached(identifier_key) if not ident_renew else None
+
+        if not identifier:
+            identifier = _engine_.helper.datetime.mtime()
+            self._cache(identifier_key, identifier)
+
+        return identifier
+
     def __call__(self, f):
         @wraps(f)
         def wrapped_f(*args, **kwargs):
             cache_clear = False
             cache_renew = False
+            ident_renew = False
+
+            fn_args = args[1:]
 
             if __cache__clear__ in kwargs:
                 del kwargs[__cache__clear__]
                 cache_clear = True
 
+                if not fn_args and not kwargs:
+                    ident_renew = True
+
             if __cache__renew__ in kwargs:
                 del kwargs[__cache__renew__]
                 cache_renew = True
 
-            cache_key = '%s-%s-%s-%s' % (args[0].__class__, f.__name__, args[1:], kwargs)
+            identifier_key = self._identifier_key(args[0].__class__, f.__name__)
+            identifier_key = self._identifier(identifier_key, ident_renew)
+
+            cache_key = 'dp:cache:val:%s:%s:%s:%s-%s' % (args[0].__class__, f.__name__, identifier_key, fn_args, kwargs)
 
             if cache_renew:
                 self._clear(cache_key)

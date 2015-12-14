@@ -39,7 +39,7 @@ class Controller(dpEngine):
     def request(self):
         return self.parent.request
 
-    def get_argument(self, name, default=None, strip=True, cast=None, fmt=None):
+    def get_argument(self, name, default=None, strip=True, cast=None, fmt=None, delimiter=None):
         ret = self.parent.get_argument(name, default, strip)
 
         try:
@@ -61,6 +61,8 @@ class Controller(dpEngine):
                 return float(ret)
             elif ret and cast == bool:
                 return True if ret in ('1', 'yes', 'true', 'True', 'TRUE') else False
+            elif delimiter:
+                ret = ret.split(delimiter) if ret else ret
 
         except ValueError:
             return default

@@ -129,8 +129,16 @@ class Bootstrap(object):
         tornado.options.define('static_aws_bucket', default=get_cfg(config, 'aws_bucket', section='static'))
         tornado.options.define('static_aws_endpoint', default=get_cfg(config, 'aws_endpoint', section='static'))
 
+        access_logging = get_cfg(config, 'access', default=1, section='logging')
+        sql_logging = get_cfg(config, 'sql', default=0, section='logging')
+
         # Initialize Logging
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
+        logging.basicConfig(
+            level=logging.DEBUG if access_logging else logging.WARN, format='[%(asctime)s][%(levelname)s] %(message)s')
+
+        # SQLAlchemy logging level
+        if sql_logging:
+            logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
         logging.info('---------------------------------')
         logging.info('dp for Tornado has been started..')

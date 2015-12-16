@@ -26,8 +26,8 @@ class JsonHelper(dpHelper):
 
             return False
 
-    def dumps(self, a, separators=None):
-        return json.dumps(a, separators=separators)
+    def dumps(self, a, separators=None, indent=None):
+        return json.dumps(a, separators=separators, indent=indent)
 
     def loads(self, a, encoding='utf8'):
         return json.loads(a, encoding=encoding)

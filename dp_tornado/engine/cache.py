@@ -317,7 +317,7 @@ class Cache(dpEngine):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
-        return conn.lrem(key, value, count)
+        return conn.lrem(key, count, value)
 
     def lpush(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

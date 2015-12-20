@@ -60,6 +60,9 @@ class CacheDriver(object):
     def brpop(self, key, timeout):
         raise NotImplementedError
 
+    def lrem(self, key, count, value):
+        raise NotImplementedError
+
     def lpush(self, key, value, expire_in):
         raise NotImplementedError
 
@@ -309,6 +312,12 @@ class Cache(dpEngine):
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.brpop(key, timeout)
+
+    def lrem(self, key, count, value, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.lrem(key, value, count)
 
     def lpush(self, key, value, dsn_or_conn, expire_in=None):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

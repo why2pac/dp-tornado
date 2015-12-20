@@ -92,8 +92,8 @@ class RedisCacheDriver(dpCacheDriver):
         return brpop[1] if brpop else None
 
     def lrem(self, key, count, value):
-        lrem = self.conn.lrem(key, count, value)
-        return lrem[1] if lrem else None
+        lrem = self.conn.lrem(name=key, num=count, value=value)
+        return lrem
 
     def lpush(self, key, value, expire_in):
         if expire_in is None:

@@ -259,6 +259,13 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         elif x._write:
             self.__write(x)
 
+        for handler in self.handlers:
+            on_finish = getattr(handler, 'on_finish', None)
+
+            if on_finish:
+                if on_finish(self.get_status()) is True:
+                    break
+
     @tornado.web.asynchronous
     @tornado.gen.coroutine
     def __processor(self, method, path):

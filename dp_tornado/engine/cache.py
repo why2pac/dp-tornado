@@ -458,7 +458,7 @@ class Decorator(object):
 
             return None
 
-        return cached['val']
+        return cached
 
     def _clear(self, cache_key):
         if not self._dsn:
@@ -532,8 +532,8 @@ class Decorator(object):
 
             cached = self._cached(cache_key)
 
-            if cached:
-                return cached
+            if cached and 'val' in cached:
+                return cached['val']
 
             output = f(*args, **kwargs)
 

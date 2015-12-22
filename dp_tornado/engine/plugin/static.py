@@ -75,11 +75,17 @@ class Compressor(dpEngine):
             self.logging.error('Command : %s' % e.cmd)
             self.logging.error('Output : %s' % e.output)
             self.logging.error('--------------------------------')
+            for ee in files:
+                self.logging.error(ee)
+            self.logging.error('--------------------------------')
 
         except Exception as e:
             self.logging.error('--------------------------------')
             self.logging.error('Static file minification error :')
             self.logging.error(e)
+            self.logging.error('--------------------------------')
+            for ee in files:
+                self.logging.error(ee)
             self.logging.error('--------------------------------')
 
         return False

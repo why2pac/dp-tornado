@@ -114,18 +114,18 @@ class ModelSingleton(dpEngine, dpSingleton):
                 connection_url = 'sqlite:///%s' % path
 
             else:
-                if conf.charset:
-                    charset = '?charset=%s' % conf.charset
-                else:
-                    charset = ''
-
                 connection_args = {}
-                connection_url = '%s://%s:%s@%s:%s/%s%s' % (
-                    conf.driver,
-                    conf.user, conf.password,
-                    conf.host, conf.port,
-                    conf.database,
-                    charset)
+                connection_url_args = {}
+
+                if conf.charset:
+                    connection_url_args['charset'] = conf.charset
+
+                for e in conf.kwargs or []:
+                    connection_url_args[e] = getattr(conf.kwargs, e)
+
+                connection_url = '%s://%s:%s@%s:%s/%s' \
+                                 % (conf.driver, conf.user, conf.password, conf.host, conf.port, conf.database)
+                connection_url = self.helper.url.build(connection_url, connection_url_args)
 
             params = {
                 'convert_unicode': conf.convert_unicode if conf.convert_unicode is not None else True,

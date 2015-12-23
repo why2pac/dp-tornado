@@ -118,6 +118,10 @@ class Cache(dpEngine):
     executed_pure_cache_config = dpInValueModelConfig(driver='sqlite', database='executed_pure_cache')
 
     @staticmethod
+    def lock_decorator(*args, **kwargs):
+        return LockDecorator(*args, **kwargs)
+
+    @staticmethod
     def decorator(*args, **kwargs):
         return Decorator(*args, **kwargs)
 
@@ -418,6 +422,48 @@ class Cache(dpEngine):
         conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
 
         return conn.ttl(key)
+
+
+class LockDecorator(object):
+    def __init__(self, a=None, b=None, dsn=None, expire_in=None):
+        if a and b is None and isinstance(a, int):
+            dsn = dsn or None
+            expire_in = expire_in or a
+        elif a and b:
+            dsn = dsn or a
+            expire_in = expire_in or b
+
+        if expire_in is None:
+            expire_in = 3600*24*365
+
+        self._dsn = dsn
+        self._expire_in = expire_in
+        self._expire_at = _engine_.helper.datetime.time() + expire_in
+        self._func_name = None
+
+    def __call__(self, f):
+        @wraps(f)
+        def wrapped_f(*args, **kwargs):
+            fn_args = args[1:]
+
+            cache_key = 'dp:lock:val:%s:%s' % (args[0].__class__, f.__name__)
+            acquired = _engine_.cache.setnx(cache_key, self._expire_at, self._dsn, expire_in=self._expire_in)
+
+            if not acquired:
+                return False
+
+            try:
+                output = f(*args, **kwargs)
+            except Exception as e:
+                _engine_.cache.delete(cache_key, self._dsn)
+                raise e
+
+            _engine_.cache.delete(cache_key, self._dsn)
+            return output
+
+        self._func_name = f.__name__
+
+        return wrapped_f
 
 
 class Storage(object):

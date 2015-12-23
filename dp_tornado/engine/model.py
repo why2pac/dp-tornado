@@ -294,6 +294,10 @@ class Model(dpEngine, dpLoader):
     def renew_cached(method, *args, **kwargs):
         return ModelSingleton().cache.renew(method, *args, **kwargs)
 
+    @staticmethod
+    def run_alone(*args, **kwargs):
+        return ModelSingleton().cache.lock_decorator(*args, **kwargs)
+
     def _getconn(self, config_dsn):
         return ModelSingleton().getconn(config_dsn)
 

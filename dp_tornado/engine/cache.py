@@ -36,6 +36,9 @@ class CacheDriver(object):
     def set(self, key, val, expire_in):
         raise NotImplementedError
 
+    def setnx(self, key, val, expire_in):
+        raise NotImplementedError
+
     def delete(self, key):
         raise NotImplementedError
 
@@ -263,6 +266,13 @@ class Cache(dpEngine):
 
         assert(expire_in is None or int(expire_in) >= 0)
         return conn.set(key, val, expire_in)
+
+    def setnx(self, key, val, dsn_or_conn, expire_in=None):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        assert(expire_in is None or int(expire_in) >= 0)
+        return conn.setnx(key, val, expire_in)
 
     def delete(self, key, dsn_or_conn):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

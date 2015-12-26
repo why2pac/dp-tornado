@@ -592,6 +592,8 @@ class Decorator(object):
             cache_renew = False
             ident_renew = False
 
+            fn_args = args[1:]
+
             if __cache__clear__ in kwargs:
                 del kwargs[__cache__clear__]
                 cache_clear = True
@@ -603,7 +605,6 @@ class Decorator(object):
                 del kwargs[__cache__renew__]
                 cache_renew = True
 
-            fn_args = args[1:]
             fn_kwargs = dict([(k, v) for k, v in kwargs.items() if k not in self._ignore])
 
             identifier_key = self._identifier_key(args[0].__class__, f.__name__)

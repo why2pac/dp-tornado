@@ -494,7 +494,7 @@ __cache__renew__ = '__cache__renew__'
 
 
 class Decorator(object):
-    def __init__(self, a=None, b=None, dsn=None, expire_in=None):
+    def __init__(self, a=None, b=None, dsn=None, expire_in=None, **kwargs):
         if a and b is None and isinstance(a, int):
             dsn = dsn or None
             expire_in = expire_in or a
@@ -508,6 +508,10 @@ class Decorator(object):
         self._dsn = dsn if dsn and isinstance(dsn, (list, tuple)) else (dsn, )
         self._expire_in = expire_in
         self._func_name = None
+        self._ignore = kwargs['ignore'] if kwargs and 'ignore' in kwargs else []
+
+        if not isinstance(self._ignore, (list, tuple)):
+            self._ignore = (self._ignore, )
 
     def _cached(self, cache_key):
         for dsn in self._dsn:
@@ -588,6 +592,7 @@ class Decorator(object):
             ident_renew = False
 
             fn_args = args[1:]
+            fn_kwargs = dict([(k, v) for k, v in kwargs.items() if k not in self._ignore])
 
             if __cache__clear__ in kwargs:
                 del kwargs[__cache__clear__]
@@ -603,7 +608,8 @@ class Decorator(object):
             identifier_key = self._identifier_key(args[0].__class__, f.__name__)
             identifier_key = self._identifier(identifier_key, ident_renew)
 
-            cache_key = 'dp:cache:val:%s:%s:%s:%s-%s' % (args[0].__class__, f.__name__, identifier_key, fn_args, kwargs)
+            cache_key = 'dp:cache:val:%s:%s:%s:%s-%s' \
+                        % (args[0].__class__, f.__name__, identifier_key, fn_args, fn_kwargs.items())
 
             if cache_renew:
                 self._clear(cache_key)

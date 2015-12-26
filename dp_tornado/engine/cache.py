@@ -508,6 +508,7 @@ class Decorator(object):
         self._dsn = dsn if dsn and isinstance(dsn, (list, tuple)) else (dsn, )
         self._expire_in = expire_in
         self._func_name = None
+        self._propagation = kwargs['propagation'] if kwargs and 'propagation' in kwargs else False
         self._ignore = kwargs['ignore'] if kwargs and 'ignore' in kwargs else []
 
         if not isinstance(self._ignore, (list, tuple)):
@@ -591,9 +592,6 @@ class Decorator(object):
             cache_renew = False
             ident_renew = False
 
-            fn_args = args[1:]
-            fn_kwargs = dict([(k, v) for k, v in kwargs.items() if k not in self._ignore])
-
             if __cache__clear__ in kwargs:
                 del kwargs[__cache__clear__]
                 cache_clear = True
@@ -605,6 +603,9 @@ class Decorator(object):
                 del kwargs[__cache__renew__]
                 cache_renew = True
 
+            fn_args = args[1:]
+            fn_kwargs = dict([(k, v) for k, v in kwargs.items() if k not in self._ignore])
+
             identifier_key = self._identifier_key(args[0].__class__, f.__name__)
             identifier_key = self._identifier(identifier_key, ident_renew)
 
@@ -613,9 +614,17 @@ class Decorator(object):
 
             if cache_renew:
                 self._clear(cache_key)
+
+                if self._propagation:
+                    kwargs[__cache__renew__] = True
+
             elif cache_clear:
                 self._clear(cache_key)
-                return True
+
+                if not self._propagation:
+                    return True
+                else:
+                    kwargs[__cache__clear__] = True
 
             cached = self._cached(cache_key)
 

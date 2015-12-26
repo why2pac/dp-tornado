@@ -570,6 +570,8 @@ class Decorator(object):
         if not identifier:
             identifier = _engine_.helper.datetime.mtime()
             self._cache(identifier_key, identifier)
+        else:
+            identifier = identifier['val']
 
         return identifier
 

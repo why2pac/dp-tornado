@@ -30,6 +30,12 @@ class CacheDriver(object):
     def getconn(self):
         pass
 
+    def flushall(self):
+        raise NotImplementedError
+
+    def flushdb(self):
+        raise NotImplementedError
+
     def get(self, key, expire_in, delete):
         raise NotImplementedError
 
@@ -257,6 +263,18 @@ class Cache(dpEngine):
             raise Exception('Cache pool initialized failed.')
 
         return driver.getconn()
+
+    def flushall(self, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.flushall()
+
+    def flushdb(self, dsn_or_conn):
+        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+
+        return conn.flushdb()
 
     def get(self, key, dsn_or_conn, expire_in=None, delete=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None

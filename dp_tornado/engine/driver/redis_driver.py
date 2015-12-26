@@ -20,6 +20,12 @@ class RedisCacheDriver(dpCacheDriver):
     def getconn(self):
         return RedisCacheDriver(self.pool, redis.Redis(connection_pool=self.pool))
 
+    def flushall(self):
+        return self.conn.flushall()
+
+    def flushdb(self):
+        return self.conn.flushdb()
+
     def get(self, key, expire_in, delete):
         if expire_in is None and not delete:
             return self.conn.get(key)

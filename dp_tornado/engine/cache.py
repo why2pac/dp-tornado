@@ -505,41 +505,45 @@ class Decorator(object):
         if expire_in is None:
             expire_in = 3600*24*365
 
-        self._dsn = dsn
+        self._dsn = dsn if dsn and isinstance(dsn, (list, tuple)) else (dsn, )
         self._expire_in = expire_in
         self._func_name = None
 
     def _cached(self, cache_key):
-        if self._dsn:
-            cached = _engine_.cache.get(cache_key, self._dsn)
-        else:
-            if hasattr(_cached_, cache_key):
-                cached = getattr(_cached_, cache_key, None)
+        for dsn in self._dsn:
+            if dsn:
+                cached = _engine_.cache.get(cache_key, dsn)
             else:
-                cached = None
+                if hasattr(_cached_, cache_key):
+                    cached = getattr(_cached_, cache_key, None)
+                else:
+                    cached = None
 
-        cached = _engine_.helper.json.deserialize(cached) if cached else None
+            cached = _engine_.helper.json.deserialize(cached) if cached else None
 
-        if cached is False:
-            raise Exception('cached value deserialization failed.')
+            if cached is False:
+                raise Exception('cached value deserialization failed.')
 
-        elif not cached:
-            return None
+            elif not cached:
+                continue
 
-        elif cached['exp'] and _engine_.helper.datetime.time() > cached['exp']:  # Value expired
-            if not self._dsn:
-                delattr(_cached_, cache_key)
+            elif cached['exp'] and _engine_.helper.datetime.time() > cached['exp']:  # Value expired
+                if not dsn:
+                    delattr(_cached_, cache_key)
 
-            return None
+                continue
 
-        return cached
+            return cached
+
+        return None
 
     def _clear(self, cache_key):
-        if not self._dsn:
-            if hasattr(_cached_, cache_key):
-                delattr(_cached_, cache_key)
-        else:
-            _engine_.cache.delete(cache_key, self._dsn)
+        for dsn in self._dsn:
+            if not dsn:
+                if hasattr(_cached_, cache_key):
+                    delattr(_cached_, cache_key)
+            else:
+                _engine_.cache.delete(cache_key, dsn)
 
         return True
 
@@ -554,10 +558,11 @@ class Decorator(object):
         if not serialized:
             raise Exception('cache decorator supported serializable value only.')
 
-        if not self._dsn:
-            setattr(_cached_, cache_key, serialized)
-        else:
-            _engine_.cache.set(cache_key, serialized, self._dsn, self._expire_in)
+        for dsn in self._dsn:
+            if not dsn:
+                setattr(_cached_, cache_key, serialized)
+            else:
+                _engine_.cache.set(cache_key, serialized, dsn, self._expire_in)
 
         return True
 

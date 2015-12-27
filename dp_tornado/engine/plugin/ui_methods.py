@@ -66,7 +66,7 @@ def number_format(c, val):
     return "{:,}".format(val)
 
 
-def prefix(c, static_url, query=None, combine_request_query=False):
+def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
     if combine_request_query:
         uri = c.helper.url.parse(c.request.uri)
 
@@ -89,8 +89,8 @@ def prefix(c, static_url, query=None, combine_request_query=False):
 
         static_url = c.helper.url.build(uri.path, uri.query)
 
-    if 'X-Proxy-Prefix' in c.request.headers:
-        p = c.request.headers['X-Proxy-Prefix']
+    if prefix or 'X-Proxy-Prefix' in c.request.headers:
+        p = prefix_alternative or prefix or c.request.headers['X-Proxy-Prefix']
         p = p[:-1] if p.endswith('/') else p
 
         if static_url.startswith(p):

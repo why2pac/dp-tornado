@@ -14,7 +14,7 @@ else:
 
 setup(
     name='dp-tornado',
-    version="0.3.8",
+    version="0.3.9",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',
@@ -33,6 +33,8 @@ setup(
         'dp_tornado/helper/archive',
         'dp_tornado/helper/aws',
         'dp_tornado/helper/i18n',
+        'dp_tornado/helper/image',
+        'dp_tornado/helper/image/resize',
         'dp_tornado/helper/validator'],
     include_package_data=True,
     install_requires=[

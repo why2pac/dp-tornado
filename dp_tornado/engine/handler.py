@@ -2,9 +2,9 @@
 
 
 import tornado.web
-import tornado.ioloop
-import tornado.gen
-import tornado.concurrent
+#import tornado.ioloop
+#import tornado.gen
+#import tornado.concurrent
 import tornado.options
 
 import inspect
@@ -45,7 +45,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return ''.join(x)
 
-    @tornado.concurrent.run_on_executor
+    #@tornado.concurrent.run_on_executor
     def route(self, method, path, initialize=None):
         return self._route(method, path, initialize)
 
@@ -266,10 +266,11 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 if on_finish(self.get_status()) is True:
                     break
 
-    @tornado.web.asynchronous
-    @tornado.gen.coroutine
+    #@tornado.web.asynchronous
+    #@tornado.gen.coroutine
     def __processor(self, method, path):
-        x = yield self.route(method, path)
+        #x = yield self.route(method, path)
+        x = self.route(method, path)
         self.postprocess(x)
 
     def __render(self, x):

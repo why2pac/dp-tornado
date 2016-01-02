@@ -2,9 +2,9 @@
 
 
 import tornado.web
-#import tornado.ioloop
-#import tornado.gen
-#import tornado.concurrent
+import tornado.ioloop
+import tornado.gen
+import tornado.concurrent
 import tornado.options
 
 import inspect
@@ -12,7 +12,27 @@ import importlib
 
 from .response import Response as dpResponse
 from .engine import Engine as dpEngine
+from .engine import EngineSingleton as dpEngineSingleton
 from .model import InValueModelConfig as dpInValueModelConfig
+
+
+class ConcurrentDecorator(object):
+    _concurrent_enabled_ = None
+
+    def __init__(self, decorator):
+        self.decorator = decorator
+
+        if ConcurrentDecorator._concurrent_enabled_ is None:
+            executor = dpEngineSingleton().executor
+
+            if executor is not None:
+                ConcurrentDecorator._concurrent_enabled_ = True if executor else False
+
+    def __call__(self, func):
+        if not ConcurrentDecorator._concurrent_enabled_:
+            return func
+
+        return self.decorator(func)
 
 
 class Handler(tornado.web.RequestHandler, dpEngine):
@@ -45,7 +65,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return ''.join(x)
 
-    #@tornado.concurrent.run_on_executor
+    @ConcurrentDecorator(tornado.concurrent.run_on_executor)
     def route(self, method, path, initialize=None):
         return self._route(method, path, initialize)
 
@@ -266,11 +286,14 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 if on_finish(self.get_status()) is True:
                     break
 
-    #@tornado.web.asynchronous
-    #@tornado.gen.coroutine
+    @ConcurrentDecorator(tornado.web.asynchronous)
+    @ConcurrentDecorator(tornado.gen.coroutine)
     def __processor(self, method, path):
-        #x = yield self.route(method, path)
-        x = self.route(method, path)
+        if ConcurrentDecorator._concurrent_enabled_:
+            x = yield self.route(method, path)
+        else:
+            x = self.route(method, path)
+
         self.postprocess(x)
 
     def __render(self, x):

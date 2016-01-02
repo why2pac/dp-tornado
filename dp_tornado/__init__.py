@@ -32,7 +32,6 @@ except ImportError:
     import ConfigParser as configparser
 
 from dp_tornado.engine.scheduler import Scheduler
-from dp_tornado.engine.handler import Handler
 from dp_tornado.engine.plugin.static import Compressor
 from dp_tornado.engine.plugin.static import StaticURL
 from dp_tornado.engine.plugin.prefix import PrefixURL
@@ -50,10 +49,6 @@ class RestfulApplication(tornado.web.Application):
         kwargs['ui_methods'] = ui_methods
 
         super(RestfulApplication, self).__init__(handlers, **kwargs)
-
-
-class DefaultHandler(Handler):
-    pass
 
 
 class Bootstrap(object):
@@ -154,6 +149,7 @@ class Bootstrap(object):
                 services_raw.append(e)
 
         services = []
+        default_handler = None
 
         for service in services_raw:
             if len(service) < 2:
@@ -166,9 +162,14 @@ class Bootstrap(object):
 
                 handler_module = importlib.import_module(module_path)
                 handler = getattr(handler_module, class_name)
+
             else:
+                if default_handler is None:
+                    handler_module = importlib.import_module('dp_tornado.engine.default_handler')
+                    default_handler = getattr(handler_module, 'DefaultHandler')
+
                 module_path = 'controller'
-                handler = DefaultHandler
+                handler = default_handler
 
             services.append((service[0], handler, dict(prefix=module_path)))
 

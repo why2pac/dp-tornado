@@ -55,10 +55,6 @@ class ResizeHelper(dpHelper):
         width_new, height_new = size
         width_origin, height_origin = img.size
 
-        if border:
-            width_new -= border * 2
-            height_new -= border * 2
-
         if scale > 1:
             if limit:
                 scale_max_width = float(width_origin) / float(width_new)
@@ -79,6 +75,10 @@ class ResizeHelper(dpHelper):
         if not height_new:
             height_new = height_origin * width_new / width_origin
             mode = self.helper.image.resize.mode.resize
+
+        if border:
+            width_new -= border * 2
+            height_new -= border * 2
 
         if not mode:
             mode = self.helper.image.resize.mode.resize

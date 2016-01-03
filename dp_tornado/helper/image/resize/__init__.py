@@ -33,6 +33,8 @@ class ResizeHelper(dpHelper):
     def resizing(self, filename, size, **kwargs):
         mode = kwargs['mode'] if 'mode' in kwargs else None
         scale = int(kwargs['scale']) if 'scale' in kwargs else 1
+        border = int(kwargs['border']) if 'border' in kwargs else 0
+        border_color = kwargs['border_color'] if 'border_color' in kwargs else '#000000'
         limit = True if 'limit' in kwargs and kwargs['limit'] else False
         background = kwargs['background'] if 'background' in kwargs else None
         colorize = kwargs['colorize'] if 'colorize' in kwargs else None
@@ -52,6 +54,10 @@ class ResizeHelper(dpHelper):
         ext = (fmt or os.path.splitext(filename)[1][1:]).lower()
         width_new, height_new = size
         width_origin, height_origin = img.size
+
+        if border:
+            width_new -= border * 2
+            height_new -= border * 2
 
         if scale > 1:
             if limit:
@@ -138,11 +144,27 @@ class ResizeHelper(dpHelper):
         if not fmt and ext in ('jpg', 'jpeg') and img.mode == 'P':  # JPEG not supported P mode
             img = img.convert('RGBA')
 
+        # Border without radius
+        if border and not radius:
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+
+            img = ImageOps.expand(img, border=(border, border), fill=border_color)
+
         # Add rounded corner
         if radius:
             fmt = 'PNG'
             img = img.convert('RGBA')
             img.putalpha(self.rounded_mask(img.size, min(radius, *img.size)))
+
+            # Border with radius
+            if border:
+                img_o = img
+
+                bordered_size = (img.size[0] + (border * 2), img.size[1] + (border * 2))
+                img = Image.new('RGBA', bordered_size, border_color)
+                img.putalpha(self.rounded_mask(bordered_size, min(radius, *bordered_size)))
+                img.paste(img_o, (border, border), img_o)
 
         if save:
             img.save(save, format=fmt, quality=100)

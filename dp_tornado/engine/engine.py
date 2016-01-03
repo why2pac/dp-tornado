@@ -83,10 +83,16 @@ class EngineSingleton(dpSingleton):
     @property
     def executor(self):
         if not hasattr(self, '_executor'):
+            if self.options.max_worker is None:
+                return None
+
             import tornado.concurrent
             import tornado.options
 
-            self._executor = tornado.concurrent.futures.ThreadPoolExecutor(self.options.max_worker or 1)
+            if self.options.max_worker:
+                self._executor = tornado.concurrent.futures.ThreadPoolExecutor(self.options.max_worker)
+            else:
+                self._executor = None
 
         return self._executor
 

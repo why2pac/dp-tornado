@@ -170,6 +170,7 @@ class ResizeHelper(dpHelper):
 
         # Colorizing
         if colorize:
+            img = img.convert('RGBA')
             r, g, b, a = img.split()
             gray = ImageOps.grayscale(img)
             result = ImageOps.colorize(gray, colorize, (255, 255, 255, 0))

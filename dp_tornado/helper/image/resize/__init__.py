@@ -33,6 +33,7 @@ class ResizeHelper(dpHelper):
     def resizing(self, filename, size, **kwargs):
         mode = kwargs['mode'] if 'mode' in kwargs else None
         scale = int(kwargs['scale']) if 'scale' in kwargs else 1
+        edge_crop = kwargs['edge_crop'] if 'edge_crop' in kwargs else None
         border = int(kwargs['border']) if 'border' in kwargs else 0
         border_color = kwargs['border_color'] if 'border_color' in kwargs else '#000000'
         limit = True if 'limit' in kwargs and kwargs['limit'] else False
@@ -50,6 +51,45 @@ class ResizeHelper(dpHelper):
 
         if not img:
             raise Exception('The specified image is invalid.')
+
+        # Edge Cropping
+        if edge_crop:
+            e_top = 0
+            e_left = 0
+            e_right = 0
+            e_bottom = 0
+
+            if self.helper.system.py_version <= 2:
+                types_str = (basestring, )
+                types_num = (int, long)
+            else:
+                types_str = (str, )
+                types_num = (int, )
+
+            if isinstance(edge_crop, types_str):
+                edge_crop = edge_crop.split(',')
+
+                for i in range(len(edge_crop)):
+                    edge_crop[i] = int(edge_crop[i])
+
+            if isinstance(edge_crop, types_num):
+                e_top = e_left = e_right = e_bottom = edge_crop
+
+            elif isinstance(edge_crop, (tuple, list)):
+                if len(edge_crop) == 1:
+                    e_top = e_left = e_right = e_bottom = edge_crop[0]
+
+                elif len(edge_crop) == 2:
+                    e_top = e_bottom = edge_crop[0]
+                    e_left = e_right = edge_crop[1]
+
+                elif len(edge_crop) == 4:
+                    e_top = edge_crop[0]
+                    e_right = edge_crop[1]
+                    e_bottom = edge_crop[2]
+                    e_left = edge_crop[3]
+
+            img = img.crop((e_left, e_top, img.size[0] - e_right, img.size[1] - e_bottom))
 
         ext = (fmt or os.path.splitext(filename)[1][1:]).lower()
         width_new, height_new = size

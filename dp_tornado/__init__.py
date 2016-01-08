@@ -37,6 +37,7 @@ from dp_tornado.engine.plugin.static import StaticURL
 from dp_tornado.engine.plugin.prefix import PrefixURL
 from dp_tornado.engine.plugin.pagination import Pagination
 from dp_tornado.engine.plugin import ui_methods
+from dp_tornado.engine.static_handler import StaticHandler
 
 
 class RestfulApplication(tornado.web.Application):
@@ -181,6 +182,7 @@ class Bootstrap(object):
         settings = {
             'template_path': os.path.join(application_path, 'view'),
             'static_path': os.path.join(application_path, 'static'),
+            'static_handler_class': StaticHandler,
             'static_url_prefix': '/s/',
             'combined_static_path': combined_path,
             'combined_static_url_prefix': '/s/combined/',

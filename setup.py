@@ -14,7 +14,7 @@ else:
 
 setup(
     name='dp-tornado',
-    version="0.4.7",
+    version="0.4.8",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',
@@ -44,7 +44,8 @@ setup(
         'croniter==0.3.8',
         'boto==2.38.0',
         'SQLAlchemy==1.0.9',
-        'futures==3.0.3'
+        'futures==3.0.3',
+        'Pillow==3.1.1'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

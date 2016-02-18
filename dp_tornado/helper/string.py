@@ -93,15 +93,15 @@ class StringHelper(dpHelper):
 
     def check_alphanumericpunc(self, val, add=None):
         add = add if add else ''
-        v = any(char not in set(c for c in self.digits + self.letters + self.punctuation + add) for char in val)
+        v = any(char not in set(c for c in self.digits + self.ascii_letters + self.punctuation + add) for char in val)
         return True if not v else False
 
     def check_alphanumeric(self, val, add=None):
         add = add if add else ''
-        v = any(char not in set(c for c in self.digits + self.letters + add) for char in val)
+        v = any(char not in set(c for c in self.digits + self.ascii_letters + add) for char in val)
         return True if not v else False
 
     def check_alphabet(self, val, add=None):
         add = add if add else ''
-        v = any(char not in set(c for c in self.letters + add) for char in val)
+        v = any(char not in set(c for c in self.ascii_letters + add) for char in val)
         return True if not v else False

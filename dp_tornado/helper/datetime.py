@@ -127,6 +127,12 @@ class DatetimeHelper(dpHelper):
         return self.datetime(d).isoweekday() if isoweekday else self.datetime(d).weekday()
 
     def datetime(self, ts=None, yyyymmdd=None, hhiiss='000000'):
+        if self.helper.string.is_str(ts) and len(ts) == 8:
+            yyyymmdd = int(ts)
+        elif self.helper.string.is_str(ts) and len(ts) == 14:
+            yyyymmdd = int(ts[0:8])
+            hhiiss = ts[8:]
+
         if yyyymmdd:
             yyyymmdd = int(yyyymmdd)
 

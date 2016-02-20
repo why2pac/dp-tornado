@@ -36,7 +36,8 @@ class ConcurrentDecorator(object):
 
 
 class InterruptException(Exception):
-    pass
+    def __init__(self, handler):
+        self.handler = handler
 
 
 class Handler(tornado.web.RequestHandler, dpEngine):
@@ -73,8 +74,8 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def route(self, method, path, initialize=None):
         try:
             return self._route(method, path, initialize)
-        except InterruptException:
-            pass
+        except InterruptException as e:
+            return e.handler
 
     def _route(self, method, path, initialize=None):
         if self.interrupted:
@@ -159,7 +160,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                         self.logging.error(e)
                         self.finish_with_error(500, 'An error has occurred')
 
-                raise InterruptException
+                raise InterruptException(handler)
 
             elif on_prepare is not True and paths_req:
                 paths_req.pop()

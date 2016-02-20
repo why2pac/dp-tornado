@@ -424,6 +424,16 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         except (AttributeError, TypeError):
             pass
 
+    def _prefix(self, url):
+        if 'X-Proxy-Prefix' in self.request.headers:
+            prefix = self.request.headers['X-Proxy-Prefix']
+            prefix = prefix[:-1] if prefix.endswith('/') else prefix
+
+            if url.startswith(prefix):
+                url = url[len(prefix):] or '/'
+
+        return url
+
     def get_user_agent(self, parsed=True):
         if not parsed:
             return self.request.headers['User-Agent'] if 'User-Agent' in self.request.headers else ''

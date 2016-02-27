@@ -10,6 +10,9 @@ class Pagination(tornado.web.UIModule, dpEngine):
     region_tag = 'div'
     region_class = 'pagination'
 
+    first = ''
+    first_class = ''
+
     prev_block = ''
     prev_block_class = ''
 
@@ -24,6 +27,9 @@ class Pagination(tornado.web.UIModule, dpEngine):
 
     current_tag = 'strong'
     current_class = ''
+
+    last = ''
+    last_class = ''
 
     link_tag = 'a'
     link_class = ''
@@ -48,6 +54,10 @@ class Pagination(tornado.web.UIModule, dpEngine):
         prev_block_class = options['prev_block_class'] if 'prev_block_class' in options else self.prev_block_class
         next_block = options['next_block'] if 'next_block' in options else self.next_block
         next_block_class = options['next_block_class'] if 'next_block_class' in options else self.next_block_class
+        first = options['first'] if 'first' in options else self.first
+        first_class = options['first_class'] if 'first_class' in options else self.first_class
+        last = options['last'] if 'last' in options else self.last
+        last_class = options['last_class'] if 'last_class' in options else self.last_class
         link_prefix = options['link_prefix'] if 'link_prefix' in options else self.link_prefix
         link_suffix = options['link_suffix'] if 'link_suffix' in options else self.link_suffix
         link_function = options['link_function'] if 'link_function' in options else self.link_function
@@ -62,7 +72,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         params = uri.query
         params = dict(params, **link_params)
 
-        last_page = self.helper.math.ceil(total_count * 1.0 / rpp * 1.0)
+        last_page = int(self.helper.math.ceil(total_count * 1.0 / rpp * 1.0))
 
         if page < 1:
             page = 1
@@ -80,6 +90,21 @@ class Pagination(tornado.web.UIModule, dpEngine):
         if region_tag:
             output = '%s<%s class="%s">' % (output, self.region_tag, self.region_class)
 
+        # First
+        if first and current_block > 1:
+            params['page'] = 1
+            s = self.helper.url.build(url, params)
+            output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
+                      % (output,
+                         self.link_tag,
+                         link_prefix,
+                         s,
+                         link_suffix,
+                         first_class,
+                         first,
+                         self.link_tag,
+                         space_block))
+
         # Prev Block
         if prev_block and current_block > 1:
             params['page'] = ((current_block - 2) * rpb) + 1
@@ -96,7 +121,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
                          space_block))
 
         # Prev Button
-        if current_block > 1:
+        if prev_btn and current_block > 1:
             params['page'] = page - 1
             s = self.helper.url.build(url, params)
             output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
@@ -145,7 +170,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
                              self.link_tag))
 
         # Next Button
-        if current_block < last_block:
+        if next_btn and current_block < last_block:
             params['page'] = page + 1
             params['page'] = last_page if params['page'] > last_page else params['page']
             s = self.helper.url.build(url, params)
@@ -177,6 +202,21 @@ class Pagination(tornado.web.UIModule, dpEngine):
                          next_block_class,
                          next_block,
                          self.link_tag))
+
+        # Last
+        if last and last_block > 1 and current_block < last_block:
+            params['page'] = last_page
+            s = self.helper.url.build(url, params)
+            output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
+                      % (output,
+                         self.link_tag,
+                         link_prefix,
+                         s,
+                         link_suffix,
+                         last_class,
+                         last,
+                         self.link_tag,
+                         space_block))
 
         if region_tag:
             output = '%s</%s">' % (output, self.region_tag)

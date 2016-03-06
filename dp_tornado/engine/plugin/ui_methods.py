@@ -94,7 +94,7 @@ def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, 
         p = p[:-1] if p.endswith('/') else p
 
         if static_url.startswith(p):
-            return static_url[len(p):]
+            return static_url[len(p):] or '/'
 
         return static_url
     else:

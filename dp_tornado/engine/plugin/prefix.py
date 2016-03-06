@@ -35,7 +35,7 @@ class PrefixURL(tornado.web.UIModule, dpEngine):
             prefix = prefix[:-1] if prefix.endswith('/') else prefix
 
             if static_url.startswith(prefix):
-                return static_url[len(prefix):]
+                return static_url[len(prefix):] or '/'
 
             return static_url
         else:

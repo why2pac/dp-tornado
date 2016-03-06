@@ -7,6 +7,6 @@
   MVC Web Application Framework with Tornado
   http://github.com/why2pac/dp-tornado
 
-  Copyright (c) 2015, why2pac <youngyongpark@gmail.com>
+  Copyright (c) 2015, why2pac <oss@dp.farm>
 
 """

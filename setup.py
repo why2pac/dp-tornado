@@ -18,9 +18,9 @@ setup(
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',
-    author_email='youngyongpark@gmail.com',
+    author_email='oss@dp.farm',
     maintainer='YoungYong Park',
-    maintainer_email='youngyongpark@gmail.com',
+    maintainer_email='oss@dp.farm',
     description=description,
     long_description=long_description,
     packages=[

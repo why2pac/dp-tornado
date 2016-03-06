@@ -177,8 +177,6 @@ class Bootstrap(object):
         # Clear combined files
         Compressor.clear(combined_path)
 
-        compressor_path = os.path.join(engine_path, 'engine', 'plugin', 'compressor')
-
         settings = {
             'template_path': os.path.join(application_path, 'view'),
             'static_path': os.path.join(application_path, 'static'),

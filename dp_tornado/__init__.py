@@ -60,7 +60,6 @@ class Bootstrap(object):
 
         engine_path = os.path.join(os.path.dirname(os.path.realpath(__file__)))
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
-        combined_path = os.path.join(application_path, 'static', 'combined')
 
         if 'initialize' in kwargs and kwargs['initialize']:
             import shutil
@@ -105,6 +104,21 @@ class Bootstrap(object):
                     return get
             except (configparser.NoSectionError, configparser.NoOptionError):
                 return default
+
+        combined_path = get_cfg(config, 'path', section='static', default='combined')
+        static_prefix = get_cfg(config, 'prefix', section='static', default='/s/')
+
+        if static_prefix[-1] != '/':
+            static_prefix = '%s/' % static_prefix
+
+        if combined_path[0] == '/':
+            combined_path = combined_path[1:]
+
+        if combined_path[-1] == '/':
+            combined_path = combined_path[:-1]
+
+        combined_prefix = '%s%s/' % (static_prefix, combined_path)
+        combined_path = os.path.join(application_path, 'static', combined_path)
 
         # Setup Options
         tornado.options.define('max_worker', default=get_cfg(config, 'max_worker', default=1))
@@ -181,9 +195,9 @@ class Bootstrap(object):
             'template_path': os.path.join(application_path, 'view'),
             'static_path': os.path.join(application_path, 'static'),
             'static_handler_class': StaticHandler,
-            'static_url_prefix': '/s/',
+            'static_url_prefix': static_prefix,
             'combined_static_path': combined_path,
-            'combined_static_url_prefix': '/s/combined/',
+            'combined_static_url_prefix': combined_prefix,
             'compressors': {
                 'minifier': None
             },

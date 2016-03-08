@@ -45,6 +45,7 @@ def weekday(c, t):
 
 def request_uri(c, s=False, d=' ', p='_', e=False, q=True):
     r = ('%s%s' % (d, p)).join(c.request.uri.split('/')).strip() if s else c.request.uri
+    r = prefix(c, r)
     r = r if q else r.split('?')[0:1][0]
     return c.helper.url.quote(r) if e else r
 

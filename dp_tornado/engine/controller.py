@@ -122,6 +122,13 @@ class Controller(dpEngine):
         except (AttributeError, TypeError):
             pass
 
+    def request_uri(self, s=False, d=' ', p='_', e=False, q=True):
+        r = ('%s%s' % (d, p)).join(self.request.uri.split('/')).strip() if s else self.request.uri
+        r = self._prefix(r)
+        r = r if q else r.split('?')[0:1][0]
+
+        return self.helper.url.quote(r) if e else r
+
     def render(self, template_name, kwargs=None):
         self._render = {'t': template_name, 'k': kwargs}
 

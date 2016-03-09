@@ -39,12 +39,12 @@ setup(
     include_package_data=True,
     install_requires=[
         'tornado==4.3',
-        'redis==2.10.3',
-        'requests==2.8.1',
-        'croniter==0.3.8',
-        'boto==2.38.0',
-        'SQLAlchemy==1.0.9',
-        'futures==3.0.3',
+        'redis==2.10.5',
+        'requests==2.9.1',
+        'croniter==0.3.11',
+        'boto==2.39.0',
+        'SQLAlchemy==1.0.12',
+        'futures==3.0.5',
         'Pillow==3.1.1'
     ],
     keywords=['MVC', 'Web Application Framework'],

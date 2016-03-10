@@ -9,11 +9,12 @@ import redis
 
 class RedisCacheDriver(dpCacheDriver):
     @staticmethod
-    def getpool(config_dsn=None, host=None, port=None, database=None, user=None, password=None):
+    def getpool(config_dsn=None, host=None, port=None, database=None, user=None, password=None, maxconn=None):
         pool = redis.ConnectionPool(
             host=host,
             port=port if port is not None else 6379,
-            db=database if database is not None else 0)
+            db=database if database is not None else 0,
+            max_connections=maxconn or None)
 
         return RedisCacheDriver(pool)
 

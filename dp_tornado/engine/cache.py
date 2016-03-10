@@ -205,7 +205,8 @@ class Cache(dpEngine):
                     conf.port,
                     conf.database,
                     conf.user,
-                    conf.password)
+                    conf.password,
+                    conf.maxconn)
 
             elif conf.driver == 'memory':
                 from .driver.memory_driver import MemoryCacheDriver as dpMemoryCacheDriver

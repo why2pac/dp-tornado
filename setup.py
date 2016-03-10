@@ -14,7 +14,7 @@ else:
 
 setup(
     name='dp-tornado',
-    version="0.5.8",
+    version="0.5.9",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',

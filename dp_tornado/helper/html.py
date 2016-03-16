@@ -39,7 +39,7 @@ class HtmlHelper(dpHelper):
                 'mark', 'ol', 'p', 'pre', 'q', 'rp', 'rt', 'ruby', 's', 'samp',
                 'small', 'source', 'span', 'strong', 'sub', 'summary', 'sup',
                 'table', 'td', 'th', 'time', 'tr', 'track', 'u', 'ul', 'var',
-                'video', 'wbr', 'b')
+                'video', 'wbr', 'b', 'br', 'site', 'font')
 
         return htmltag.strip_xss(html, whitelist, replacement)
 

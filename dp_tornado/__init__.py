@@ -108,7 +108,7 @@ class Bootstrap(object):
         combined_path = get_cfg(config, 'path', section='static', default='combined')
         static_prefix = get_cfg(config, 'prefix', section='static', default='/s/')
 
-        if combined_path.index('{server_name}') != -1:
+        if combined_path.find('{server_name}') != -1:
             import socket
             combined_path = combined_path.replace('{server_name}', socket.gethostname())
 

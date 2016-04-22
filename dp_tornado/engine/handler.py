@@ -496,3 +496,14 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     def on_interrupt(self):
         pass
+
+    def m17n_lang(self, lang=None):
+        if lang is None:
+            import tornado.options
+
+            allowed_m17n = tornado.options.options.m17n
+            m17n = self.get_cookie('__m17n__')
+
+            return m17n if m17n in allowed_m17n else allowed_m17n[0]
+
+        self.m17n.set(self, lang)

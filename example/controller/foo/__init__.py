@@ -25,4 +25,6 @@ class FooController(Controller):
             'foo': 'bar'
         }
 
+        print('Lang : %s' % self.m17n_lang())
+
         self.render('foo/index.html', params)

@@ -6,6 +6,7 @@ import tornado.options
 
 from .engine import Engine as dpEngine
 
+allowed_m17n = tornado.options.options.m17n
 session_default_expire_in = tornado.options.options.session_exp_in or 7200
 py_version = sys.version_info[0]
 
@@ -145,4 +146,8 @@ class Controller(dpEngine):
         self._finish = chunk
 
     def m17n_lang(self, lang=None):
-        self.m17n.set(self.parent, lang)
+        if lang is None:
+            m17n = self.parent.get_cookie('__m17n__')
+            return m17n if m17n in allowed_m17n else allowed_m17n[0]
+
+        return self.parent.m17n_lang(lang)

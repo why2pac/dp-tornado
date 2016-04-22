@@ -54,6 +54,9 @@ class RestfulApplication(tornado.web.Application):
 
 class Bootstrap(object):
     def run(self, **kwargs):
+        # Initialize Logging
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
+
         custom_scheduler = kwargs['scheduler'] if 'scheduler' in kwargs else None
         custom_service = kwargs['service'] if 'service' in kwargs else None
         custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else None
@@ -62,26 +65,37 @@ class Bootstrap(object):
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
 
         if 'initialize' in kwargs and kwargs['initialize']:
-            import shutil
+            valid = True
 
-            template_path = os.path.join(engine_path, 'engine', 'template')
+            for e in ('config', 'controller', 'model', 'helper'):
+                if os.path.isdir(os.path.join(application_path, e)):
+                    valid = False
+                    break
 
-            for root, dirs, files in os.walk(template_path):
-                path = root[len(template_path)+1:]
-                app_path = os.path.join(application_path, path)
+            if not valid:
+                logging.warning('Default directory structure initialzation skipped. Directory not empty.')
 
-                if path and os.path.isdir(app_path):
-                    continue
+            else:
+                import shutil
 
-                if not os.path.isdir(app_path):
-                    os.mkdir(app_path)
+                template_path = os.path.join(engine_path, 'engine', 'template')
 
-                for file in files:
-                    src = os.path.join(root, file)
-                    dest = os.path.join(app_path, file)
+                for root, dirs, files in os.walk(template_path):
+                    path = root[len(template_path)+1:]
+                    app_path = os.path.join(application_path, path)
 
-                    if not os.path.isfile(dest):
-                        shutil.copy(src, dest)
+                    if path and os.path.isdir(app_path):
+                        continue
+
+                    if not os.path.isdir(app_path):
+                        os.mkdir(app_path)
+
+                    for file in files:
+                        src = os.path.join(root, file)
+                        dest = os.path.join(app_path, file)
+
+                        if not os.path.isfile(dest):
+                            shutil.copy(src, dest)
 
         # INI
         config = configparser.RawConfigParser()

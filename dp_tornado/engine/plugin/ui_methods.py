@@ -54,6 +54,13 @@ def i18n(c):
     return c.helper.i18n
 
 
+def m17n(c, m17n_lang=None):
+    if not m17n_lang:
+        m17n_lang = c.get_cookie('__m17n__')
+
+    return c.m17n.get(m17n_lang)
+
+
 def c(c):
     return c
 

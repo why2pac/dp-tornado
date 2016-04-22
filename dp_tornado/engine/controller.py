@@ -143,3 +143,6 @@ class Controller(dpEngine):
 
     def finish(self, chunk=None):
         self._finish = chunk
+
+    def m17n_lang(self, lang=None):
+        self.m17n.set(self.parent, lang)

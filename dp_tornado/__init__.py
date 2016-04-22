@@ -151,6 +151,12 @@ class Bootstrap(object):
         tornado.options.define('application_path', application_path)
         tornado.options.define('python', sys.executable)
 
+        m17n = get_cfg(config, 'm17n', default='').strip()
+        m17n = m17n.split(',') if m17n else ['dummy']
+        m17n = [e.strip() for e in m17n]
+
+        tornado.options.define('m17n', m17n)
+
         # Static AWS
         tornado.options.define('static_aws_id', default=get_cfg(config, 'aws_id', section='static'))
         tornado.options.define('static_aws_secret', default=get_cfg(config, 'aws_secret', section='static'))

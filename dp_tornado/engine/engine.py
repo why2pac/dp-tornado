@@ -57,6 +57,14 @@ class EngineSingleton(dpSingleton):
         return self._view
 
     @property
+    def m17n(self):
+        if not hasattr(self, '_m17n'):
+            from .m17n import M17n as dpM17n
+            self._m17n = dpM17n()
+
+        return self._m17n
+
+    @property
     def cache(self):
         if not hasattr(self, '_cache'):
             from .cache import Cache as dpCache
@@ -117,6 +125,10 @@ class Engine(object):
     @property
     def view(self):
         return EngineSingleton().view
+
+    @property
+    def m17n(self):
+        return EngineSingleton().m17n
 
     @property
     def cache(self):

@@ -113,6 +113,7 @@ class StaticURL(tornado.web.UIModule):
     def render(self, *statics, **options):
         if not self.handler.vars.compressor:
             self.handler.vars.compressor = Compressor(self.handler)
+            self.handler.vars.static.minify = self.handler.settings.get('static_minify')
             self.handler.vars.static.path = self.handler.settings.get('static_path')
             self.handler.vars.static.prefix = self.handler.settings.get('static_url_prefix')
             self.handler.vars.static.combined_path = self.handler.settings.get('combined_static_path')
@@ -133,7 +134,7 @@ class StaticURL(tornado.web.UIModule):
         if self.handler.settings.get('debug'):
             return '\n'.join(
                 [self._template('%s?%s' % (t, self.handler.vars.compressor.helper.datetime.mtime())) for t in statics])
-        elif options and 'proxy' in options and options['proxy']:
+        elif not self.handler.vars.static.minify or (options and 'proxy' in options and options['proxy']):
             return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 
         cache_key = 'key_%s_%s' % (len(statics), self.handler.helper.crypto.sha224_hash('/'.join(sorted(statics))))

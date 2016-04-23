@@ -121,6 +121,7 @@ class Bootstrap(object):
 
         combined_path = get_cfg(config, 'path', section='static', default='combined')
         static_prefix = get_cfg(config, 'prefix', section='static', default='/s/')
+        static_minify = get_cfg(config, 'minify', section='static', default=True)
 
         if combined_path.find('{server_name}') != -1:
             import socket
@@ -220,6 +221,7 @@ class Bootstrap(object):
             'static_path': os.path.join(application_path, 'static'),
             'static_handler_class': StaticHandler,
             'static_url_prefix': static_prefix,
+            'static_minify': static_minify,
             'combined_static_path': combined_path,
             'combined_static_url_prefix': combined_prefix,
             'compressors': {

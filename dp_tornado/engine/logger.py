@@ -4,10 +4,14 @@
 import logging
 import traceback
 import threading
-import queue
 import tornado.options
 
 from .singleton import Singleton as dpSingleton
+
+try:
+    import Queue as queue
+except ImportError:
+    import queue
 
 
 class Logger(dpSingleton):
@@ -32,7 +36,6 @@ class Logger(dpSingleton):
 
         logging.exception(msg, *args, **kwargs)
         logging.exception(tb)
-
 
     def error(self, msg, *args, **kwargs):
         logging.error(self.strip(str(msg), True), *args, **kwargs)

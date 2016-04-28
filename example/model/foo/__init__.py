@@ -18,3 +18,8 @@ class FooModel(dpModel):
     def cache_decorator_local(self, a, b, c):
         print('new', 'cache_decorator_local')
         return a+b+c+self.helper.random.randint(0, 10**7)
+
+    def exception_delegate(self, level, msg, traceback):
+        print(level)
+        print(msg)
+        print(traceback)

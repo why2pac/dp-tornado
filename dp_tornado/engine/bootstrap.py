@@ -118,8 +118,15 @@ class Bootstrap(object):
         tornado.options.define('static_aws_bucket', default=get_cfg(config, 'aws_bucket', section='static'))
         tornado.options.define('static_aws_endpoint', default=get_cfg(config, 'aws_endpoint', section='static'))
 
+        exception_delegate = get_cfg(config, 'exception_delegate', default='', section='logging') or None
         access_logging = get_cfg(config, 'access', default=1, section='logging')
         sql_logging = get_cfg(config, 'sql', default=0, section='logging')
+
+        if exception_delegate:
+            from .engine import Engine as dpEngine
+            exception_delegate = eval('dpEngine().%s' % exception_delegate)
+
+        tornado.options.define('exception_delegate', exception_delegate)
 
         # Initialize Logging
         logging.basicConfig(

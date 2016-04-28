@@ -3,6 +3,9 @@
 
 import logging
 import traceback
+import threading
+import queue
+import tornado.options
 
 from .singleton import Singleton as dpSingleton
 
@@ -10,14 +13,26 @@ from .singleton import Singleton as dpSingleton
 class Logger(dpSingleton):
     def __init__(self, engine=None):
         self.engine = engine
+        self.delegate_handler = tornado.options.options.exception_delegate
+
+        if self.delegate_handler:
+            self.delegate_queue = queue.Queue()
+            self.delegate = LoggerDelegate(self)
+            self.delegate.start()
 
     def strip(self, msg, strip=False):
         return msg.strip() if strip else msg
 
     def exception(self, exception, *args, **kwargs):
-        traceback.print_exc()
+        msg = self.strip(str(exception), True)
+        tb = traceback.format_exc()
 
-        logging.exception(self.strip(str(exception), True), *args, **kwargs)
+        if self.delegate_handler:
+            self.delegate_queue.put((logging.ERROR, msg, tb))
+
+        logging.exception(msg, *args, **kwargs)
+        logging.exception(tb)
+
 
     def error(self, msg, *args, **kwargs):
         logging.error(self.strip(str(msg), True), *args, **kwargs)
@@ -30,3 +45,14 @@ class Logger(dpSingleton):
 
     def debug(self, msg, *args, **kwargs):
         logging.debug(self.strip(msg), *args, **kwargs)
+
+
+class LoggerDelegate(threading.Thread):
+    def __init__(self, logger):
+        threading.Thread.__init__(self)
+        self.logger = logger
+
+    def run(self):
+        while True:
+            payload = self.logger.delegate_queue.get()
+            self.logger.delegate_handler(*payload)

@@ -20,6 +20,11 @@ class FooModel(dpModel):
         return a+b+c+self.helper.random.randint(0, 10**7)
 
     def exception_delegate(self, level, msg, traceback):
+        print('-------------------------------')
         print(level)
         print(msg)
         print(traceback)
+
+        #fp = open('scheduler_%s' % self.helper.datetime.time(), 'w')
+        #fp.write('scheduler %s' % self.helper.datetime.time())
+        #fp.close()

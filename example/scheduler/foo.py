@@ -10,4 +10,5 @@ class Scheduler(Processor):
         #fp.write('scheduler %s' % self.helper.datetime.time())
         #fp.close()
 
+        print(xxx)
         print('foo scheduler done')

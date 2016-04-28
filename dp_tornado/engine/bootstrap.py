@@ -123,7 +123,7 @@ class Bootstrap(object):
         sql_logging = get_cfg(config, 'sql', default=0, section='logging')
 
         if exception_delegate:
-            from .engine import Engine as dpEngine
+            from dp_tornado.engine.engine import Engine as dpEngine
             exception_delegate = eval('dpEngine().%s' % exception_delegate)
 
         tornado.options.define('exception_delegate', exception_delegate)

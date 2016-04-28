@@ -4,6 +4,9 @@
 import sys
 import importlib
 
+from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
+from dp_tornado.engine.engine import Engine as dpEngine
+
 
 if __name__ == '__main__':
     if len(sys.argv) <= 2:
@@ -15,6 +18,7 @@ if __name__ == '__main__':
     timeout = sys.argv[3] if len(sys.argv) >= 4 else None
 
     sys.path.append(app_path)
+    EngineBootstrap.init_ini(application_path=app_path, ini_file=None)
 
     try:
         module = importlib.import_module(module)
@@ -35,5 +39,6 @@ if __name__ == '__main__':
         runner.run()
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        dpEngine().logging.exception(e)
+
+    dpEngine().logging.delegate_interrupt()

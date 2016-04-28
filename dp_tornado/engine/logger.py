@@ -46,6 +46,10 @@ class Logger(dpSingleton):
     def debug(self, msg, *args, **kwargs):
         logging.debug(self.strip(msg), *args, **kwargs)
 
+    def delegate_interrupt(self):
+        if self.delegate_handler:
+            self.delegate_queue.put(False)
+
 
 class LoggerDelegate(threading.Thread):
     def __init__(self, logger):
@@ -55,4 +59,8 @@ class LoggerDelegate(threading.Thread):
     def run(self):
         while True:
             payload = self.logger.delegate_queue.get()
+
+            if not payload:
+                break
+
             self.logger.delegate_handler(*payload)

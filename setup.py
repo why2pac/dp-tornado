@@ -42,6 +42,7 @@ setup(
         'redis==2.10.5',
         'requests==2.9.1',
         'croniter==0.3.11',
+        'pytz==2016.4',
         'boto==2.39.0',
         'SQLAlchemy==1.0.12',
         'futures==3.0.5',

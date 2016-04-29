@@ -6,6 +6,7 @@ import time
 import threading
 import subprocess
 import tornado.options
+import pytz
 
 from dp_tornado.engine.scheduler import tornado_subprocess
 from dp_tornado.engine.engine import Engine
@@ -26,13 +27,19 @@ class Scheduler(threading.Thread, Engine):
         self.python = tornado.options.options.python
         self.application_path = tornado.options.options.application_path
         self.ts = self.helper.datetime.time()
+        self.start_time = self.helper.datetime.datetime()
         self.reference_count = 0
+
+        # Replace timezone
+        if tornado.options.options.scheduler_timezone:
+            tz = pytz.timezone(tornado.options.options.scheduler_timezone)
+            self.start_time = self.helper.datetime.datetime(tz=tz)
 
         for e in schedules:
             i = e[2] if len(e) >= 3 and isinstance(e[2], int) else 1
 
             for i in range(i):
-                s = e[0] if isinstance(e[0], int) else croniter(e[0], self.ts)
+                s = e[0] if isinstance(e[0], int) else croniter(e[0], start_time=self.start_time)
 
                 self.schedules.append({
                     'c': e[1],

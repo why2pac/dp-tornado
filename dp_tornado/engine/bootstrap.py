@@ -118,6 +118,9 @@ class Bootstrap(object):
         tornado.options.define('static_aws_bucket', default=get_cfg(config, 'aws_bucket', section='static'))
         tornado.options.define('static_aws_endpoint', default=get_cfg(config, 'aws_endpoint', section='static'))
 
+        # Scheduler
+        tornado.options.define('scheduler_timezone', default=get_cfg(config, 'timezone', section='scheduler', default=''))
+
         exception_delegate = get_cfg(config, 'exception_delegate', default='', section='logging') or None
         access_logging = get_cfg(config, 'access', default=1, section='logging')
         sql_logging = get_cfg(config, 'sql', default=0, section='logging')

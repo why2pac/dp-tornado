@@ -126,7 +126,7 @@ class DatetimeHelper(dpHelper):
 
         return self.datetime(d).isoweekday() if isoweekday else self.datetime(d).weekday()
 
-    def datetime(self, ts=None, yyyymmdd=None, hhiiss='000000'):
+    def datetime(self, ts=None, yyyymmdd=None, hhiiss='000000', tz=None):
         if self.helper.string.is_str(ts) and len(ts) == 8:
             yyyymmdd = int(ts)
         elif self.helper.string.is_str(ts) and len(ts) == 14:
@@ -160,7 +160,7 @@ class DatetimeHelper(dpHelper):
             else:
                 return datetime.datetime.fromtimestamp(ts)
         else:
-            return datetime.datetime.now()
+            return datetime.datetime.now(tz)
 
     def millisecs_to_next_hour(self, from_time=None):
         dst = self.today() + self.timedelta(hours=1)

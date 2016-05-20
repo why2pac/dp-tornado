@@ -73,8 +73,7 @@ class Bootstrap(object):
         ]
 
         if custom_service:
-            for e in custom_service:
-                services_raw.append(e)
+            services_raw = custom_service + services_raw
 
         services = []
         default_handler = None

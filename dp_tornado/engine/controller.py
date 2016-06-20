@@ -111,12 +111,15 @@ class Controller(dpEngine):
 
         return url
 
-    def redirect(self, url, prefix=False, permanent=False, status=None):
+    def redirect(self, url, prefix=False, permanent=False, status=None, safe=False):
         if self.parent._headers_written:
             return
 
         if prefix:
             url = self._prefix(url)
+
+        if safe and url and not url.startswith('/'):
+            url = '/'
 
         try:
             self.parent.redirect(url, permanent, status)

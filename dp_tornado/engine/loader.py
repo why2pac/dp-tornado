@@ -49,6 +49,13 @@ class Loader(object):
         _prepared.__dict__['_category'] = self.__dict__['_category']
         _prepared.__dict__['_path_prefix'] = '%s.%s' % (self.__dict__['_path_prefix'], name)
 
+        if self.__dict__['_category'] == 'schema':
+            chlid__dsn__ = getattr(obj, '__dsn__', None)
+            self__dsn__ = getattr(self, '__dsn__', None)
+
+            if not chlid__dsn__ and self__dsn__:
+                setattr(obj, '__dsn__', self__dsn__)
+
         self._prepared[name] = _prepared
 
         if hasattr(_prepared, 'index'):

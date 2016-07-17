@@ -35,6 +35,13 @@ class EngineSingleton(dpSingleton):
         return self._config
 
     @property
+    def schema(self):
+        if not hasattr(self, '_schema'):
+            self._schema = dpLoader('schema')
+
+        return self._schema
+
+    @property
     def model(self):
         if not hasattr(self, '_model'):
             self._model = dpLoader('model')
@@ -113,6 +120,10 @@ class Engine(object):
     @property
     def config(self):
         return EngineSingleton().config
+
+    @property
+    def schema(self):
+        return EngineSingleton().schema
 
     @property
     def model(self):

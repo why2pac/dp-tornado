@@ -5,6 +5,11 @@ from dp_tornado.engine.model import Model as dpModel
 
 
 class FooModel(dpModel):
+    def index(self):
+        self.schema.school.classes.migrate()
+        self.schema.school.students.migrate()
+        self.schema.test.multiple_pk.migrate()
+
     def clear(self):
         dpModel.clear_cached(self.cache_decorator_memory, 10, 20, 30)
         dpModel.clear_cached(self.cache_decorator_local, 30, 20, 10)

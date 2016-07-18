@@ -14,7 +14,7 @@ else:
 
 setup(
     name='dp-tornado',
-    version="0.7.1",
+    version="0.7.3",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',
@@ -28,6 +28,8 @@ setup(
         'dp_tornado/engine',
         'dp_tornado/engine/driver',
         'dp_tornado/engine/scheduler',
+        'dp_tornado/engine/schema',
+        'dp_tornado/engine/schema/driver',
         'dp_tornado/engine/plugin',
         'dp_tornado/helper',
         'dp_tornado/helper/archive',

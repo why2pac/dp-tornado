@@ -289,13 +289,15 @@ class MySqlDriver(dpSchemaDriver):
         elif getattr(field.data_type, 'enums', None):
             data_type = '%s%s' % (data_type, getattr(field.data_type, 'enums', None))
 
-        return '{data_type} {null} {zerofill} {default} {auto_increment} {comment}' \
+        ret = '{data_type} {null} {zerofill} {default} {auto_increment} {comment}' \
             .replace('{data_type}', data_type) \
             .replace('{null}', null) \
             .replace('{zerofill}', zerofill) \
             .replace('{default}', default) \
             .replace('{auto_increment}', auto_increment) \
             .replace('{comment}', comment)
+
+        return ret.decode('utf8') if dpModel().helper.system.py_version <= 2 else ret
 
     @staticmethod
     def migrate_indexes(proxy, table, indexes, exist):

@@ -33,12 +33,13 @@ class SmtpSender(object):
 
         self.connected = True
 
-    def send(self, subject, content, from_user, to_user, html=True):
+    def send(self, subject, content, from_user, to_user, html=True, subject_charset=None):
         if self.connected:
             from email.mime.text import MIMEText
+            from email.header import Header
 
             msg = MIMEText('%s\n' % content, 'html' if html else 'plain', 'UTF-8')
-            msg['Subject'] = subject
+            msg['Subject'] = subject if not subject_charset else Header(subject, subject_charset)
             msg['From'] = from_user
             msg['To'] = to_user
 
@@ -61,10 +62,18 @@ class SmtpSender(object):
 
 class SmtpHelper(dpHelper):
     def send(self, to_user, subject, content, from_user=None, cc=None, attach=None,
-             host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True):
+             host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True, subject_charset=None):
         s = SmtpSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
         s.connect()
-        s.send(subject=subject, content=content, from_user=from_user, to_user=to_user, html=html)
+
+        s.send(
+            subject=subject,
+            content=content,
+            from_user=from_user,
+            to_user=to_user,
+            html=html,
+            subject_charset=subject_charset)
+
         s.quit()
 
         return True

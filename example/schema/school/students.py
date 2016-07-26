@@ -9,10 +9,10 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class StudentsSchema(dpTable):
     __table_name__ = 'students'
 
-    idx = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, comment='Index of Student!!')
+    idx = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, comment='Index of Student')
     class_id = dpAttribute.field(dpAttribute.DataType.BIGINT, nn=True, comment='Class ID of Student')
     name = dpAttribute.field(dpAttribute.DataType.VARCHAR(32), name='student_name', nn=True, comment='Name of Student')
-    admission_year = dpAttribute.field(dpAttribute.DataType.SMALLINT, nn=True, comment='Admission Year')
+    admission_year = dpAttribute.field(dpAttribute.DataType.SMALLINT, nn=True, comment='입학연도')
 
     primary_key = dpAttribute.index(dpAttribute.IndexType.PRIMARY, 'idx')
 

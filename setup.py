@@ -13,8 +13,8 @@ else:
     long_description = description
 
 setup(
-    name='dp-tornado',
-    version="0.7.3",
+    name='dp-python',
+    version="0.7.5",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',

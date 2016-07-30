@@ -302,7 +302,13 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         else:
             x = self.route(method, path)
 
-        self.postprocess(x)
+        try:
+            self.postprocess(x)
+
+        except Exception as e:
+            self.logger.exception(e)
+
+            raise e
 
     def __render(self, x):
         if not x._render:

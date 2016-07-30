@@ -251,6 +251,10 @@ class MySqlDriver(dpSchemaDriver):
             proxy.execute(
                 'CREATE TABLE `{table_name}` (`_____dummy_____` INT NULL)'.replace('{table_name}', table_name))
 
+            exist['col'] = {
+                '_____dummy_____': dpAttribute.field(data_type=dpAttribute.DataType.INT, name='_____dummy_____')
+            }
+
         if change:
             exist['col'] = dict(fields)
 
@@ -336,7 +340,7 @@ class MySqlDriver(dpSchemaDriver):
             source_col = [getattr(table, e).name for e in (source_col if isinstance(source_col, (list, tuple)) else (source_col, ))]
             dest_table = v.fields[1].__table_name__
             dest_col = v.fields[2]
-            dest_col = [getattr(table, e).name for e in (dest_col if isinstance(dest_col, (list, tuple)) else (dest_col, ))]
+            dest_col = [getattr(v.fields[1], e).name for e in (dest_col if isinstance(dest_col, (list, tuple)) else (dest_col, ))]
 
             fields = (source_col, dest_table, dest_col)
 

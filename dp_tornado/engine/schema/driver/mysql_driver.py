@@ -251,6 +251,10 @@ class MySqlDriver(dpSchemaDriver):
             proxy.execute(
                 'CREATE TABLE `{table_name}` (`_____dummy_____` INT NULL)'.replace('{table_name}', table_name))
 
+            exist['col'] = {
+                '_____dummy_____': dpAttribute.field(data_type=dpAttribute.DataType.INT, name='_____dummy_____')
+            }
+
         if change:
             exist['col'] = dict(fields)
 

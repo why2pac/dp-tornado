@@ -7,6 +7,10 @@ class SchemaDriver(object):
         raise NotImplementedError
 
     @staticmethod
+    def migrate_data(dsn, table):
+        raise NotImplementedError
+
+    @staticmethod
     def migrate_fields(proxy, table, fields, exist):
         raise NotImplementedError
 

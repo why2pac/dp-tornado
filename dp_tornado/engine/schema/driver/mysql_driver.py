@@ -315,8 +315,16 @@ class MySqlDriver(dpSchemaDriver):
             else:
                 index_name = k or '%s_%s' % (table_name, '_'.join(v.fields))
 
-                proxy.execute('ALTER TABLE {table_name} ADD INDEX {index_name} ({fields})'
+                if v.index_type == dpAttribute.IndexType.UNIQUE:
+                    index_type = 'UNIQUE INDEX'
+                elif v.index_type == dpAttribute.IndexType.FULLTEXT:
+                    index_type = 'FULLTEXT INDEX'
+                else:
+                    index_type = 'INDEX'
+
+                proxy.execute('ALTER TABLE {table_name} ADD {index_type} {index_name} ({fields})'
                               .replace('{table_name}', table_name)
+                              .replace('{index_type}', index_type)
                               .replace('{index_name}', index_name)
                               .replace('{fields}', ','.join(['`%s`' % e for e in fields])))
 

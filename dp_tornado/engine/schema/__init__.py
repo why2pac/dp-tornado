@@ -144,22 +144,7 @@ class _IndexType(object):
 class Table(object):
     __migrated = False
 
-    def migrate(self):
-        if self.__migrated:
-            return True
-
-        self.__migrated = True
-
-        fields = sorted(inspect.getmembers(self, lambda o: isinstance(o, Field)), key=lambda o: o[1].__field_priority__)
-        indexes = sorted(inspect.getmembers(self, lambda o: isinstance(o, Index)), key=lambda o: o[1].__field_priority__)
-        foreign_keys = sorted(inspect.getmembers(self, lambda o: isinstance(o, ForeignKey)), key=lambda o: o[1].__field_priority__)
-
-        for k, v in indexes:
-            if v.index_type == Attribute.IndexType.PRIMARY:
-                for e in v.fields:
-                    o = getattr(self, e)
-                    o.pk = True
-
+    def _get_driver(self):
         dsn = getattr(self, '__dsn__', None)
         dsn_config = dsn.split('/')
 
@@ -191,12 +176,42 @@ class Table(object):
         if not driver:
             raise Exception('The specified driver from dsn is not supported.')
 
+        return dsn, driver
+
+    def migrate(self):
+        if self.__migrated:
+            return True
+
+        self.__migrated = True
+
+        fields = sorted(inspect.getmembers(self, lambda o: isinstance(o, Field)), key=lambda o: o[1].__field_priority__)
+        indexes = sorted(inspect.getmembers(self, lambda o: isinstance(o, Index)), key=lambda o: o[1].__field_priority__)
+        foreign_keys = sorted(inspect.getmembers(self, lambda o: isinstance(o, ForeignKey)), key=lambda o: o[1].__field_priority__)
+
+        for k, v in indexes:
+            if v.index_type == Attribute.IndexType.PRIMARY:
+                for e in v.fields:
+                    o = getattr(self, e)
+                    o.pk = True
+
+        dsn, driver = self._get_driver()
+
         if driver == 'mysql':
             from .driver.mysql_driver import MySqlDriver as SchemaDriver
         else:
             from .driver import SchemaDriver
 
         SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys)
+
+    def migrate_data(self):
+        dsn, driver = self._get_driver()
+
+        if driver == 'mysql':
+            from .driver.mysql_driver import MySqlDriver as SchemaDriver
+        else:
+            from .driver import SchemaDriver
+
+        SchemaDriver.migrate_data(dsn, self)
 
     def __getattribute__(self, item):
         o = super(Table, self).__getattribute__(item)

@@ -15,13 +15,17 @@ class MySqlDriver(dpSchemaDriver):
             if not v.name:
                 setattr(v, 'name', k)
 
+        created = False
+
         for val in (False, True):
             proxy = dpModel().begin(dsn)
 
             try:
                 exist = MySqlDriver._get_exist(proxy, table)
+                create = MySqlDriver.migrate_fields(proxy, table, fields, exist, change=val)
 
-                MySqlDriver.migrate_fields(proxy, table, fields, exist, change=val)
+                if not val:
+                    created = create
 
                 if not val:
                     MySqlDriver.migrate_indexes(proxy, table, indexes, exist)
@@ -39,6 +43,46 @@ class MySqlDriver(dpSchemaDriver):
                 logging.error('Table migration failed : %s :: %s' % (dsn, table.__table_name__))
 
                 break
+
+        if not created:
+            return
+
+        MySqlDriver.migrate_data(dsn, table)
+
+    @staticmethod
+    def migrate_data(dsn, table):
+        dummy_data = getattr(table, '__dummy_data__', None)
+
+        if dummy_data:
+            dummy_data = dummy_data if isinstance(dummy_data, (tuple, list)) else list(dummy_data)
+
+            proxy = dpModel().begin(dsn)
+
+            try:
+                for e in dummy_data:
+                    fields = []
+                    params = []
+
+                    for k, v in e.items():
+                        fields.append(k)
+                        params.append(v)
+
+                    proxy.execute("""
+                        INSERT INTO {table_name}
+                            ({fields}) VALUES ({params})"""
+                                  .replace('{table_name}', table.__table_name__)
+                                  .replace('{fields}', ','.join(['`%s`' % ee for ee in fields]))
+                                  .replace('{params}', ','.join(['%s' for ee in fields])), params)
+
+                proxy.commit()
+
+                logging.info('Table data insertion succeed : %s :: %s' % (dsn, table.__table_name__))
+
+            except Exception as e:
+                proxy.rollback()
+                logging.exception(e)
+
+                logging.error('Table data insertion failed : %s :: %s' % (dsn, table.__table_name__))
 
     @staticmethod
     def _get_chars_pcn(strval):
@@ -245,9 +289,11 @@ class MySqlDriver(dpSchemaDriver):
 
     @staticmethod
     def migrate_fields(proxy, table, fields, exist, change=True):
+        created = False
         table_name = table.__table_name__
 
         if not proxy.scalar('SHOW TABLES LIKE %s', table_name):
+            created = True
             proxy.execute(
                 'CREATE TABLE `{table_name}` (`_____dummy_____` INT NULL)'.replace('{table_name}', table_name))
 
@@ -278,6 +324,8 @@ class MySqlDriver(dpSchemaDriver):
             proxy.execute("""ALTER TABLE `{table_name}` DROP COLUMN `{column_name}`"""
                           .replace('{table_name}', table_name)
                           .replace('{column_name}', exist['col'][k].name))
+
+        return created
 
     @staticmethod
     def _field_attrs_to_query(key, field, ai=False):

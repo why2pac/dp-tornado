@@ -71,6 +71,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         url = uri.path
         params = uri.query
         params = dict(params, **link_params)
+        params = dict((k, v) for k, v in params.items() if v is not None)
 
         last_page = int(self.helper.math.ceil(total_count * 1.0 / rpp * 1.0))
 

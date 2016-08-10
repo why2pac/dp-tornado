@@ -274,10 +274,6 @@ class PirorityData(object):
                     if ov == v:
                         continue
 
-                print('>>>>>>>', k, '/', str(ov), '/', str(v))
-                print('>>>>>>>', self)
-                print('>>>>>>>', other)
-
                 return False
 
         return True

@@ -12,7 +12,12 @@ class StudentsSchema(dpTable):
     idx = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, comment='Index of Student')
     class_id = dpAttribute.field(dpAttribute.DataType.BIGINT, nn=True, comment='Class ID of Student')
     name = dpAttribute.field(dpAttribute.DataType.VARCHAR(32), name='student_name', nn=True, comment='Name of Student')
-    admission_year = dpAttribute.field(dpAttribute.DataType.SMALLINT, nn=True, comment='입학연도')
+    grade = dpAttribute.field(dpAttribute.DataType.ENUM('A', 'B', 'C', 'D', 'F'), nn=True, comment='Grade~')
+    birthday = dpAttribute.field(dpAttribute.DataType.CHAR(8), nn=True, comment='생년월일')
+    admission_year = dpAttribute.field(dpAttribute.DataType.SMALLINT, default='2017', nn=True, comment='Admission Year')
+
+    updatedate = dpAttribute.field(dpAttribute.DataType.BIGINT, comment='Updatedate')
+    signdate = dpAttribute.field(dpAttribute.DataType.BIGINT, comment='Signdate')
 
     primary_key = dpAttribute.index(dpAttribute.IndexType.PRIMARY, 'idx')
 

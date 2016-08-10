@@ -9,8 +9,25 @@ from ..loader import Loader as dpLoader
 from ..model import Model as dpModel
 
 
+class _ComparableDataType(object):
+    def __eq__(self, other):
+        if not other:
+            return False
+
+        if self.name == 'ENUM':
+            return list(self.enums) == list(other.enums)
+
+        return self.name == other.name and self.size == other.size
+
+    def __str__(self):
+        if self.name == 'ENUM':
+            return 'TYPE : %s / ENUMS : %s' % (self.name, list(self.enums))
+
+        return 'TYPE : %s / SIZE : %s' % (self.name, self.size)
+
+
 class _DataType(object):
-    class INT(object):
+    class INT(_ComparableDataType):
         name = 'INT'
         size = 11
 
@@ -18,7 +35,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class TINYINT(object):
+    class TINYINT(_ComparableDataType):
         name = 'TINYINT'
         size = 4
 
@@ -26,7 +43,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class SMALLINT(object):
+    class SMALLINT(_ComparableDataType):
         name = 'SMALLINT'
         size = 6
 
@@ -34,7 +51,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class MEDIUMINT(object):
+    class MEDIUMINT(_ComparableDataType):
         name = 'MEDIUMINT'
         size = 9
 
@@ -42,7 +59,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class BIGINT(object):
+    class BIGINT(_ComparableDataType):
         name = 'BIGINT'
         size = 20
 
@@ -50,7 +67,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class DOUBLE(object):
+    class DOUBLE(_ComparableDataType):
         name = 'DOUBLE'
         size = None
 
@@ -58,7 +75,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class FLOAT(object):
+    class FLOAT(_ComparableDataType):
         name = 'FLOAT'
         size = None
 
@@ -66,12 +83,12 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class DECIMAL(object):
+    class DECIMAL(_ComparableDataType):
         def __init__(self, m=10, d=0):
             self.name = 'DECIMAL'
             self.size = (m, d)
 
-    class CHAR(object):
+    class CHAR(_ComparableDataType):
         name = 'CHAR'
         size = 1
 
@@ -79,7 +96,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class VARCHAR(object):
+    class VARCHAR(_ComparableDataType):
         name = 'VARCHAR'
         size = 128
 
@@ -87,7 +104,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class TEXT(object):
+    class TEXT(_ComparableDataType):
         name = 'TEXT'
         size = None
 
@@ -95,7 +112,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class TINYTEXT(object):
+    class TINYTEXT(_ComparableDataType):
         name = 'TINYTEXT'
         size = None
 
@@ -103,7 +120,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class MEDIUMTEXT(object):
+    class MEDIUMTEXT(_ComparableDataType):
         name = 'MEDIUMTEXT'
         size = None
 
@@ -111,7 +128,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class LONGTEXT(object):
+    class LONGTEXT(_ComparableDataType):
         name = 'LONGTEXT'
         size = None
 
@@ -119,7 +136,7 @@ class _DataType(object):
             if size is not None:
                 self.size = size
 
-    class ENUM(object):
+    class ENUM(_ComparableDataType):
         name = 'ENUM'
 
         def __init__(self, *enums):
@@ -225,6 +242,9 @@ class Table(object):
         return super(Table, self).__setattr__(key, value)
 
 
+__PriorityDataCompareIgnoreKeys__ = ['pk', 'query', 'name', 'm_pk']
+
+
 class PirorityData(object):
     __field_priority__ = 0
 
@@ -239,6 +259,28 @@ class PirorityData(object):
 
     def __str__(self):
         return str(self.__temp)
+
+    def __eq__(self, other):
+        for k, v in self.__temp.items():
+            if k in __PriorityDataCompareIgnoreKeys__:
+                continue
+
+            ov = getattr(other, k, None)
+
+            if ov != v:
+                if k == 'nn':
+                    ov = getattr(other, 'm_pk', None)
+
+                    if ov == v:
+                        continue
+
+                print('>>>>>>>', k, '/', str(ov), '/', str(v))
+                print('>>>>>>>', self)
+                print('>>>>>>>', other)
+
+                return False
+
+        return True
 
 
 class Field(PirorityData):
@@ -267,24 +309,28 @@ class Attribute(object):
     def field(data_type,
               default=None,
               comment=None,
+              m_pk=None,
               pk=None,
               uq=None,
               nn=None,
               un=None,
               zf=None,
               ai=None,
-              name=None):
+              name=None,
+              query=None):
         return Field(
             name=name,
             data_type=data_type,
             default=default,
             comment=comment,
+            m_pk=m_pk,
             pk=pk,
             uq=uq,
-            nn=nn,
+            nn=True if ai else nn,
             un=un,
             zf=zf,
-            ai=ai)
+            ai=ai,
+            query=query)
 
     @staticmethod
     def index(index_type, fields, name=None):

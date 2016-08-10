@@ -44,6 +44,8 @@ class MySqlDriver(dpSchemaDriver):
 
                 break
 
+        MySqlDriver.migrate_priority(dsn, table, fields)
+
         if not created:
             return
 
@@ -83,6 +85,48 @@ class MySqlDriver(dpSchemaDriver):
                 logging.exception(e)
 
                 logging.error('Table data insertion failed : %s :: %s' % (dsn, table.__table_name__))
+
+    @staticmethod
+    def migrate_priority(dsn, table, fields):
+        proxy = dpModel().begin(dsn)
+
+        try:
+            exist = MySqlDriver._get_exist(proxy, table)
+            exist = [(e[0], e[1]) for e in sorted(exist['col'].items(), key=lambda o: o[1].__field_priority__)]
+
+            exist_priority = [e[0] for e in sorted(exist, key=lambda o: o[1].__field_priority__)]
+            exist_fields = dict(exist)
+
+            modified = False
+
+            for i in range(len(fields)):
+                if fields[i][0] != exist_priority[i]:
+                    modified = True
+
+            if modified:
+                previous = None
+                queries = []
+
+                for k, v in fields:
+                    if previous is None:
+                        p = 'FIRST'
+                    else:
+                        p = 'AFTER `%s`' % previous
+
+                    previous = v.name
+                    queries.append('CHANGE COLUMN `%s` %s %s' % (v.name, exist_fields[k].query, p))
+
+                proxy.execute('ALTER TABLE `%s`\n%s' % (table.__table_name__,  ',\n'.join(queries)))
+
+            proxy.commit()
+
+            logging.info('Table priority rearrange succeed : %s :: %s' % (dsn, table.__table_name__))
+
+        except Exception as e:
+            proxy.rollback()
+            logging.exception(e)
+
+            logging.error('Table priority rearrange failed : %s :: %s' % (dsn, table.__table_name__))
 
     @staticmethod
     def _get_chars_pcn(strval):
@@ -195,6 +239,10 @@ class MySqlDriver(dpSchemaDriver):
 
         for e in create_table:
             attrs = e.strip()
+            attr = attrs
+
+            if attr[-1] == ',':
+                attr = attr[:-1]
 
             if not attrs.startswith('`'):
                 break
@@ -283,7 +331,15 @@ class MySqlDriver(dpSchemaDriver):
                 comment = comment[:id_idx-1]
 
             output['col'][key] = dpAttribute.field(
-                data_type=data_type, name=column_name, default=default, nn=nn, un=un, zf=zf, ai=ai, comment=comment)
+                data_type=data_type,
+                name=column_name,
+                default=default,
+                nn=nn,
+                un=un,
+                zf=zf,
+                ai=ai,
+                comment=comment,
+                query=attr)
 
         return output
 

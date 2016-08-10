@@ -273,7 +273,8 @@ class Attribute(object):
               un=None,
               zf=None,
               ai=None,
-              name=None):
+              name=None,
+              query=None):
         return Field(
             name=name,
             data_type=data_type,
@@ -284,7 +285,8 @@ class Attribute(object):
             nn=nn,
             un=un,
             zf=zf,
-            ai=ai)
+            ai=ai,
+            query=query)
 
     @staticmethod
     def index(index_type, fields, name=None):

@@ -270,60 +270,64 @@ class MySqlDriver(dpSchemaDriver):
                 if v is None:
                     break
 
-                if v.upper().startswith('INT('):
+                if v.strip().upper().startswith('INT('):
                     data_type = dpAttribute.DataType.INT(int(v[4:-1]))
-                elif v.upper().startswith('TINYINT('):
+                elif v.strip().upper().startswith('TINYINT('):
                     data_type = dpAttribute.DataType.TINYINT(int(v[8:-1]))
-                elif v.upper().startswith('SMALLINT('):
+                elif v.strip().upper().startswith('SMALLINT('):
                     data_type = dpAttribute.DataType.SMALLINT(int(v[9:-1]))
-                elif v.upper().startswith('MEDIUMINT('):
+                elif v.strip().upper().startswith('MEDIUMINT('):
                     data_type = dpAttribute.DataType.MEDIUMINT(int(v[10:-1]))
-                elif v.upper().startswith('BIGINT('):
+                elif v.strip().upper().startswith('BIGINT('):
                     data_type = dpAttribute.DataType.BIGINT(int(v[7:-1]))
 
-                elif v.upper().startswith('DOUBLE('):
+                elif v.strip().upper().startswith('DOUBLE('):
                     data_type = dpAttribute.DataType.DOUBLE(int(v[7:-1]))
-                elif v.upper().startswith('FLOAT('):
+                elif v.strip().upper().startswith('FLOAT('):
                     data_type = dpAttribute.DataType.FLOAT(int(v[6:-1]))
-                elif v.upper().startswith('DECIMAL('):
+                elif v.strip().upper().startswith('DECIMAL('):
                     m, d = v[8:-1].split(',')
                     data_type = dpAttribute.DataType.DECIMAL(int(m), int(d))
 
-                elif v.upper().startswith('CHAR('):
+                elif v.strip().upper().startswith('CHAR('):
                     data_type = dpAttribute.DataType.CHAR(int(v[5:-1]))
-                elif v.upper().startswith('VARCHAR('):
+                elif v.strip().upper().startswith('VARCHAR('):
                     data_type = dpAttribute.DataType.VARCHAR(int(v[8:-1]))
 
-                elif v.upper().startswith('TEXT'):
+                elif v.strip().upper().startswith('TEXT'):
                     data_type = dpAttribute.DataType.TEXT()
-                elif v.upper().startswith('TINYTEXT'):
+                elif v.strip().upper().startswith('TINYTEXT'):
                     data_type = dpAttribute.DataType.TINYTEXT()
-                elif v.upper().startswith('MEDIUMTEXT'):
+                elif v.strip().upper().startswith('MEDIUMTEXT'):
                     data_type = dpAttribute.DataType.MEDIUMTEXT()
-                elif v.upper().startswith('LONGTEXT'):
+                elif v.strip().upper().startswith('LONGTEXT'):
                     data_type = dpAttribute.DataType.LONGTEXT()
 
-                elif v.startswith('ENUM('):
-                    data_type = dpAttribute.DataType.ENUM(v[5:-1].split(','))
+                elif v.strip().upper().startswith('ENUM('):
+                    data_type = dpAttribute.DataType.ENUM(*[(e[1:-1] if e[0] == "'" and e[-1] == "'" else e) for e in v[5:-1].split(',')])
 
-                elif v == 'UNSIGNED':
+                elif v.strip().upper() == 'UNSIGNED':
                     un = True
 
-                elif v == 'ZEROFILL':
+                elif v.strip().upper() == 'ZEROFILL':
                     zf = True
 
-                elif v == 'NULL':
+                elif v.strip().upper() == 'NULL':
                     if prev == 'NOT':
                         nn = True
 
-                elif v == 'DEFAULT':
-                    default = attrs[i + 1]
+                elif v.strip().upper() == 'DEFAULT':
+                    default, i = MySqlDriver._get_field_attr(attrs, i)
+                    default = default[1:-1] if default[0] == "'" and default[-1] == "'" else default
+                    default = default if default and default.upper() != 'NULL' else None
 
-                elif v == 'AUTO_INCREMENT':
+                elif v.strip().upper() == 'AUTO_INCREMENT':
                     ai = True
 
-                elif v == 'COMMENT':
+                elif v.strip().upper() == 'COMMENT':
                     comment, i = MySqlDriver._get_field_attr(attrs, i)
+
+                prev = v.upper()
 
             if comment and comment.endswith('}') and comment.rfind('{') != -1:
                 id_idx = comment.rfind('{')
@@ -362,11 +366,13 @@ class MySqlDriver(dpSchemaDriver):
 
         for k, v in fields:
             if k in exist['col']:
-                proxy.execute("""ALTER TABLE `{table_name}` CHANGE COLUMN `{column_name_b}` `{column_name_a}` {attrs}"""
-                              .replace('{table_name}', table_name)
-                              .replace('{column_name_b}', exist['col'][k].name)
-                              .replace('{column_name_a}', v.name)
-                              .replace('{attrs}', MySqlDriver._field_attrs_to_query(k, v, ai=True)))
+                if exist['col'][k] != v:
+                    proxy.execute("""
+                        ALTER TABLE `{table_name}` CHANGE COLUMN `{column_name_b}` `{column_name_a}` {attrs}"""
+                                  .replace('{table_name}', table_name)
+                                  .replace('{column_name_b}', exist['col'][k].name)
+                                  .replace('{column_name_a}', v.name)
+                                  .replace('{attrs}', MySqlDriver._field_attrs_to_query(k, v, ai=True)))
 
                 del exist['col'][k]
 

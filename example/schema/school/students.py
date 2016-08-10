@@ -14,6 +14,7 @@ class StudentsSchema(dpTable):
     name = dpAttribute.field(dpAttribute.DataType.VARCHAR(32), name='student_name', nn=True, comment='Name of Student')
     grade = dpAttribute.field(dpAttribute.DataType.ENUM('A', 'B', 'C', 'D', 'F'), nn=True, comment='Grade~')
     birthday = dpAttribute.field(dpAttribute.DataType.CHAR(8), nn=True, comment='생년월일')
+    ft_test = dpAttribute.field(dpAttribute.DataType.VARCHAR(256), comment='TEST Filed for Fulltext Index')
     admission_year = dpAttribute.field(dpAttribute.DataType.SMALLINT, default='2017', nn=True, comment='Admission Year')
 
     updatedate = dpAttribute.field(dpAttribute.DataType.BIGINT, comment='Updatedate')
@@ -23,5 +24,6 @@ class StudentsSchema(dpTable):
 
     index_name = dpAttribute.index(dpAttribute.IndexType.INDEX, 'name')
     index_admission_year_name = dpAttribute.index(dpAttribute.IndexType.INDEX, ('admission_year', 'name'))
+    index_fulltext_test = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'ft_test')
 
     fk_class_id = dpAttribute.foreign_key(('class_id', dpSchema.field().school.classes, 'idx'))

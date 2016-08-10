@@ -216,6 +216,12 @@ class MySqlDriver(dpSchemaDriver):
                 keys = [e[1:-1] for e in attrs[attrs.find('(') + 1:attrs.rfind(')')].split(',')]
                 output['ix'].append(dpAttribute.index(dpAttribute.IndexType.UNIQUE, keys))
                 output['ik'].append(keys)
+                output['pk'] = keys
+
+            elif attrs.upper().startswith('FULLTEXT KEY'):
+                keys = [e[1:-1] for e in attrs[attrs.find('(') + 1:attrs.rfind(')')].split(',')]
+                output['ix'].append(dpAttribute.index(dpAttribute.IndexType.FULLTEXT, keys))
+                output['ik'].append(keys)
 
             elif attrs.upper().startswith('CONSTRAINT'):
                 v, i = MySqlDriver._get_field_attr(attrs, 0)

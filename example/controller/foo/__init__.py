@@ -21,7 +21,7 @@ class FooController(Controller):
 
     # URL matching with /foo
     def get(self):
-        self.model.foo.index()
+        self.model.foo.migration()
 
         params = {
             'foo': 'bar'

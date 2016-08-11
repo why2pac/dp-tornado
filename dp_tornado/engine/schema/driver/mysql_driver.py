@@ -398,6 +398,7 @@ class MySqlDriver(dpSchemaDriver):
     @staticmethod
     def _field_attrs_to_query(key, field, ai=False):
         data_type = field.data_type.name
+        unsigned = 'unsigned' if field.un else ''
         default = "DEFAULT '%s'" % field.default if field.default else ''
         comment = "COMMENT '%s {%s}'" % (field.comment, key)
         null = 'NOT NULL' if field.nn or field.ai or field.pk else 'NULL'
@@ -409,8 +410,9 @@ class MySqlDriver(dpSchemaDriver):
         elif getattr(field.data_type, 'enums', None):
             data_type = '%s%s' % (data_type, getattr(field.data_type, 'enums', None))
 
-        ret = '{data_type} {null} {zerofill} {default} {auto_increment} {comment}' \
+        ret = '{data_type} {unsigned} {null} {zerofill} {default} {auto_increment} {comment}' \
             .replace('{data_type}', data_type) \
+            .replace('{unsigned}', unsigned) \
             .replace('{null}', null) \
             .replace('{zerofill}', zerofill) \
             .replace('{default}', default) \

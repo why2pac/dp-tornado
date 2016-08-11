@@ -162,6 +162,7 @@ class _IndexType(object):
 class Table(object):
     __migrated = False
     __identifier = None
+    __thread_stricted = False
 
     def _get_driver(self):
         dsn = getattr(self, '__dsn__', None)
@@ -198,6 +199,9 @@ class Table(object):
         return dsn, driver
 
     def _guarantee_permission(self):
+        if not Table.__thread_stricted:
+            return True
+
         cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
         cache_key = 'dp:engine:schema:permission'
 

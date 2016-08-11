@@ -7,6 +7,7 @@ from ..singleton import Singleton as dpSingleton
 from ..engine import Engine as dpEngine
 from ..loader import Loader as dpLoader
 from ..model import Model as dpModel
+from ..cache import dpInValueModelConfig
 
 
 class _ComparableDataType(object):
@@ -160,6 +161,7 @@ class _IndexType(object):
 
 class Table(object):
     __migrated = False
+    __identifier = None
 
     def _get_driver(self):
         dsn = getattr(self, '__dsn__', None)
@@ -195,7 +197,38 @@ class Table(object):
 
         return dsn, driver
 
+    def _guarantee_permission(self):
+        cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
+        cache_key = 'dp:engine:schema:permission'
+
+        got = dpEngine().cache.get(cache_key, dsn_or_conn=cache_config)
+        gox = Table.__identifier if got else None
+
+        if got:
+            if got == gox:
+                return True
+
+            if got != gox:
+                return False
+
+        identifier = dpEngine().helper.random.uuid()
+        Table.__identifier = identifier
+
+        dpEngine().cache.set(cache_key, identifier, dsn_or_conn=cache_config)
+        got = dpEngine().cache.get(cache_key, dsn_or_conn=cache_config)
+
+        if got == identifier:
+            return True
+
+        return False
+
     def migrate(self):
+        if not self._guarantee_permission():
+            return False
+
+        self._migrate()
+
+    def _migrate(self):
         if self.__migrated:
             return True
 
@@ -221,6 +254,12 @@ class Table(object):
         SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys)
 
     def migrate_data(self):
+        if not self._guarantee_permission():
+            return False
+
+        self._migrate_data()
+
+    def _migrate_data(self):
         dsn, driver = self._get_driver()
 
         if driver == 'mysql':

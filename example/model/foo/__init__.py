@@ -5,7 +5,7 @@ from dp_tornado.engine.model import Model as dpModel
 
 
 class FooModel(dpModel):
-    def index(self):
+    def migration(self):
         self.schema.school.classes.migrate()
         self.schema.school.students.migrate()
         self.schema.test.multiple_pk.migrate()

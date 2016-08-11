@@ -386,7 +386,7 @@ class MySqlDriver(dpSchemaDriver):
                 proxy.execute("""ALTER TABLE `{table_name}` ADD COLUMN `{column_name}` {attrs}"""
                               .replace('{table_name}', table_name)
                               .replace('{column_name}', v.name)
-                              .replace('{attrs}', MySqlDriver._field_attrs_to_query(k, v)))
+                              .replace('{attrs}', MySqlDriver._field_attrs_to_query(k, v, ai=change)))
 
         for k in exist['col']:
             proxy.execute("""ALTER TABLE `{table_name}` DROP COLUMN `{column_name}`"""

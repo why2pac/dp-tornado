@@ -464,9 +464,10 @@ class MySqlDriver(dpSchemaDriver):
         for k, v in foreign_keys:
             source_col = v.fields[0]
             source_col = [getattr(table, e).name for e in (source_col if isinstance(source_col, (list, tuple)) else (source_col, ))]
-            dest_table = v.fields[1].__table_name__
+            dest_table_obj = v.fields[1] if v.fields[1] else table
+            dest_table = dest_table_obj.__table_name__
             dest_col = v.fields[2]
-            dest_col = [getattr(v.fields[1], e).name for e in (dest_col if isinstance(dest_col, (list, tuple)) else (dest_col, ))]
+            dest_col = [getattr(dest_table_obj, e).name for e in (dest_col if isinstance(dest_col, (list, tuple)) else (dest_col, ))]
 
             fields = (source_col, dest_table, dest_col)
 

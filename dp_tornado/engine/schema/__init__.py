@@ -20,6 +20,9 @@ class _ComparableDataType(object):
 
         return self.name == other.name and self.size == other.size
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __str__(self):
         if self.name == 'ENUM':
             return 'TYPE : %s / ENUMS : %s' % (self.name, list(self.enums))
@@ -244,9 +247,12 @@ class Table(object):
 
         for k, v in indexes:
             if v.index_type == Attribute.IndexType.PRIMARY:
+                oo = 0
                 for e in v.fields:
+                    oo += 1
                     o = getattr(self, e)
-                    o.pk = True
+                    o.pk = oo
+                    o.nn = True
 
         dsn, driver = self._get_driver()
 
@@ -310,6 +316,12 @@ class PirorityData(object):
 
             ov = getattr(other, k, None)
 
+            if dpEngine().helper.string.is_str(v):
+                if dpEngine().helper.string.to_unicode(v) != dpEngine().helper.string.to_unicode(ov):
+                    return False
+                else:
+                    continue
+
             if ov != v:
                 if k == 'nn':
                     ov = getattr(other, 'm_pk', None)
@@ -320,6 +332,9 @@ class PirorityData(object):
                 return False
 
         return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 class Field(PirorityData):

@@ -291,6 +291,8 @@ class MySqlDriver(dpSchemaDriver):
                     data_type = dpAttribute.DataType.DOUBLE(int(v[7:-1]))
                 elif v.strip().upper().startswith('FLOAT('):
                     data_type = dpAttribute.DataType.FLOAT(int(v[6:-1]))
+                elif v.strip().upper().startswith('FLOAT'):
+                    data_type = dpAttribute.DataType.FLOAT
                 elif v.strip().upper().startswith('DECIMAL('):
                     m, d = v[8:-1].split(',')
                     data_type = dpAttribute.DataType.DECIMAL(int(m), int(d))
@@ -359,13 +361,20 @@ class MySqlDriver(dpSchemaDriver):
         table_name = table.__table_name__
 
         if not proxy.scalar('SHOW TABLES LIKE %s', table_name):
-            created = True
-            proxy.execute(
-                'CREATE TABLE `{table_name}` (`_____dummy_____` INT NULL)'.replace('{table_name}', table_name))
+            fields_query = ',\n'.join(['`%s` %s' % (v.name, MySqlDriver._field_attrs_to_query(k, v, ai=True)) for k, v in fields])
+            primary_key = ', '.join(['`%s`' % e[0] for e in sorted([(v.name, v.pk) for k, v in fields if v.pk is not None], key=lambda e: e[1])])
+            primary_key = ', PRIMARY KEY (%s)' % primary_key if primary_key else ''
 
-            exist['col'] = {
-                '_____dummy_____': dpAttribute.field(data_type=dpAttribute.DataType.INT, name='_____dummy_____')
-            }
+            proxy.execute("""
+                CREATE TABLE `{table_name}` (
+                    {fields}
+                    {primary_key}
+                )"""
+                          .replace('{fields}', fields_query)
+                          .replace('{primary_key}', primary_key)
+                          .replace('{table_name}', table_name))
+
+            return True
 
         if change:
             exist['col'] = dict(fields)
@@ -432,22 +441,27 @@ class MySqlDriver(dpSchemaDriver):
                 pass
             else:
                 index_name = k or '%s_%s' % (table_name, '_'.join(v.fields))
+                skip = False
 
-                if v.index_type == dpAttribute.IndexType.UNIQUE:
+                if v.index_type == dpAttribute.IndexType.PRIMARY:
+                    index_type = None
+                    skip = True
+                elif v.index_type == dpAttribute.IndexType.UNIQUE:
                     index_type = 'UNIQUE INDEX'
                 elif v.index_type == dpAttribute.IndexType.FULLTEXT:
                     index_type = 'FULLTEXT INDEX'
                 else:
                     index_type = 'INDEX'
 
-                proxy.execute('ALTER TABLE {table_name} ADD {index_type} {index_name} ({fields})'
-                              .replace('{table_name}', table_name)
-                              .replace('{index_type}', index_type)
-                              .replace('{index_name}', index_name)
-                              .replace('{fields}', ','.join(['`%s`' % e for e in fields])))
+                if not skip:
+                    proxy.execute('ALTER TABLE {table_name} ADD {index_type} {index_name} ({fields})'
+                                  .replace('{table_name}', table_name)
+                                  .replace('{index_type}', index_type)
+                                  .replace('{index_name}', index_name)
+                                  .replace('{fields}', ','.join(['`%s`' % e for e in fields])))
 
             if v.index_type == dpAttribute.IndexType.PRIMARY:
-                if exist['pk'] != fields:
+                if 1 == 2 and exist['pk'] != fields:
                     if exist['pk']:
                         query = 'ALTER TABLE {table_name} DROP PRIMARY KEY, ADD PRIMARY KEY ({fields})'
                     else:

@@ -62,13 +62,14 @@ class Pagination(tornado.web.UIModule, dpEngine):
         link_suffix = options['link_suffix'] if 'link_suffix' in options else self.link_suffix
         link_function = options['link_function'] if 'link_function' in options else self.link_function
         link_params = options['link_params'] if 'link_params' in options else {}
+        link_url = options['link'] if 'link' in options else None
 
         if link_function:
             link_prefix = 'javascript:%s(\'' % link_function
             link_suffix = '\');'
 
         uri = self.helper.url.parse(self.request)
-        url = uri.path
+        url = link_url or uri.path
         params = uri.query
         params = dict(params, **link_params)
         params = dict((k, v) for k, v in params.items() if v is not None)

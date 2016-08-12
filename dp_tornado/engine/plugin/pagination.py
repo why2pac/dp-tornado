@@ -221,6 +221,6 @@ class Pagination(tornado.web.UIModule, dpEngine):
                          space_block))
 
         if region_tag:
-            output = '%s</%s">' % (output, self.region_tag)
+            output = '%s</%s>' % (output, self.region_tag)
 
         return output

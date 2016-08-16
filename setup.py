@@ -46,6 +46,7 @@ setup(
         'croniter==0.3.11',
         'pytz==2016.4',
         'boto==2.39.0',
+        'boto3==1.4.0',
         'SQLAlchemy==1.0.12',
         'futures==3.0.5',
         'Pillow==3.1.1'

@@ -79,15 +79,46 @@ class S3Helper(dpHelper):
     def connect(self, public, secret):
         return S3Bridge(public, secret)
 
+    def set_contents_from_file(self,
+                               aws_access_key_id,
+                               aws_secret_access_key,
+                               bucket_name,
+                               region_name,
+                               key,
+                               fp,
+                               url=False):
+        import boto3
+
+        s3 = boto3.client(
+            service_name='s3',
+            region_name=region_name,
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+
+        s3.upload_file(fp, bucket_name, key)
+
     def prepare_post(self,
                      aws_access_key_id,
                      aws_secret_access_key,
                      bucket_name,
                      key,
+                     region=None,
                      success_action_redirect=None,
                      max_content_length=None,
                      expires_in=6000,
                      acl=None):
+        if region:
+            return self._prepare_post_boto3(
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+                bucket_name=bucket_name,
+                key=key,
+                region=region,
+                success_action_redirect=success_action_redirect,
+                max_content_length=max_content_length,
+                expires_in=expires_in,
+                acl=acl)
+
         s3 = s3_connection()(
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key)
@@ -109,6 +140,48 @@ class S3Helper(dpHelper):
             conditions=conditions)
 
         return payload
+
+    def _prepare_post_boto3(self,
+                            aws_access_key_id,
+                            aws_secret_access_key,
+                            bucket_name,
+                            key,
+                            region=None,
+                            success_action_redirect=None,
+                            max_content_length=None,
+                            expires_in=6000,
+                            acl=None):
+        import boto3
+
+        s3 = boto3.client(
+            service_name='s3',
+            region_name=region,
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+
+        fields = {}
+        conditions = []
+
+        if success_action_redirect:
+            fields['success_action_redirect'] = success_action_redirect
+            conditions.append({'success_action_redirect': success_action_redirect})
+        else:
+            fields['success_action_status'] = '201'
+            conditions.append({'success_action_status': '201'})
+
+
+        if acl:
+            conditions.append({'acl': acl})
+
+        if max_content_length:
+            conditions.append(["content-length-range", 0, max_content_length])
+
+        return s3.generate_presigned_post(
+            Bucket=bucket_name,
+            Key=key,
+            Fields=fields,
+            Conditions=conditions,
+            ExpiresIn=expires_in)
 
     def generate_url_with_filename(self,
                                    aws_access_key_id,

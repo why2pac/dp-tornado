@@ -97,6 +97,31 @@ class S3Helper(dpHelper):
 
         s3.upload_file(fp, bucket_name, key)
 
+    def copy(self,
+             aws_access_key_id,
+             aws_secret_access_key,
+             region_name,
+             src_bucket_name,
+             src_key,
+             dest_bucket_name,
+             dest_key):
+        import boto3
+
+        s3 = boto3.client(
+            service_name='s3',
+            region_name=region_name,
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key)
+
+        copy_source = {
+            'Bucket': src_bucket_name,
+            'Key': src_key
+        }
+
+        s3.copy(copy_source, dest_bucket_name, dest_key)
+
+        return True
+
     def prepare_post(self,
                      aws_access_key_id,
                      aws_secret_access_key,

@@ -169,19 +169,23 @@ class S3Helper(dpHelper):
             fields['success_action_status'] = '201'
             conditions.append({'success_action_status': '201'})
 
-
         if acl:
             conditions.append({'acl': acl})
 
         if max_content_length:
             conditions.append(["content-length-range", 0, max_content_length])
 
-        return s3.generate_presigned_post(
+        payload = s3.generate_presigned_post(
             Bucket=bucket_name,
             Key=key,
             Fields=fields,
             Conditions=conditions,
             ExpiresIn=expires_in)
+
+        return {
+            'action': payload['url'],
+            'fields': [{'name': k, 'value': v} for k, v in payload['fields'].items()]
+        }
 
     def generate_url_with_filename(self,
                                    aws_access_key_id,

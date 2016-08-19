@@ -29,10 +29,10 @@ class DatetimeHelper(dpHelper):
             d = str(d)
             d = self.datetime(self.mktime(int(d[0:4]), int(d[4:6]), int(d[6:8])))
 
-        elif d is not None:
+        elif d is not None and not isinstance(d, datetime.datetime):
             raise ValueError
 
-        else:
+        elif not isinstance(d, datetime.datetime):
             d = self.today()
 
         return d - self.timedelta(days=1)

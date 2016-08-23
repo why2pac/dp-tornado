@@ -166,7 +166,11 @@ class ResizeHelper(dpHelper):
                 img = img.resize((width_new, height_new), Image.ANTIALIAS)
 
         elif mode == self.helper.image.resize.mode.resize:
-                img = img.resize((width_new, height_new), Image.ANTIALIAS)
+            if width_new > width_origin or height_new > height_origin:
+                width_new = width_origin
+                height_new = height_origin
+
+            img = img.resize((width_new, height_new), Image.ANTIALIAS)
 
         # Colorizing
         if colorize:

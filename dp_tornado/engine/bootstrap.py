@@ -91,6 +91,7 @@ class Bootstrap(object):
             combined_path = combined_path[:-1]
 
         combined_prefix = '%s%s/' % (static_prefix, combined_path)
+        combined_url = combined_path
         combined_path = os.path.join(application_path, 'static', combined_path)
 
         # Setup Options
@@ -116,6 +117,7 @@ class Bootstrap(object):
         tornado.options.define('static_aws_id', default=get_cfg(config, 'aws_id', section='static'))
         tornado.options.define('static_aws_secret', default=get_cfg(config, 'aws_secret', section='static'))
         tornado.options.define('static_aws_bucket', default=get_cfg(config, 'aws_bucket', section='static'))
+        tornado.options.define('static_aws_region', default=get_cfg(config, 'aws_region', section='static'))
         tornado.options.define('static_aws_endpoint', default=get_cfg(config, 'aws_endpoint', section='static'))
 
         # Scheduler
@@ -145,6 +147,7 @@ class Bootstrap(object):
             'static_handler_class': StaticHandler,
             'static_url_prefix': static_prefix,
             'static_minify': static_minify,
+            'static_combined_url': combined_url,
             'combined_static_path': combined_path,
             'combined_static_url_prefix': combined_prefix,
             'compressors': {

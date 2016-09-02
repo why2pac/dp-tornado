@@ -86,7 +86,8 @@ class S3Helper(dpHelper):
                                region_name,
                                key,
                                fp,
-                               url=False):
+                               url=False,
+                               ExtraArgs=None):
         import boto3
 
         s3 = boto3.client(
@@ -95,7 +96,7 @@ class S3Helper(dpHelper):
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key)
 
-        s3.upload_file(fp, bucket_name, key)
+        s3.upload_file(fp, bucket_name, key, ExtraArgs=ExtraArgs)
 
     def copy(self,
              aws_access_key_id,

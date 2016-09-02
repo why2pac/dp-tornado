@@ -116,6 +116,7 @@ class StaticURL(tornado.web.UIModule):
             self.handler.vars.static.minify = self.handler.settings.get('static_minify')
             self.handler.vars.static.path = self.handler.settings.get('static_path')
             self.handler.vars.static.prefix = self.handler.settings.get('static_url_prefix')
+            self.handler.vars.static.combined_url = self.handler.settings.get('static_combined_url')
             self.handler.vars.static.combined_path = self.handler.settings.get('combined_static_path')
             self.handler.vars.static.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
             self.handler.vars.static.cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
@@ -123,6 +124,7 @@ class StaticURL(tornado.web.UIModule):
             self.handler.vars.static.aws_id = tornado.options.options.static_aws_id
             self.handler.vars.static.aws_secret = tornado.options.options.static_aws_secret
             self.handler.vars.static.aws_bucket = tornado.options.options.static_aws_bucket
+            self.handler.vars.static.aws_region = tornado.options.options.static_aws_region
             self.handler.vars.static.aws_endpoint = tornado.options.options.static_aws_endpoint
 
             self.handler.vars.static.aws_configured = True if (self.handler.vars.static.aws_id and
@@ -213,14 +215,27 @@ class StaticURL(tornado.web.UIModule):
         # AWS configured, upload compressed files to S3.
         else:
             content_length = os.path.getsize(tempname)
-            fp = open(tempname, 'r')
+            filename = '%s/%s' % (self.handler.vars.static.combined_url, filename)
 
-            s3bridge = self.handler.helper.aws.s3.connect(
-                self.handler.vars.static.aws_id, self.handler.vars.static.aws_secret)
+            if not self.handler.vars.static.aws_region:
+                fp = open(tempname, 'r')
 
-            s3bridge.set_contents_from_file(self.handler.vars.static.aws_bucket, filename, fp)
+                s3bridge = self.handler.helper.aws.s3.connect(
+                    self.handler.vars.static.aws_id, self.handler.vars.static.aws_secret)
 
-            fp.close()
+                s3bridge.set_contents_from_file(self.handler.vars.static.aws_bucket, filename, fp)
+
+                fp.close()
+
+            else:
+                self.handler.helper.aws.s3.set_contents_from_file(
+                    aws_access_key_id=self.handler.vars.static.aws_id,
+                    aws_secret_access_key=self.handler.vars.static.aws_secret,
+                    bucket_name=self.handler.vars.static.aws_bucket,
+                    region_name=self.handler.vars.static.aws_region,
+                    key=filename,
+                    fp=tempname, ExtraArgs={'ContentType': 'text/%s' % ('javascript' if ext == 'js' else ext)})
+
             os.remove(tempname)
 
             prepared_url = self.handler.vars.compressor.helper.url.urlparse.urljoin(
@@ -228,7 +243,7 @@ class StaticURL(tornado.web.UIModule):
             prepared = template % {'url': prepared_url}
 
             test = requests.get(prepared_url)
-            test = False if test.status_code != 200  or (content_length and not len(test.text.strip())) else True
+            test = False if test.status_code != 200 or (content_length and not len(test.text.strip())) else True
 
         if self.handler.cache.get(acquire_key, dsn_or_conn=self.handler.vars.static.cache_config) == acquire_identifier:
             if not test:

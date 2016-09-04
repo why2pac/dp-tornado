@@ -17,3 +17,11 @@ class ClassesSchema(dpTable):
 
     index_grade = dpAttribute.index(dpAttribute.IndexType.INDEX, 'grade')
     index_name_grade = dpAttribute.index(dpAttribute.IndexType.INDEX, ('name', 'grade'))
+
+    __dummy_data__ = [
+        {'idx': 1, 'grade': 'A', 'name': 'A CLASS'},
+        {'idx': 2, 'grade': 'B', 'name': 'B CLASS'},
+        {'idx': 3, 'grade': 'C', 'name': 'C CLASS'},
+        {'idx': 4, 'grade': '-', 'name': '- CLASS'},
+        {'idx': 4, 'grade': '-', 'name': 'Dummy CLASS'}
+    ]

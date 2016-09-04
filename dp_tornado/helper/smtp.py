@@ -23,17 +23,17 @@ class SmtpSender(object):
         self.connection = smtplib.SMTP(self.host, self.port)
 
         if self.userid and self.password:
+            if self.tls:
+                self.connection.starttls()
+
             self.connection.login(self.userid, self.password)
 
             if self.ehlo is not None:
                 self.connection.ehlo(self.ehlo)
 
-            if self.tls:
-                self.connection.starttls()
-
         self.connected = True
 
-    def send(self, subject, content, from_user, to_user, html=True, subject_charset=None):
+    def send(self, subject, content, from_user, to_user, html=True, subject_charset=None, headers=None):
         if self.connected:
             from email.mime.text import MIMEText
             from email.header import Header
@@ -43,8 +43,9 @@ class SmtpSender(object):
             msg['From'] = from_user
             msg['To'] = to_user
 
-            if html:
-                msg['Content-Type'] = 'text/html; charset=utf-8'
+            if headers:
+                for k, v in headers.items():
+                    msg[k] = v
 
             if self.e.helper.system.py_version <= 2:
                 self.connection.sendmail(from_user, to_user, msg.as_string())

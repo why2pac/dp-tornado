@@ -45,11 +45,10 @@ class MySqlDriver(dpSchemaDriver):
                 break
 
         MySqlDriver.migrate_priority(dsn, table, fields)
+        MySqlDriver.migrate_data(dsn, table)
 
         if not created:
             return
-
-        MySqlDriver.migrate_data(dsn, table)
 
     @staticmethod
     def migrate_data(dsn, table):
@@ -71,10 +70,14 @@ class MySqlDriver(dpSchemaDriver):
 
                     proxy.execute("""
                         INSERT INTO {table_name}
-                            ({fields}) VALUES ({params})"""
+                            ({fields}) VALUES ({params})
+                                ON DUPLICATE KEY UPDATE
+                                    {updates}"""
                                   .replace('{table_name}', table.__table_name__)
                                   .replace('{fields}', ','.join(['`%s`' % ee for ee in fields]))
-                                  .replace('{params}', ','.join(['%s' for ee in fields])), params)
+                                  .replace('{params}', ','.join(['%s' for ee in fields]))
+                                  .replace('{updates}', ','.join(['`%s` = VALUES(`%s`)' % (ee, ee) for ee in fields])),
+                                  params)
 
                 proxy.commit()
 

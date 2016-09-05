@@ -5,9 +5,8 @@ import sys
 import time
 import subprocess
 
-
-dp_testing_identifier = 'dp-tornado-testing-9x890203'
-dp_testing_port = '18923'
+from . import consts
+from . import utils
 
 
 def run_server(main=False):
@@ -15,22 +14,28 @@ def run_server(main=False):
     subprocess.Popen([
         'python',
         '%sexample/__init__.py' % ('../' if not main else ''),
-        '--identifier', dp_testing_identifier,
-        '--port', dp_testing_port])
+        '--identifier', consts.dp_testing_identifier,
+        '--port', consts.dp_testing_port])
 
 
 def wait_server(timeout=3):
+    executed = False
+
     for e in range(timeout):
         if server_pids():
-            return True
+            executed = True
+            break
 
         time.sleep(1)
 
-    assert False
+    if not executed:
+        assert False
+
+    utils.expecting_text('get', '/', 'tests::get')
 
 
 def server_pids():
-    pids = subprocess.Popen(['pgrep', '-f', dp_testing_identifier], stdout=subprocess.PIPE)
+    pids = subprocess.Popen(['pgrep', '-f', consts.dp_testing_identifier], stdout=subprocess.PIPE)
     pids = pids.stdout.readlines()
 
     return [(e.decode('utf8') if sys.version_info[0] >= 3 else e).replace('\n', '') for e in (pids if pids else [])]

@@ -7,11 +7,16 @@ import subprocess
 
 
 dp_testing_identifier = 'dp-tornado-testing-9x890203'
+dp_testing_port = '18923'
 
 
 def run_server(main=False):
     stop_server()
-    subprocess.Popen(['python', '%sexample/__init__.py' % ('../' if not main else ''), dp_testing_identifier, '&'])
+    subprocess.Popen([
+        'python',
+        '%sexample/__init__.py' % ('../' if not main else ''),
+        '--identifier', dp_testing_identifier,
+        '--port', dp_testing_port])
 
 
 def wait_server(timeout=3):

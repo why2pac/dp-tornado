@@ -11,8 +11,13 @@ python:
 install:
   - virtualenv nodeps
   - ./nodeps/bin/python setup.py install
-  - ./nodeps/bin/activate
+  - . ./nodeps/bin/activate
   - python setup.py install
+  - pip install python-coveralls
+  - pip install nose
   - pip freeze
 
-script: nosetests
+script: ./nodeps/bin/nosetests
+
+after_success:
+  - coveralls

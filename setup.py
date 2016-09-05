@@ -40,16 +40,16 @@ setup(
         'dp_tornado/helper/validator'],
     include_package_data=True,
     install_requires=[
-        'tornado==4.3',
+        'tornado==4.4.1',
         'redis==2.10.5',
-        'requests==2.9.1',
-        'croniter==0.3.11',
-        'pytz==2016.4',
-        'boto==2.39.0',
+        'requests==2.11.1',
+        'croniter==0.3.12',
+        'pytz==2016.6.1',
+        'boto==2.42.0',
         'boto3==1.4.0',
-        'SQLAlchemy==1.0.12',
+        'SQLAlchemy==1.0.15',
         'futures==3.0.5',
-        'Pillow==3.1.1'
+        'Pillow==3.3.1'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

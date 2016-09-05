@@ -9,7 +9,6 @@ python:
   - pypy3
 
 install:
-  - virtualenv ./nodeps
-  - ./nodeps/bin/python setup.py install
+  - python setup.py install
 
 script: nosetests

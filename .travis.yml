@@ -9,6 +9,10 @@ python:
   - pypy3
 
 install:
+  - virtualenv nodeps
+  - ./nodeps/bin/python setup.py install
+  - ./nodeps/bin/activate
   - python setup.py install
+  - pip freeze
 
 script: nosetests

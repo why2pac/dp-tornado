@@ -40,6 +40,7 @@ setup(
         'dp_tornado/helper/validator'],
     include_package_data=True,
     install_requires=[
+        'argparse',
         'tornado==4.4.1',
         'redis==2.10.5',
         'requests==2.11.1',

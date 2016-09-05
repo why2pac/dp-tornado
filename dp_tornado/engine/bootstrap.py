@@ -50,7 +50,20 @@ class Bootstrap(object):
                         shutil.copy(src, dest)
 
     @staticmethod
+    def init_args():
+        import argparse
+
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument('-i', '--identifier', help='Identifier')
+        parser.add_argument('-p', '--port', type=int, help='Binding port')
+
+        return parser.parse_args()
+
+    @staticmethod
     def init_ini(application_path, ini_file):
+        args = Bootstrap.init_args()
+
         # INI
         config = configparser.RawConfigParser()
         config.read(os.path.join(application_path, ini_file or 'config.ini'))
@@ -97,7 +110,7 @@ class Bootstrap(object):
         # Setup Options
         tornado.options.define('max_worker', default=get_cfg(config, 'max_worker', default=1))
         tornado.options.define('num_processes', default=get_cfg(config, 'num_processes', default=0))
-        tornado.options.define('port', default=get_cfg(config, 'port', default=8080))
+        tornado.options.define('port', default=args.port or get_cfg(config, 'port', default=8080))
         tornado.options.define('debug', default=get_cfg(config, 'debug', default=False))
         tornado.options.define('gzip', default=get_cfg(config, 'gzip', default=True))
         tornado.options.define('crypto_key', default=get_cfg(config, 'key', section='crypto', default='CR$t0-$CR@T'))

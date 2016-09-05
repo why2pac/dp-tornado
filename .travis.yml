@@ -17,7 +17,7 @@ install:
   - pip install nose
   - pip freeze
 
-script: ./nodeps/bin/nosetests
+script: ./nodeps/bin/nosetests -w ./tests
 
 after_success:
   - coveralls

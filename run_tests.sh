@@ -9,8 +9,17 @@ then
   exit
 fi
 
-virtualenv nodeps
+if [ "$1" = "init" ] || [ "$1" = "all" ]
+then
+  virtualenv nodeps
+fi
+
 . ./nodeps/bin/activate
-python setup.py install
-./nodeps/bin/nosetests -w ./tests --with-coverage
+
+if [ "$1" = "install" ] || [ "$1" = "all" ]
+then
+  python setup.py install
+fi
+
+./nodeps/bin/nosetests -w ./tests --cover-erase --with-coverage
 deactivate

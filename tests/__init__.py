@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
+
 from . import __main__
 
-__main__.run()
+
+if 'nose' in sys.modules.keys():
+    __main__.run(False)

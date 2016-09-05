@@ -1,2 +1,3 @@
 [report]
 omit = */nodeps/lib/*
+show_missing = True

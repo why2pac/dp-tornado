@@ -2,24 +2,35 @@
 
 if [ "$1" = "dry" ]
 then
-  . ./nodeps/bin/activate
-  python -m tests
-  deactivate
+ 
+  for py_ver in 2.7 3.4; do
+
+    . ./nodeps/$py_ver/bin/activate
+    python -m tests
+    deactivate
   
+  done  
+
   exit
 fi
 
 if [ "$1" = "init" ] || [ "$1" = "all" ]
 then
-  virtualenv nodeps
+  virtualenv nodeps/2.7 --python=python2.7
+  virtualenv nodeps/3.4 --python=python3.4
 fi
 
-. ./nodeps/bin/activate
+for py_ver in 2.7 3.4; do
 
-if [ "$1" = "install" ] || [ "$1" = "all" ]
-then
-  python setup.py install
-fi
+  . ./nodeps/$py_ver/bin/activate
 
-./nodeps/bin/nosetests -w ./tests --cover-erase --with-coverage
-deactivate
+  if [ "$1" = "install" ] || [ "$1" = "all" ] || [ "$1" = "init" ]
+  then
+    python setup.py install
+    pip install nose
+  fi
+
+  ./nodeps/$py_ver/bin/nosetests -w ./tests --cover-erase --with-coverage
+  deactivate
+
+done

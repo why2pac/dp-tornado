@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
 import time
 import subprocess
 
@@ -27,7 +28,7 @@ def server_pids():
     pids = subprocess.Popen(['pgrep', '-f', dp_testing_identifier], stdout=subprocess.PIPE)
     pids = pids.stdout.readlines()
 
-    return [e.replace('\n', '') for e in (pids if pids else [])]
+    return [(e.decode('utf8') if sys.version_info[0] >= 3 else e).replace('\n', '') for e in (pids if pids else [])]
 
 
 def stop_server():

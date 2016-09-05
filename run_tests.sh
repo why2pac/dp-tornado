@@ -26,11 +26,11 @@ for py_ver in 2.7 3.4; do
 
   if [ "$1" = "install" ] || [ "$1" = "all" ] || [ "$1" = "init" ]
   then
-    python setup.py install
-    pip install nose
+    python setup.py install > /dev/null 2>&1
+    pip install nose > /dev/null 2>&1
   fi
 
-  ./nodeps/$py_ver/bin/nosetests -w ./tests --cover-erase --with-coverage
+  ./nodeps/$py_ver/bin/nosetests -w ./tests --cover-erase
   deactivate
 
 done

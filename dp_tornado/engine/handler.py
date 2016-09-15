@@ -61,7 +61,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     @property
     def executor(self):
-        return self._executor
+        return self._executor()
 
     @staticmethod
     def capitalized_method_name(method_name):

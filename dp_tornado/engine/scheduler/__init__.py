@@ -7,6 +7,7 @@ import threading
 import subprocess
 import tornado.options
 import pytz
+import requests
 
 from dp_tornado.engine.scheduler import tornado_subprocess
 from dp_tornado.engine.engine import Engine
@@ -30,6 +31,9 @@ class Scheduler(threading.Thread, Engine):
         self.start_time = self.helper.datetime.datetime()
         self.reference_count = 0
 
+        if tornado.options.options.scheduler_mode not in ('web', 'process'):
+            raise Exception('The specified scheduler mode is invalid.')
+
         # Replace timezone
         if tornado.options.options.scheduler_timezone:
             tz = pytz.timezone(tornado.options.options.scheduler_timezone)
@@ -37,6 +41,10 @@ class Scheduler(threading.Thread, Engine):
 
         for e in schedules:
             i = e[2] if len(e) >= 3 and isinstance(e[2], int) else 1
+            o = e[2] if len(e) >= 3 and isinstance(e[2], dict) else {}
+
+            if 'iter' in o:
+                i = o['iter']
 
             for i in range(i):
                 s = e[0] if isinstance(e[0], int) else croniter(e[0], start_time=self.start_time)
@@ -44,7 +52,8 @@ class Scheduler(threading.Thread, Engine):
                 self.schedules.append({
                     'c': e[1],
                     's': s,
-                    'n': self.ts + 5 if isinstance(e[0], int) else s.get_next()
+                    'n': self.ts + 5 if isinstance(e[0], int) else s.get_next(),
+                    'm': o['mode'] if 'mode' in o else tornado.options.options.scheduler_mode
                 })
 
         threading.Thread.__init__(self)
@@ -60,20 +69,33 @@ class Scheduler(threading.Thread, Engine):
                 if ts >= e['n']:
                     try:
                         e['n'] = ts + e['s'] if isinstance(e['s'], int) else e['s'].get_next()
-                        args = [self.python, self.path, self.application_path, e['c']]
                         self.reference_count += 1
 
-                        if subprocess.mswindows:
-                            subprocess.Popen(
-                                ' '.join(args), shell=True, close_fds=False if subprocess.mswindows else True)
-                        else:
-                            h = SchedulerHandler()
-                            h.attach(args=args, timeout=0, ref=self.reference_count)
+                        # Scheduler Mode : Process
+                        if e['m'] == 'process':
+                            args = [
+                                self.python,
+                                self.path,
+                                '--app-path', self.application_path,
+                                '--scheduler-path', e['c']
+                            ]
+
+                            if subprocess.mswindows:
+                                subprocess.Popen(
+                                    ' '.join(args), shell=True, close_fds=False if subprocess.mswindows else True)
+                            else:
+                                h = SchedulerHandler()
+                                h.attach(args=args, timeout=0, ref=self.reference_count)
+
+                        # Scheduler Mode : Web
+                        elif e['m'] == 'web':
+                            requests.get(
+                                'http://127.0.0.1:%s/__scheduler__/%s' % (tornado.options.options.port, e['c']))
 
                     except Exception as e:
                         self.logging.exception(e)
 
-            time.sleep(2)
+            time.sleep(0.2)
 
 
 class SchedulerHandler(Engine):

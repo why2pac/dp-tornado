@@ -12,10 +12,12 @@ if __name__ == '__main__':
     if len(sys.argv) <= 2:
         exit(0)
 
+    args = EngineBootstrap.init_args()
+
     runner = None
-    app_path = sys.argv[1]
-    module = sys.argv[2]
-    timeout = sys.argv[3] if len(sys.argv) >= 4 else None
+    app_path = args.app_path
+    module = args.scheduler_path
+    timeout = args.scheduler_timeout or None
 
     sys.path.append(app_path)
     EngineBootstrap.init_ini(application_path=app_path, ini_file=None)

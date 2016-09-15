@@ -55,6 +55,11 @@ class Bootstrap(object):
 
         parser = argparse.ArgumentParser()
 
+        parser.add_argument('--app-path', help='App Path')
+
+        parser.add_argument('--scheduler-path', help='Scheduler Path')
+        parser.add_argument('--scheduler-timeout', type=int, help='Scheduler Timeout')
+
         parser.add_argument('-i', '--identifier', help='Identifier')
         parser.add_argument('-p', '--port', type=int, help='Binding port')
 
@@ -135,6 +140,7 @@ class Bootstrap(object):
 
         # Scheduler
         tornado.options.define('scheduler_timezone', default=get_cfg(config, 'timezone', section='scheduler', default=''))
+        tornado.options.define('scheduler_mode', default=get_cfg(config, 'mode', section='scheduler', default='web'))
 
         exception_delegate = get_cfg(config, 'exception_delegate', default='', section='logging') or None
         access_logging = get_cfg(config, 'access', default=1, section='logging')

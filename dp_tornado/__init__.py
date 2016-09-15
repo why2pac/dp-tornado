@@ -68,6 +68,7 @@ class Bootstrap(object):
         logging.info('---------------------------------')
 
         services_raw = [
+            (r"/__scheduler__/(.*)", 'dp_tornado.engine.scheduler_handler.SchedulerHandler'),
             (r"/", None),
             (r"/(.*)", None),
         ]

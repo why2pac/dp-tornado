@@ -11,7 +11,9 @@ kwargs = {
         #(r"/post/multipart/(.*)", 'controller.post.multipart.MultipartHandler'),
     ],
     'scheduler': [
-        ('22 16 * * *', 'scheduler.foo')
+        ('22 16 * * *', 'scheduler.foo'),
+        (30, 'scheduler.tests.periodic.three_seconds', {'iter': 2, 'mode': 'web'}),
+        (30, 'scheduler.tests.periodic.three_seconds', {'iter': 1, 'mode': 'process'})
     ]
 }
 

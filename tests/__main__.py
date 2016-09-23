@@ -3,10 +3,11 @@
 
 def run(main):
     from . import server
-    from . import controller_basic
 
     server.run_server(main)
     server.wait_server()
+
+    from . import controller_basic
 
     controller_basic.get()
     controller_basic.post()

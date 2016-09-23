@@ -50,7 +50,7 @@ def expecting_text(method, url, expected, expect_code=200, params=None, retry=3,
         url=url, method=method, params=params, retry=retry, retry_delay=retry_delay, session=session)
 
     if status_code == expect_code and (expected is None or response == expected):
-        return session, True
+        return session
 
     logging.error('URL : [%s] %s' % (method.upper(), url))
     logging.error('Expected : %s, %s' % (expect_code, expected))

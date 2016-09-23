@@ -9,7 +9,7 @@ def switch_ko():
 
     utils.expecting_text(
         'get', '/m17n/view', 'ko_hello/ko_hello', 200, session=utils.expecting_text(
-            'get', '/m17n/check', 'ko', 200, session=utils.expecting_text('get', '/m17n/switch/ko', 'done', 200)[0])[0])
+            'get', '/m17n/check', 'ko', 200, session=utils.expecting_text('get', '/m17n/switch/ko', 'done', 200)))
 
 
 def switch_en():
@@ -17,7 +17,7 @@ def switch_en():
 
     utils.expecting_text(
         'get', '/m17n/view', 'en_hello/en_hello', 200, session=utils.expecting_text(
-            'get', '/m17n/check', 'en', 200, session=utils.expecting_text('get', '/m17n/switch/en', 'done', 200)[0])[0])
+            'get', '/m17n/check', 'en', 200, session=utils.expecting_text('get', '/m17n/switch/en', 'done', 200)))
 
 
 def switch_jp():

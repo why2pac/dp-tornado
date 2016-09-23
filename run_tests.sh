@@ -11,7 +11,7 @@ then
   
   done  
 
-  exit
+  return
 fi
 
 if [ "$1" = "init" ] || [ "$1" = "all" ]

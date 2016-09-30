@@ -7,19 +7,19 @@ def run(main):
     server.run_server(main)
     server.wait_server()
 
-    from . import controller_basic
+    from . import test_controller
 
-    controller_basic.get()
-    controller_basic.post()
-    controller_basic.put()
-    controller_basic.delete()
-    controller_basic.head()
+    test_controller.get()
+    test_controller.post()
+    test_controller.put()
+    test_controller.delete()
+    test_controller.head()
 
-    from . import m17n_basic
+    from . import test_m17n
 
-    m17n_basic.switch_ko()
-    m17n_basic.switch_en()
-    m17n_basic.switch_jp()
+    test_m17n.switch_ko()
+    test_m17n.switch_en()
+    test_m17n.switch_jp()
 
     server.stop_server()
 

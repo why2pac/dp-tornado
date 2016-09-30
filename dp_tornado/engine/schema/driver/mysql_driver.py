@@ -422,7 +422,7 @@ class MySqlDriver(dpSchemaDriver):
         elif getattr(field.data_type, 'enums', None):
             data_type = '%s%s' % (data_type, getattr(field.data_type, 'enums', None))
 
-        ret = '{data_type} {unsigned} {null} {zerofill} {default} {auto_increment} {comment}' \
+        ret = '{data_type} {zerofill} {unsigned} {null} {default} {auto_increment} {comment}' \
             .replace('{data_type}', data_type) \
             .replace('{unsigned}', unsigned) \
             .replace('{null}', null) \

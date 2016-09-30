@@ -5,7 +5,14 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 import re
 
-# extract from https://gist.github.com/dperini/729294
+
+# Regular Expression for URL validation
+# Author: Diego Perini
+# License: MIT
+# Copyright (c) 2010-2013 Diego Perini (http://www.iport.it)
+
+# https://gist.github.com/dperini/729294
+
 regex = re.compile(
     u"^"
     # protocol identifier

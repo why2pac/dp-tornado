@@ -15,7 +15,7 @@ class M17n(object):
             controller.clear_cookie('__m17n__')
 
         if m17n_lang not in allowed_m17n:
-            return False
+            raise Exception('Not allowed multilingual language.')
 
         return controller.set_cookie('__m17n__', m17n_lang, expires_days=365*10)
 

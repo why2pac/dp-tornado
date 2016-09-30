@@ -11,7 +11,7 @@ then
   
   done  
 
-  exit
+  return
 fi
 
 if [ "$1" = "init" ] || [ "$1" = "all" ]
@@ -28,6 +28,8 @@ for py_ver in 2.7 3.4; do
   then
     python setup.py install > /dev/null 2>&1
     pip install nose > /dev/null 2>&1
+    pip install CyMySQL==0.8.9
+
     if [ "$py_ver" = "3.4" ]
     then
       pip uninstall futures -y > /dev/null 2>&1

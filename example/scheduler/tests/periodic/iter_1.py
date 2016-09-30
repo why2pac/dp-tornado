@@ -6,4 +6,4 @@ from dp_tornado.engine.scheduler.processor import Processor
 
 class Scheduler(Processor):
     def run(self):
-        print('scheduler:tests:periodic:three_seconds, executed')
+        print('scheduler:tests:periodic:iter_1, executed')

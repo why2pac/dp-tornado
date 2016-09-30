@@ -95,20 +95,30 @@ class ModelSingleton(dpEngine, dpSingleton):
             ModelSingleton._lock.acquire()
 
             if conf.driver == 'memory':
+                identifier = delegate['database']
+
+                if conf.identifier:
+                    identifier = conf.identifier
+
                 app_path = tornado.options.options.application_path
                 path = '%s/resource/database/sqlite/cache_%s_%s.db' \
-                       % (app_path, delegate['config'], delegate['database'])
+                       % (app_path, delegate['config'], identifier)
 
                 connection_args = {'check_same_thread': False}
                 connection_url = 'sqlite:///%s' % path
 
             elif conf.driver == 'sqlite':
+                identifier = delegate['database']
+
+                if conf.identifier:
+                    identifier = conf.identifier
+
                 if conf.path:
                     path = conf.path
                 else:
                     app_path = tornado.options.options.application_path
                     path = '%s/resource/database/sqlite/%s_%s.db' \
-                           % (app_path, delegate['config'], delegate['database'])
+                           % (app_path, delegate['config'], identifier)
 
                 connection_args = {'check_same_thread': False}
                 connection_url = 'sqlite:///%s' % path

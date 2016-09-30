@@ -2,6 +2,7 @@
 
 [![Pypi Status](https://img.shields.io/pypi/v/dp-tornado.svg)](https://pypi.python.org/pypi/dp-tornado)
 [![Build Status](https://travis-ci.org/why2pac/dp-tornado.svg?branch=master)](https://travis-ci.org/why2pac/dp-tornado)
+[![Requirements Status](https://requires.io/github/why2pac/dp-tornado/requirements.svg?branch=master)](https://requires.io/github/why2pac/dp-tornado/requirements/?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/why2pac/dp-tornado/badge.svg?branch=master)](https://coveralls.io/github/why2pac/dp-tornado?branch=master)
 
 MVC Web Application Framework with Tornado, Python 2 and 3

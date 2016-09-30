@@ -14,6 +14,9 @@ class CacheTestModel(dpModel):
     def get_sqlite(self, key):
         return self.cache.get(key=key, dsn_or_conn='tests.model_test/drv_sqlite')
 
+    def del_sqlite(self, key):
+        return self.cache.delete(key=key, dsn_or_conn='tests.model_test/drv_sqlite')
+
     def set_sqlite(self, key, val):
         return self.cache.set(key=key, val=val, dsn_or_conn='tests.model_test/drv_sqlite')
 
@@ -30,6 +33,9 @@ class CacheTestModel(dpModel):
 
     def get_redis(self, key):
         return self.cache.get(key=key, dsn_or_conn='tests.model_test/drv_redis')
+
+    def del_redis(self, key):
+        return self.cache.delete(key=key, dsn_or_conn='tests.model_test/drv_redis')
 
     def set_redis(self, key, val):
         return self.cache.set(key=key, val=val, dsn_or_conn='tests.model_test/drv_redis')

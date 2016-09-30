@@ -33,22 +33,17 @@ class SchemaTestModel(dpModel):
         offset = 0
 
         fields = (
-            ('toy_id', 'bigint(20) unsigned', 'no', 'pri', '', 'auto_increment'),
-            ('toy_code', 'bigint(20) unsigned zerofill', 'no', '', '', ''),
-            ('toy_name', "varchar(128)", 'no', 'mul', '', ''),
-            ('toy_summary', 'text', 'no', 'mul', '', ''),
-            ('toy_description', 'longtext', 'no', 'mul', '', '')
+            ('toy_id', 'bigint(20) unsigned', 'NO', 'PRI', None, 'auto_increment'),
+            ('toy_code', 'bigint(20) unsigned zerofill', 'NO', '', None, ''),
+            ('toy_name', 'varchar(128)', 'NO', 'MUL', None, ''),
+            ('toy_summary', 'text', 'NO', 'MUL', None, ''),
+            ('toy_description', 'longtext', 'NO', 'MUL', None, '')
         )
 
         for e in self.rows("""
             SHOW COLUMNS FROM %s
                 """ % self.schema.tests.unittest.toys.__table_name__, None, 'tests.model_test/drv_mysql_test'):
-            assert ((e[0] or '').lower() == fields[offset][0] and
-                    (e[1] or '').lower() == fields[offset][1] and
-                    (e[2] or '').lower() == fields[offset][2] and
-                    (e[3] or '').lower() == fields[offset][3] and
-                    (e[4] or '').lower() == fields[offset][4] and
-                    (e[5] or '').lower() == fields[offset][5])
+            assert self._assert_fields(e, fields[offset])
 
             offset += 1
 

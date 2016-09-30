@@ -4,7 +4,18 @@
 from ..cache import CacheDriver as dpCacheDriver
 
 
+import sys
 import redis
+
+
+__is_py3__ = True if sys.version_info[0] >= 3 else False
+
+
+def decoded_value(val):
+    if val and __is_py3__ and isinstance(val, bytes):
+        return val.decode('utf8')
+
+    return val
 
 
 class RedisCacheDriver(dpCacheDriver):
@@ -29,7 +40,7 @@ class RedisCacheDriver(dpCacheDriver):
 
     def get(self, key, expire_in, delete):
         if expire_in is None and not delete:
-            return self.conn.get(key)
+            return decoded_value(self.conn.get(key))
 
         else:
             p = self.conn.pipeline()
@@ -44,7 +55,8 @@ class RedisCacheDriver(dpCacheDriver):
             ret = p.execute()
 
             if ret:
-                return ret[0]
+                return decoded_value(ret[0])
+            
             else:
                 return False
 

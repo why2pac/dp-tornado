@@ -19,12 +19,12 @@ class SetController(Controller):
 
         if delay and expire_in > 0:
             import time
-            time.sleep(expire_in + 0.3)
+            time.sleep(expire_in + 1)
 
             cached_after_expire = self.model.tests.model_test.cache_test.get_sqlite(key=key)
 
             assert cached_after_expire is None
 
-            return self.finish('cache-redis:%s=%s=>%s' % (key, cached, cached_after_expire or 'empty'))
+            return self.finish('cache-sqlite:%s=%s=>%s' % (key, cached, cached_after_expire or 'empty'))
 
         self.finish('cache-sqlite:%s=%s' % (key, cached))

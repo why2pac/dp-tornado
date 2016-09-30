@@ -25,6 +25,14 @@ def run(main):
     test_model_cache.sqlite_flushdb()
     test_model_cache.sqlite_flushall()
 
+    test_model_cache.redis_flushall_only()
+    test_model_cache.redis_get()
+    test_model_cache.redis_set()
+    test_model_cache.redis_del()
+    test_model_cache.redis_set_with_expire()
+    test_model_cache.redis_flushdb()
+    test_model_cache.redis_flushall()
+
     from . import test_m17n
 
     test_m17n.switch_ko()

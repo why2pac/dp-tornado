@@ -59,3 +59,59 @@ def sqlite_flushall(key=None):
         'get', '/model/cache/sqlite/set/%s/%s' % (key, val), 'cache-sqlite:%s=%s' % (key, val), 200)
     utils.expecting_text('get', '/model/cache/sqlite/flushall', 'done', 200)
     utils.expecting_text('get', '/model/cache/sqlite/get/%s' % key, 'cached-sqlite:%s=empty' % key, 200)
+
+
+def redis_flushall_only():
+    utils.expecting_text('get', '/model/cache/redis/flushall', 'done', 200)
+
+
+def redis_get(key=None):
+    key = str(uuid.uuid1()) if not key else key
+    utils.expecting_text('get', '/model/cache/redis/get/%s' % key, 'cached-redis:%s=empty' % key, 200)
+
+
+def redis_set(key=None):
+    key = str(uuid.uuid1()) if not key else key
+    val = '123'
+
+    utils.expecting_text(
+        'get', '/model/cache/redis/set/%s/%s' % (key, val), 'cache-redis:%s=%s' % (key, val), 200)
+
+
+def redis_del(key=None):
+    key = str(uuid.uuid1()) if not key else key
+
+    redis_set(key)
+    utils.expecting_text('get', '/model/cache/redis/del/%s' % key, 'cache-redis:%s=empty' % key, 200)
+    redis_get(key)
+
+
+def redis_set_with_expire(key=None):
+    key = str(uuid.uuid1()) if not key else key
+    val = 'opq'
+
+    utils.expecting_text(
+        'get', '/model/cache/redis/set/%s/%s/1/yes' % (key, val), 'cache-redis:%s=%s=>empty' % (key, val), 200)
+
+
+def redis_flushdb(key=None):
+    key = str(uuid.uuid1()) if not key else key
+    val = 'abc'
+
+    utils.expecting_text(
+        'get', '/model/cache/redis/set/%s/%s' % (key, val), 'cache-redis:%s=%s' % (key, val), 200)
+    utils.expecting_text('get', '/model/cache/redis/flushdb/b', 'done', 200)
+    utils.expecting_text('get', '/model/cache/redis/get/%s' % key, 'cached-redis:%s=%s' % (key, val), 200)
+    utils.expecting_text('get', '/model/cache/redis/flushdb/a', 'done', 200)
+    utils.expecting_text('get', '/model/cache/redis/get/%s' % key, 'cached-redis:%s=empty' % key, 200)
+
+
+def redis_flushall(key=None):
+    key = str(uuid.uuid1()) if not key else key
+    val = 'xyz'
+
+    utils.expecting_text(
+        'get', '/model/cache/redis/set/%s/%s' % (key, val), 'cache-redis:%s=%s' % (key, val), 200)
+    utils.expecting_text('get', '/model/cache/redis/flushall', 'done', 200)
+    utils.expecting_text('get', '/model/cache/redis/get/%s' % key, 'cached-redis:%s=empty' % key, 200)
+

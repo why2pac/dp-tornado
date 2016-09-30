@@ -34,10 +34,10 @@ class SchemaTestModel(dpModel):
 
         fields = (
             ('toy_id', 'bigint(20) unsigned', 'NO', 'PRI', None, 'auto_increment'),
-            ('toy_code', 'bigint(20) unsigned zerofill', 'NO', '', None, ''),
-            ('toy_name', 'varchar(128)', 'NO', 'MUL', None, ''),
-            ('toy_summary', 'text', 'NO', 'MUL', None, ''),
-            ('toy_description', 'longtext', 'NO', 'MUL', None, '')
+            ('toy_code', 'bigint(20) unsigned zerofill', 'NO', False, None, ''),
+            ('toy_name', 'varchar(128)', 'NO', False, None, ''),
+            ('toy_summary', 'text', 'NO', False, None, ''),
+            ('toy_description', 'longtext', 'NO', False, None, '')
         )
 
         for e in self.rows("""
@@ -186,20 +186,22 @@ class SchemaTestModel(dpModel):
             return False
 
         for i in range(len(a)):
-            if isinstance(b[i], str_type):
+            if b[i] is False:
+                continue
+            elif isinstance(b[i], str_type):
                 if ('%s' % (a[i] or '')).lower() != ('%s' % (b[i] or '')).lower():
                     self.logging.error('TEST FAILED S -----------------------')
                     self.logging.error('Index : %s' % i)
-                    self.logging.error('%s' % a)
-                    self.logging.error('%s' % b)
+                    self.logging.error(str(a))
+                    self.logging.error(str(b))
                     self.logging.error('-------------------------------------')
 
                     return False
             elif a[i] != b[i]:
                 self.logging.error('TEST FAILED T -----------------------')
                 self.logging.error('Index : %s' % i)
-                self.logging.error('%s' % a)
-                self.logging.error('%s' % b)
+                self.logging.error(str(a))
+                self.logging.error(str(b))
                 self.logging.error('-------------------------------------')
 
                 return False

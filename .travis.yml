@@ -19,6 +19,7 @@ install:
   - python setup.py install
   - pip install python-coveralls
   - pip install nose
+  - pip install CyMySQL==0.8.9
   - pip freeze
 
 before_script:

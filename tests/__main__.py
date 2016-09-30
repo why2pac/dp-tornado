@@ -15,6 +15,10 @@ def run(main):
     test_controller.delete()
     test_controller.head()
 
+    from . import test_schema
+
+    test_schema.migrate()
+
     from . import test_model_cache
 
     test_model_cache.sqlite_flushall_only()

@@ -11,4 +11,4 @@ class DelController(Controller):
 
         assert cached is None
 
-        self.finish('cache-redis:%s=%s' % (key, cached or 'empty'))
+        self.finish('cache-sqlite:%s=%s' % (key, cached or 'empty'))

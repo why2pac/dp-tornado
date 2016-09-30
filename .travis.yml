@@ -22,6 +22,7 @@ install:
   - pip freeze
 
 before_script:
+  - mysql -e "DROP DATABASE IF EXISTS dp_test_db;" -u root
   - mysql -e "CREATE DATABASE IF NOT EXISTS dp_test_db;" -u root
 
 script: ./nodeps/bin/nosetests -w ./tests

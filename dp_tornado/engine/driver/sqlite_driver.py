@@ -110,7 +110,18 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         return self
 
     def flushall(self):
-        return self.flushdb()
+        for e in dpModelSingleton().rows("""
+                SELECT
+                    `name`
+                FROM
+                    sqlite_master
+                WHERE
+                    `type` = 'table'""", None, self._config_dsn, cache=True):
+            dpModelSingleton().execute(
+                'DROP TABLE IF EXISTS {table_name}'.replace('{table_name}', e['name']),
+                None,
+                self._config_dsn,
+                cache=True)
 
     def flushdb(self):
         return dpModelSingleton().execute(

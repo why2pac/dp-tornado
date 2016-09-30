@@ -18,7 +18,6 @@ class CacheTestModel(dpModel):
         return self.cache.set(key=key, val=val, dsn_or_conn='tests.model_test/drv_sqlite')
 
     def set_sqlite_with_expire(self, key, val, expire_in):
-        self.cache.set(key=key, val=val, dsn_or_conn='tests.model_test/drv_sqlite_2')
         return self.cache.set(key=key, val=val, dsn_or_conn='tests.model_test/drv_sqlite', expire_in=expire_in)
 
     #

@@ -19,6 +19,10 @@ def run(main):
 
     test_schema.migrate()
 
+    from . import test_model_db
+
+    test_model_db.mysql()
+
     from . import test_model_cache
 
     test_model_cache.sqlite_flushall_only()

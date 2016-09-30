@@ -104,7 +104,7 @@ class SchemaTestModel(dpModel):
 
             parent_kim_id = tran.scalar('SELECT last_insert_id()')
 
-            assert parent_kim_id and parent_kim_id == 2
+            assert parent_kim_id and parent_kim_id > parent_park_id
 
             tran.commit()
 

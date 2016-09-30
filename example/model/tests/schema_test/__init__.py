@@ -189,15 +189,17 @@ class SchemaTestModel(dpModel):
             if isinstance(b[i], str_type):
                 if ('%s' % (a[i] or '')).lower() != ('%s' % (b[i] or '')).lower():
                     self.logging.error('TEST FAILED S -----------------------')
-                    self.logging.error('%s' % a[i])
-                    self.logging.error('%s' % b[i])
+                    self.logging.error('Index : %s' % i)
+                    self.logging.error('%s' % a)
+                    self.logging.error('%s' % b)
                     self.logging.error('-------------------------------------')
 
                     return False
             elif a[i] != b[i]:
                 self.logging.error('TEST FAILED T -----------------------')
-                self.logging.error('%s' % a[i])
-                self.logging.error('%s' % b[i])
+                self.logging.error('Index : %s' % i)
+                self.logging.error('%s' % a)
+                self.logging.error('%s' % b)
                 self.logging.error('-------------------------------------')
 
                 return False

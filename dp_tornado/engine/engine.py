@@ -7,6 +7,14 @@ from .loader import Loader as dpLoader
 
 class EngineSingleton(dpSingleton):
     @property
+    def decorators(self):
+        if not hasattr(self, '_decorators'):
+            from .decorators import Decorators
+            self._decorators = Decorators()
+
+        return self._decorators
+
+    @property
     def options(self):
         if not hasattr(self, '_options'):
             import tornado.options
@@ -21,7 +29,7 @@ class EngineSingleton(dpSingleton):
                         return None
 
             self._options = TornadoOptions()
-        
+
         try:
             return self._options
         except AttributeError:
@@ -114,6 +122,8 @@ class EngineSingleton(dpSingleton):
 
 
 class Engine(object):
+    decorators = EngineSingleton().decorators
+
     @property
     def options(self):
         return EngineSingleton().options

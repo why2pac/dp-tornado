@@ -74,15 +74,15 @@ class Pagination(tornado.web.UIModule, dpEngine):
         params = dict(params, **link_params)
         params = dict((k, v) for k, v in params.items() if v is not None)
 
-        last_page = int(self.helper.math.ceil(total_count * 1.0 / rpp * 1.0))
+        last_page = int(self.helper.numeric.math.ceil(total_count * 1.0 / rpp * 1.0))
 
         if page < 1:
             page = 1
         elif page > last_page:
             page = last_page
 
-        current_block = int(self.helper.math.ceil(page * 1.0 / rpb * 1.0))
-        last_block = int(self.helper.math.ceil(last_page * 1.0 / rpb * 1.0))
+        current_block = int(self.helper.numeric.math.ceil(page * 1.0 / rpb * 1.0))
+        last_block = int(self.helper.numeric.math.ceil(last_page * 1.0 / rpb * 1.0))
 
         current_block = int(current_block)
         last_block = int(last_block)

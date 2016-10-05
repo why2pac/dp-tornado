@@ -1,2 +1,8 @@
 # Assets Compressor
-recursive-include dp_tornado/engine/template *
+recursive-include dp_tornado/engine/template *.js
+recursive-include dp_tornado/engine/template *.css
+recursive-include dp_tornado/engine/template *.ini
+recursive-include dp_tornado/engine/template *.html
+recursive-include dp_tornado/engine/template Readme
+recursive-include dp_tornado/engine *.py
+recursive-include dp_tornado/helper *.py

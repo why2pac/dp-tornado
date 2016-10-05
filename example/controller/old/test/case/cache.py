@@ -43,7 +43,7 @@ class CacheController(dpController):
             ('ObjectId_dict_value', {'x': 'b', 'd': 345, 'l': ObjectId('5490160353286b8984a956e4')})
         )
 
-        pm = self.helper.performance.start()
+        pm = self.helper.misc.performance.start()
 
         for k in x:
             key = k[0]

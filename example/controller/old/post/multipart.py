@@ -132,7 +132,7 @@ class MultipartHandler(dpHandler):
         self.action_identifier = request_uri[1] if len(request_uri) > 1 else None
         self.options = request_uri[2] if len(request_uri) > 2 else None
         self.content_length = self.request.headers['Content-Length'] if 'Content-Length' in self.request.headers else 0
-        self.content_length = self.helper.numeric.long(self.content_length)
+        self.content_length = self.helper.numeric.cast.long(self.content_length)
         self.received_length = 0
         self.stx = None
         self.btx = None

@@ -17,7 +17,7 @@ class BarModel(dpModel):
         return self.execute("""
             INSERT INTO userinfo
                 (user_id, updatedate) VALUES (?, ?)
-        """, (user_id, self.helper.datetime.time()), 'foo.bar/bar')
+        """, (user_id, self.helper.datetime.timestamp.now()), 'foo.bar/bar')
 
     # Method callable by self.model.foo.bar.user.ex_row from Controller
     def ex_row(self, user_id):
@@ -43,7 +43,7 @@ class BarModel(dpModel):
 
         proxy.execute("""
             UPDATE userinfo SET updatedate = ? WHERE user_id = ?
-        """, (self.helper.datetime.time(), user_id))
+        """, (self.helper.datetime.timestamp.now(), user_id))
 
         after = proxy.row("""
             SELECT * FROM userinfo WHERE user_id = ?
@@ -65,7 +65,7 @@ class BarModel(dpModel):
 
         proxy.execute("""
             UPDATE userinfo SET updatedate = ? WHERE user_id = ?
-        """, (self.helper.datetime.time(), user_id))
+        """, (self.helper.datetime.timestamp.now(), user_id))
 
         after = proxy.row("""
             SELECT * FROM userinfo WHERE user_id = ?

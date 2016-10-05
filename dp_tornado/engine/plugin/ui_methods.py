@@ -23,24 +23,24 @@ def truncate(c, t, l, s='..'):
     return t
 
 
-def yyyymmdd(c, t, s='.'):
-    return c.helper.datetime.yyyymmdd(s=s, d=t)
+def yyyymmdd(c, datetime=None, timestamp=None, ms=False, concat='.'):
+    return c.helper.datetime.date.yyyymmdd(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def mmdd(c, t, s='.'):
-    return c.helper.datetime.mmdd(s=s, d=t)
+def mmdd(c, datetime=None, timestamp=None, ms=False, concat='.'):
+    return c.helper.datetime.date.yyyymmdd(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def hhiiss(c, t, s=':'):
-    return c.helper.datetime.hhiiss(s=s, d=t)
+def hhiiss(c, datetime=None, timestamp=None, ms=False, concat='.'):
+    return c.helper.datetime.time.hhiiss(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def hhii(c, t, s=':'):
-    return c.helper.datetime.hhii(s=s, d=t)
+def hhii(c, datetime=None, timestamp=None, ms=False, concat='.'):
+    return c.helper.datetime.time.hhii(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def weekday(c, t):
-    return c.helper.datetime.weekday(d=t)
+def weekday(c, datetime=None, timestamp=None, ms=False):
+    return c.helper.datetime.date.weekday(datetime=datetime, timestamp=timestamp, ms=ms)
 
 
 def request_uri(c, s=False, d=' ', p='_', e=False, q=True):

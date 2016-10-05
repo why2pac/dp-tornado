@@ -98,10 +98,10 @@ class MultipartHandler(dpHandler):
         large = None
 
         filename = '%s-%s-%s-%s_%s' % (
-            self.helper.datetime.year(),
-            self.helper.datetime.month(),
-            self.helper.datetime.day(),
-            self.helper.datetime.hhiiss(),
+            self.helper.datetime.date.year(),
+            self.helper.datetime.date.month(),
+            self.helper.datetime.date.day(),
+            self.helper.datetime.time.hhiiss(),
             self.helper.crypto.sha224_hash('%sx%s' % (width, height)))
 
         filename_thumb = '%s_thumb.%s' % (filename, ext)

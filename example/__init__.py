@@ -5,6 +5,9 @@ import os
 
 from dp_tornado import Bootstrap
 
+
+os.environ['TZ'] = 'Europe/London'
+
 kwargs = {
     'application_path': os.path.join(os.path.dirname(os.path.realpath(__file__))),
     'service': [

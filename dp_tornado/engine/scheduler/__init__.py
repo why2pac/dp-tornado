@@ -27,8 +27,8 @@ class Scheduler(threading.Thread, Engine):
         self.path = os.path.join(self.path, 'runner.py')
         self.python = tornado.options.options.python
         self.application_path = tornado.options.options.application_path
-        self.ts = self.helper.datetime.time()
-        self.start_time = self.helper.datetime.datetime()
+        self.ts = self.helper.datetime.timestamp.now()
+        self.start_time = self.helper.datetime.now()
         self.reference_count = 0
 
         if tornado.options.options.scheduler_mode not in ('web', 'process'):
@@ -37,7 +37,7 @@ class Scheduler(threading.Thread, Engine):
         # Replace timezone
         if tornado.options.options.scheduler_timezone:
             tz = pytz.timezone(tornado.options.options.scheduler_timezone)
-            self.start_time = self.helper.datetime.datetime(tz=tz)
+            self.start_time = self.helper.datetime.now(timezone=tz)
 
         for e in schedules:
             i = e[2] if len(e) >= 3 and isinstance(e[2], int) else 1
@@ -63,7 +63,7 @@ class Scheduler(threading.Thread, Engine):
             return
 
         while not self.interrupted:
-            ts = self.helper.datetime.time()
+            ts = self.helper.datetime.timestamp.now()
 
             for e in self.schedules:
                 if ts >= e['n']:

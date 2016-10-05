@@ -30,6 +30,6 @@ class FooModel(dpModel):
         print(msg)
         print(traceback)
 
-        #fp = open('scheduler_%s' % self.helper.datetime.time(), 'w')
-        #fp.write('scheduler %s' % self.helper.datetime.time())
+        #fp = open('scheduler_%s' % self.helper.datetime.timestamp.now(), 'w')
+        #fp.write('scheduler %s' % self.helper.datetime.timestamp.now())
         #fp.close()

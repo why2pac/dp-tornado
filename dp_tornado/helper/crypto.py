@@ -54,7 +54,7 @@ class CryptoHelper(dpHelper):
                     self.helper.string.random_string(self.helper.random.randint(2, 10))
 
             if expire_in > 0:
-                plain['ts'] = self.helper.datetime.current_time() + expire_in
+                plain['ts'] = self.helper.datetime.timestamp.now() + expire_in
 
             if json_encode:
                 plain['e'] = True
@@ -98,7 +98,7 @@ class CryptoHelper(dpHelper):
                 decoded['p'] = self.helper.json.loads(decoded['p'])
 
             if 'ts' in decoded:
-                return decoded['p'] if self.helper.datetime.current_time() < decoded['ts'] else None
+                return decoded['p'] if self.helper.datetime.timestamp.now() < decoded['ts'] else None
 
             else:
                 return decoded['p']

@@ -46,9 +46,8 @@ class Controller(dpEngine):
         try:
             if ret and cast == int and fmt == 'yyyymmdd':
                 try:
-
-                    return self.helper.datetime.time(
-                        self.helper.datetime.datetime(
+                    return self.helper.datetime.timestamp.time(
+                        self.helper.datetime.date.convert(
                             yyyymmdd=self.helper.numeric.extract_numbers(ret or '')))
 
                 except:

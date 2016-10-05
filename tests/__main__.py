@@ -15,6 +15,13 @@ def run(main):
     test_controller.delete()
     test_controller.head()
 
+    from . import test_helper
+
+    test_helper.datetime()
+    test_helper.datetime_date()
+    test_helper.datetime_time()
+    test_helper.datetime_timestamp()
+
     from . import test_schema
 
     test_schema.migrate()

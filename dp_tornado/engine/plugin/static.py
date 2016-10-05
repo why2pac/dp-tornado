@@ -135,7 +135,7 @@ class StaticURL(tornado.web.UIModule):
         # for Debugging Mode, do not minify css or js.
         if self.handler.settings.get('debug'):
             return '\n'.join(
-                [self._template('%s?%s' % (t, self.handler.vars.compressor.helper.datetime.mtime())) for t in statics])
+                [self._template('%s?%s' % (t, self.handler.vars.compressor.helper.datetime.timestamp.time(ms=True))) for t in statics])
         elif not self.handler.vars.static.minify or (options and 'proxy' in options and options['proxy']):
             return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 

@@ -56,6 +56,7 @@ class NumericHelper(dpHelper):
 
         return lhs + splt[:-1] + rhs
 
+    @dpHelper.decorators.deprecated
     def int(self, a, raise_exception=True):
         try:
             if self.helper.system.py_version <= 2:
@@ -69,6 +70,7 @@ class NumericHelper(dpHelper):
 
             return False
 
+    @dpHelper.decorators.deprecated
     def long(self, a, raise_exception=True):
         try:
             if self.helper.system.py_version <= 2:

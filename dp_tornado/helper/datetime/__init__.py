@@ -22,7 +22,7 @@ class DatetimeHelper(dpHelper):
             return self.helper.datetime.timezone.normalize(datetime=datetime, timezone=timezone)
 
     def from_timestamp(self, timestamp, timezone=None, ms=False):
-        timestamp = self.helper.numeric.long(timestamp)
+        timestamp = self.helper.numeric.cast.long(timestamp)
 
         # TZ Info from Zone
         if timezone and self.helper.misc.type.check.string(timezone):

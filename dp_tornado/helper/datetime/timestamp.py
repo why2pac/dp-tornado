@@ -10,7 +10,7 @@ import time as abs_time
 
 class TimestampHelper(dpHelper):
     def now(self, ms=False):
-        return self.helper.numeric.long(abs_time.time() if not ms else round(abs_time.time() * 1000))
+        return self.helper.numeric.cast.long(abs_time.time() if not ms else round(abs_time.time() * 1000))
 
     def yesterday(self, timestamp=None, ms=False):
         return timestamp - (3600*24*(1 if not ms else 1000))
@@ -35,7 +35,7 @@ class TimestampHelper(dpHelper):
             0
         )
 
-        timestamp = self.helper.numeric.long(abs_time.mktime(p_tuple))
+        timestamp = self.helper.numeric.cast.long(abs_time.mktime(p_tuple))
 
         if not ms:
             return timestamp

@@ -16,6 +16,9 @@ fi
 
 if [ "$1" = "init" ] || [ "$1" = "all" ]
 then
+  rm -rf builds
+  rm -rf dist
+  rm -rf dp_tornado.egg-info
   rm -rf nodeps
   virtualenv nodeps/2.7 --python=python2.7
   virtualenv nodeps/3.4 --python=python3.4

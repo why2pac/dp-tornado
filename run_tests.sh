@@ -16,6 +16,7 @@ fi
 
 if [ "$1" = "init" ] || [ "$1" = "all" ]
 then
+  rm -rf nodeps
   virtualenv nodeps/2.7 --python=python2.7
   virtualenv nodeps/3.4 --python=python3.4
 fi

@@ -143,7 +143,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
         return dpModelSingleton().execute(
             'DELETE FROM {table_name} WHERE expire_at < ?'.replace('{table_name}', self._table_name(self._config_dsn)),
-            self.helper.datetime.timestamp.time(), self._config_dsn, cache=True)
+            self.helper.datetime.timestamp.now(), self._config_dsn, cache=True)
 
     def get(self, key, retry_count=0, raise_error=False):
         self._referenced()
@@ -175,7 +175,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                     return None
 
         if result:
-            if result['expire_at'] and result['expire_at'] < self.helper.datetime.timestamp.time():
+            if result['expire_at'] and result['expire_at'] < self.helper.datetime.timestamp.now():
                 return None
             else:
                 type = self._key_to_type(result['type'])
@@ -228,7 +228,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
     def set(self, key, val, expire_in=1209600, retry_count=10, raise_error=False):
         if expire_in is not None:
-            expire_in = self.helper.datetime.timestamp.time() + expire_in
+            expire_in = self.helper.datetime.timestamp.now() + expire_in
 
         type = self._val_to_type(val)
         val_serialized = empty
@@ -301,7 +301,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
     def increase(self, key, amount, expire_in=None):
         if expire_in is not None:
-            expire_in = self.helper.datetime.timestamp.time() + expire_in
+            expire_in = self.helper.datetime.timestamp.now() + expire_in
 
         if expire_in:
             return dpModelSingleton().execute(
@@ -337,4 +337,4 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         elif not record['expire_at']:
             return -1
         else:
-            return record['expire_at'] - self.helper.datetime.timestamp.time()
+            return record['expire_at'] - self.helper.datetime.timestamp.now()

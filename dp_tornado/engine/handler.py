@@ -386,7 +386,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             except:
                 sessionid = None
 
-        sessionid = sessionid or self.helper.crypto.sha224_hash(self.helper.datetime.timestamp.time(ms=True))
+        sessionid = sessionid or self.helper.crypto.sha224_hash(self.helper.datetime.timestamp.now(ms=True))
         self.set_secure_cookie('PSESSIONID', sessionid)
         self._sessionid = sessionid
 

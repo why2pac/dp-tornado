@@ -20,3 +20,8 @@ class ToysSchema(dpTable):
     idx_toys_toy_name = dpAttribute.index(dpAttribute.IndexType.INDEX, 'toy_name')
     idx_toys_toy_summary = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'toy_summary')
     idx_toys_toy_description = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'toy_description')
+
+    __dummy_data__ = [
+        {'toy_id': 1, 'toy_code': 1000, 'toy_name': 'Lego', 'toy_summary': 'Lego Limited Edition', 'toy_description': 'Lego Limited Edition.'},
+        {'toy_id': 2, 'toy_code': 2000, 'toy_name': 'Teddy Bear', 'toy_summary': 'Teddy Bear Limited Edition', 'toy_description': 'Teddy Bear Limited Edition.'}
+    ]

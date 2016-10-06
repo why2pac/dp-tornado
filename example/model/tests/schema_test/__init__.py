@@ -19,6 +19,7 @@ class SchemaTestModel(dpModel):
         setattr(self, '__tested__', True)
 
     def migrate_unittest(self):
+        self.schema.tests.unittest.fields.migrate()
         self.schema.tests.unittest.toys.migrate()
         self.schema.tests.unittest.parents.migrate()
         self.schema.tests.unittest.childs.migrate()

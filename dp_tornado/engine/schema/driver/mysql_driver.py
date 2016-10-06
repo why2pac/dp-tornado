@@ -420,7 +420,13 @@ class MySqlDriver(dpSchemaDriver):
         auto_increment = 'AUTO_INCREMENT' if ai and field.ai else ''
 
         if getattr(field.data_type, 'size', None) and not zerofill:
-            data_type = '%s(%s)' % (data_type, getattr(field.data_type, 'size', None))
+            size = getattr(field.data_type, 'size', None)
+
+            if isinstance(size, (tuple, list)):
+                data_type = '%s%s' % (data_type, tuple(size))
+            else:
+                data_type = '%s(%s)' % (data_type, size)
+
         elif getattr(field.data_type, 'enums', None):
             data_type = '%s%s' % (data_type, getattr(field.data_type, 'enums', None))
 

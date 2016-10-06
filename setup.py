@@ -28,16 +28,16 @@ setup(
     include_package_data=True,
     install_requires=[
         'argparse',
-        'tornado==4.4.1',
+        'tornado==4.4.2',
         'redis==2.10.5',
         'requests==2.11.1',
         'croniter==0.3.12',
-        'pytz==2016.6.1',
+        'pytz==2016.7',
         'boto==2.42.0',
         'boto3==1.4.0',
-        'SQLAlchemy==1.0.15',
+        'SQLAlchemy==1.1.0',
         'futures==3.0.5',
-        'Pillow==3.3.1'
+        'Pillow==3.4.1'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

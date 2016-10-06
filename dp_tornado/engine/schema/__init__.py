@@ -151,6 +151,88 @@ class _DataType(object):
             if enums:
                 self.enums = enums
 
+    class BLOB(_ComparableDataType):
+        name = 'BLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class LONGBLOB(_ComparableDataType):
+        name = 'LONGBLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class MEDIUMBLOB(_ComparableDataType):
+        name = 'MEDIUMBLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class TINYBLOB(_ComparableDataType):
+        name = 'TINYBLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class DATETIME(_ComparableDataType):
+        name = 'DATETIME'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class DATE(_ComparableDataType):
+        name = 'DATE'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class TIME(_ComparableDataType):
+        name = 'TIME'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class TIMESTAMP(_ComparableDataType):
+        name = 'TIMESTAMP'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class YEAR(_ComparableDataType):
+        name = 'YEAR'
+        size = 4
+
+        def __init__(self, size=None):
+            if size is not None:
+                self.size = size
+
+                assert size == 4
+
+    class BINARY(_ComparableDataType):
+        name = 'BINARY'
+        size = 1
+
+        def __init__(self, size=None):
+            if size is not None:
+                self.size = size
+
+    class VARBINARY(_ComparableDataType):
+        name = 'VARBINARY'
+        size = 1
+
+        def __init__(self, size=None):
+            if size is not None:
+                self.size = size
+
 
 class _IndexType(object):
     class PRIMARY(object):

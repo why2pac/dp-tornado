@@ -318,6 +318,33 @@ class MySqlDriver(dpSchemaDriver):
                 elif v.strip().upper().startswith('LONGTEXT'):
                     data_type = dpAttribute.DataType.LONGTEXT()
 
+                elif v.strip().upper().startswith('BLOB'):
+                    data_type = dpAttribute.DataType.BLOB()
+                elif v.strip().upper().startswith('LONGBLOB'):
+                    data_type = dpAttribute.DataType.LONGBLOB()
+                elif v.strip().upper().startswith('MEDIUMBLOB'):
+                    data_type = dpAttribute.DataType.MEDIUMBLOB()
+                elif v.strip().upper().startswith('TINYBLOB'):
+                    data_type = dpAttribute.DataType.TINYBLOB()
+
+                elif v.strip().upper() == 'DATETIME':
+                    data_type = dpAttribute.DataType.DATETIME
+                elif v.strip().upper() == 'DATE':
+                    data_type = dpAttribute.DataType.DATE
+                elif v.strip().upper() == 'TIME':
+                    data_type = dpAttribute.DataType.TIME
+                elif v.strip().upper() == 'TIMESTAMP':
+                    data_type = dpAttribute.DataType.TIMESTAMP
+                elif v.strip().upper() == 'YEAR':
+                    data_type = dpAttribute.DataType.YEAR
+                elif v.strip().upper().startswith('YEAR('):
+                    data_type = dpAttribute.DataType.YEAR(int(v[5:-1]))
+
+                elif v.strip().upper().startswith('BINARY('):
+                    data_type = dpAttribute.DataType.BINARY(int(v[7:-1]))
+                elif v.strip().upper().startswith('VARBINARY('):
+                    data_type = dpAttribute.DataType.VARBINARY(int(v[10:-1]))
+
                 elif v.strip().upper().startswith('ENUM('):
                     data_type = dpAttribute.DataType.ENUM(*[(e[1:-1] if e[0] == "'" and e[-1] == "'" else e) for e in v[5:-1].split(',')])
 

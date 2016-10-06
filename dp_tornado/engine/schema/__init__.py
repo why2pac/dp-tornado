@@ -11,6 +11,10 @@ from ..cache import dpInValueModelConfig
 
 
 class _ComparableDataType(object):
+    name = None
+    size = None
+    enums = None
+
     def __eq__(self, other):
         if not other:
             return False
@@ -147,6 +151,88 @@ class _DataType(object):
             if enums:
                 self.enums = enums
 
+    class BLOB(_ComparableDataType):
+        name = 'BLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class LONGBLOB(_ComparableDataType):
+        name = 'LONGBLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class MEDIUMBLOB(_ComparableDataType):
+        name = 'MEDIUMBLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class TINYBLOB(_ComparableDataType):
+        name = 'TINYBLOB'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class DATETIME(_ComparableDataType):
+        name = 'DATETIME'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class DATE(_ComparableDataType):
+        name = 'DATE'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class TIME(_ComparableDataType):
+        name = 'TIME'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class TIMESTAMP(_ComparableDataType):
+        name = 'TIMESTAMP'
+        size = None
+
+        def __init__(self):
+            pass
+
+    class YEAR(_ComparableDataType):
+        name = 'YEAR'
+        size = 4
+
+        def __init__(self, size=None):
+            if size is not None:
+                self.size = size
+
+                assert size == 4
+
+    class BINARY(_ComparableDataType):
+        name = 'BINARY'
+        size = 1
+
+        def __init__(self, size=None):
+            if size is not None:
+                self.size = size
+
+    class VARBINARY(_ComparableDataType):
+        name = 'VARBINARY'
+        size = 1
+
+        def __init__(self, size=None):
+            if size is not None:
+                self.size = size
+
 
 class _IndexType(object):
     class PRIMARY(object):
@@ -231,19 +317,19 @@ class Table(object):
 
     def migrate(self):
         if not self._guarantee_permission():
-            return False
+            return None
 
-        self._migrate(migrate_data=True)
+        return self._migrate(migrate_data=True)
 
     def migrate_schema(self):
         if not self._guarantee_permission():
-            return False
+            return None
 
-        self._migrate(migrate_data=False)
+        return self._migrate(migrate_data=False)
 
     def _migrate(self, migrate_data=True):
         if self.__migrated:
-            return True
+            return None
 
         self.__migrated = True
 
@@ -267,13 +353,13 @@ class Table(object):
         else:
             from .driver import SchemaDriver
 
-        SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys, migrate_data=migrate_data)
+        return SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys, migrate_data=migrate_data)
 
     def migrate_data(self):
         if not self._guarantee_permission():
-            return False
+            return None
 
-        self._migrate_data()
+        return self._migrate_data()
 
     def _migrate_data(self):
         dsn, driver = self._get_driver()
@@ -283,7 +369,7 @@ class Table(object):
         else:
             from .driver import SchemaDriver
 
-        SchemaDriver.migrate_data(dsn, self)
+        return SchemaDriver.migrate_data(dsn, self)
 
     def __getattribute__(self, item):
         o = super(Table, self).__getattribute__(item)
@@ -368,7 +454,7 @@ class Attribute(object):
     @staticmethod
     def field(data_type,
               default=None,
-              comment=None,
+              comment='',
               m_pk=None,
               pk=None,
               uq=None,

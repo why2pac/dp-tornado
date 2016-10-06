@@ -16,6 +16,7 @@ class MySqlDriver(dpSchemaDriver):
                 setattr(v, 'name', k)
 
         created = False
+        succeed = True
 
         for val in (False, True):
             proxy = dpModel().begin(dsn)
@@ -37,6 +38,8 @@ class MySqlDriver(dpSchemaDriver):
                     logging.info('Table migration succeed : %s :: %s' % (dsn, table.__table_name__))
 
             except Exception as e:
+                succeed = True
+
                 proxy.rollback()
                 logging.exception(e)
 
@@ -44,16 +47,17 @@ class MySqlDriver(dpSchemaDriver):
 
                 break
 
-        MySqlDriver.migrate_priority(dsn, table, fields)
+        if MySqlDriver.migrate_priority(dsn, table, fields) is False:
+            return False
 
         if migrate_data:
-            MySqlDriver.migrate_data(dsn, table)
+            return MySqlDriver.migrate_data(dsn, table) and succeed
 
-        if not created:
-            return
+        return succeed
 
     @staticmethod
     def migrate_data(dsn, table):
+        succed = True
         dummy_data = getattr(table, '__dummy_data__', None)
 
         if dummy_data:
@@ -86,13 +90,18 @@ class MySqlDriver(dpSchemaDriver):
                 logging.info('Table data insertion succeed : %s :: %s' % (dsn, table.__table_name__))
 
             except Exception as e:
+                succed = False
+
                 proxy.rollback()
                 logging.exception(e)
 
                 logging.error('Table data insertion failed : %s :: %s' % (dsn, table.__table_name__))
 
+        return succed
+
     @staticmethod
     def migrate_priority(dsn, table, fields):
+        succeed = True
         proxy = dpModel().begin(dsn)
 
         try:
@@ -128,10 +137,14 @@ class MySqlDriver(dpSchemaDriver):
             logging.info('Table priority rearrange succeed : %s :: %s' % (dsn, table.__table_name__))
 
         except Exception as e:
+            succeed = False
+
             proxy.rollback()
             logging.exception(e)
 
             logging.error('Table priority rearrange failed : %s :: %s' % (dsn, table.__table_name__))
+
+        return succeed
 
     @staticmethod
     def _get_chars_pcn(strval):
@@ -294,6 +307,8 @@ class MySqlDriver(dpSchemaDriver):
 
                 elif v.strip().upper().startswith('DOUBLE('):
                     data_type = dpAttribute.DataType.DOUBLE(int(v[7:-1]))
+                elif v.strip().upper().startswith('DOUBLE'):
+                    data_type = dpAttribute.DataType.DOUBLE
                 elif v.strip().upper().startswith('FLOAT('):
                     data_type = dpAttribute.DataType.FLOAT(int(v[6:-1]))
                 elif v.strip().upper().startswith('FLOAT'):
@@ -315,6 +330,33 @@ class MySqlDriver(dpSchemaDriver):
                     data_type = dpAttribute.DataType.MEDIUMTEXT()
                 elif v.strip().upper().startswith('LONGTEXT'):
                     data_type = dpAttribute.DataType.LONGTEXT()
+
+                elif v.strip().upper().startswith('BLOB'):
+                    data_type = dpAttribute.DataType.BLOB()
+                elif v.strip().upper().startswith('LONGBLOB'):
+                    data_type = dpAttribute.DataType.LONGBLOB()
+                elif v.strip().upper().startswith('MEDIUMBLOB'):
+                    data_type = dpAttribute.DataType.MEDIUMBLOB()
+                elif v.strip().upper().startswith('TINYBLOB'):
+                    data_type = dpAttribute.DataType.TINYBLOB()
+
+                elif v.strip().upper() == 'DATETIME':
+                    data_type = dpAttribute.DataType.DATETIME
+                elif v.strip().upper() == 'DATE':
+                    data_type = dpAttribute.DataType.DATE
+                elif v.strip().upper() == 'TIME':
+                    data_type = dpAttribute.DataType.TIME
+                elif v.strip().upper() == 'TIMESTAMP':
+                    data_type = dpAttribute.DataType.TIMESTAMP
+                elif v.strip().upper() == 'YEAR':
+                    data_type = dpAttribute.DataType.YEAR
+                elif v.strip().upper().startswith('YEAR('):
+                    data_type = dpAttribute.DataType.YEAR(int(v[5:-1]))
+
+                elif v.strip().upper().startswith('BINARY('):
+                    data_type = dpAttribute.DataType.BINARY(int(v[7:-1]))
+                elif v.strip().upper().startswith('VARBINARY('):
+                    data_type = dpAttribute.DataType.VARBINARY(int(v[10:-1]))
 
                 elif v.strip().upper().startswith('ENUM('):
                     data_type = dpAttribute.DataType.ENUM(*[(e[1:-1] if e[0] == "'" and e[-1] == "'" else e) for e in v[5:-1].split(',')])
@@ -420,7 +462,13 @@ class MySqlDriver(dpSchemaDriver):
         auto_increment = 'AUTO_INCREMENT' if ai and field.ai else ''
 
         if getattr(field.data_type, 'size', None) and not zerofill:
-            data_type = '%s(%s)' % (data_type, getattr(field.data_type, 'size', None))
+            size = getattr(field.data_type, 'size', None)
+
+            if isinstance(size, (tuple, list)):
+                data_type = '%s%s' % (data_type, tuple(size))
+            else:
+                data_type = '%s(%s)' % (data_type, size)
+
         elif getattr(field.data_type, 'enums', None):
             data_type = '%s%s' % (data_type, getattr(field.data_type, 'enums', None))
 

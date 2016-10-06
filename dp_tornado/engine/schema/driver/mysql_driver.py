@@ -294,6 +294,8 @@ class MySqlDriver(dpSchemaDriver):
 
                 elif v.strip().upper().startswith('DOUBLE('):
                     data_type = dpAttribute.DataType.DOUBLE(int(v[7:-1]))
+                elif v.strip().upper().startswith('DOUBLE'):
+                    data_type = dpAttribute.DataType.DOUBLE
                 elif v.strip().upper().startswith('FLOAT('):
                     data_type = dpAttribute.DataType.FLOAT(int(v[6:-1]))
                 elif v.strip().upper().startswith('FLOAT'):

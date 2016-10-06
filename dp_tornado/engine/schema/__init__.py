@@ -317,19 +317,19 @@ class Table(object):
 
     def migrate(self):
         if not self._guarantee_permission():
-            return False
+            return None
 
-        self._migrate(migrate_data=True)
+        return self._migrate(migrate_data=True)
 
     def migrate_schema(self):
         if not self._guarantee_permission():
-            return False
+            return None
 
-        self._migrate(migrate_data=False)
+        return self._migrate(migrate_data=False)
 
     def _migrate(self, migrate_data=True):
         if self.__migrated:
-            return True
+            return None
 
         self.__migrated = True
 
@@ -353,13 +353,13 @@ class Table(object):
         else:
             from .driver import SchemaDriver
 
-        SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys, migrate_data=migrate_data)
+        return SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys, migrate_data=migrate_data)
 
     def migrate_data(self):
         if not self._guarantee_permission():
-            return False
+            return None
 
-        self._migrate_data()
+        return self._migrate_data()
 
     def _migrate_data(self):
         dsn, driver = self._get_driver()
@@ -369,7 +369,7 @@ class Table(object):
         else:
             from .driver import SchemaDriver
 
-        SchemaDriver.migrate_data(dsn, self)
+        return SchemaDriver.migrate_data(dsn, self)
 
     def __getattribute__(self, item):
         o = super(Table, self).__getattribute__(item)

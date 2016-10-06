@@ -16,6 +16,7 @@ class MySqlDriver(dpSchemaDriver):
                 setattr(v, 'name', k)
 
         created = False
+        succeed = True
 
         for val in (False, True):
             proxy = dpModel().begin(dsn)
@@ -37,6 +38,8 @@ class MySqlDriver(dpSchemaDriver):
                     logging.info('Table migration succeed : %s :: %s' % (dsn, table.__table_name__))
 
             except Exception as e:
+                succeed = True
+
                 proxy.rollback()
                 logging.exception(e)
 
@@ -44,16 +47,17 @@ class MySqlDriver(dpSchemaDriver):
 
                 break
 
-        MySqlDriver.migrate_priority(dsn, table, fields)
+        if MySqlDriver.migrate_priority(dsn, table, fields) is False:
+            return False
 
         if migrate_data:
-            MySqlDriver.migrate_data(dsn, table)
+            return MySqlDriver.migrate_data(dsn, table) and succeed
 
-        if not created:
-            return
+        return succeed
 
     @staticmethod
     def migrate_data(dsn, table):
+        succed = True
         dummy_data = getattr(table, '__dummy_data__', None)
 
         if dummy_data:
@@ -86,13 +90,18 @@ class MySqlDriver(dpSchemaDriver):
                 logging.info('Table data insertion succeed : %s :: %s' % (dsn, table.__table_name__))
 
             except Exception as e:
+                succed = False
+
                 proxy.rollback()
                 logging.exception(e)
 
                 logging.error('Table data insertion failed : %s :: %s' % (dsn, table.__table_name__))
 
+        return succed
+
     @staticmethod
     def migrate_priority(dsn, table, fields):
+        succeed = True
         proxy = dpModel().begin(dsn)
 
         try:
@@ -128,10 +137,14 @@ class MySqlDriver(dpSchemaDriver):
             logging.info('Table priority rearrange succeed : %s :: %s' % (dsn, table.__table_name__))
 
         except Exception as e:
+            succeed = False
+
             proxy.rollback()
             logging.exception(e)
 
             logging.error('Table priority rearrange failed : %s :: %s' % (dsn, table.__table_name__))
+
+        return succeed
 
     @staticmethod
     def _get_chars_pcn(strval):

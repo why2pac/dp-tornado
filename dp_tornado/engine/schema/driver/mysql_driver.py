@@ -10,7 +10,7 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 
 class MySqlDriver(dpSchemaDriver):
     @staticmethod
-    def migrate(dsn, table, fields, indexes, foreign_keys):
+    def migrate(dsn, table, fields, indexes, foreign_keys, migrate_data=True):
         for k, v in fields:
             if not v.name:
                 setattr(v, 'name', k)
@@ -45,7 +45,9 @@ class MySqlDriver(dpSchemaDriver):
                 break
 
         MySqlDriver.migrate_priority(dsn, table, fields)
-        MySqlDriver.migrate_data(dsn, table)
+
+        if migrate_data:
+            MySqlDriver.migrate_data(dsn, table)
 
         if not created:
             return

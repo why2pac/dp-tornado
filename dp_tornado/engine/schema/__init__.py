@@ -233,9 +233,15 @@ class Table(object):
         if not self._guarantee_permission():
             return False
 
-        self._migrate()
+        self._migrate(migrate_data=True)
 
-    def _migrate(self):
+    def migrate_schema(self):
+        if not self._guarantee_permission():
+            return False
+
+        self._migrate(migrate_data=False)
+
+    def _migrate(self, migrate_data=True):
         if self.__migrated:
             return True
 
@@ -261,7 +267,7 @@ class Table(object):
         else:
             from .driver import SchemaDriver
 
-        SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys)
+        SchemaDriver.migrate(dsn, self, fields, indexes, foreign_keys, migrate_data=migrate_data)
 
     def migrate_data(self):
         if not self._guarantee_permission():

@@ -11,6 +11,10 @@ from ..cache import dpInValueModelConfig
 
 
 class _ComparableDataType(object):
+    name = None
+    size = None
+    enums = None
+
     def __eq__(self, other):
         if not other:
             return False
@@ -368,7 +372,7 @@ class Attribute(object):
     @staticmethod
     def field(data_type,
               default=None,
-              comment=None,
+              comment='',
               m_pk=None,
               pk=None,
               uq=None,

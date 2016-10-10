@@ -88,6 +88,7 @@ class NumericHelper(dpHelper):
     def xxx(self):
         return 'ABtQR5JxfghijN_qrb4KSy9-Uuvw6ZVcLnpMFGkeTPd3WXYEHCDma78sz12'
 
+    @dpHelper.decorators.deprecated
     def to_xxx(self, x):
         __ = self.xxx
         _ = ''
@@ -102,6 +103,7 @@ class NumericHelper(dpHelper):
 
         return _
 
+    @dpHelper.decorators.deprecated
     def from_xxx(self, x):
         __ = self.xxx
         _ = 0

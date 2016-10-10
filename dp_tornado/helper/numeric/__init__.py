@@ -93,7 +93,7 @@ class NumericHelper(dpHelper):
         __ = self.xxx
         _ = ''
 
-        while (True):
+        while True:
             if x <= 0:
                 break
 

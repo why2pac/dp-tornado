@@ -62,6 +62,7 @@ class SmtpSender(object):
 
 
 class SmtpHelper(dpHelper):
+    @dpHelper.decorators.deprecated
     def send(self, to_user, subject, content, from_user=None, cc=None, attach=None,
              host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True, subject_charset=None):
         s = SmtpSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)

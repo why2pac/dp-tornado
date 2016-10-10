@@ -28,5 +28,6 @@ class ZipFile(object):
 
 
 class ZipHelper(dpHelper):
+    @dpHelper.decorators.deprecated
     def new(self, file, mode="r", compression=zipfile.ZIP_STORED, allowZip64=False):
         return ZipFile(file, mode, compression, allowZip64)

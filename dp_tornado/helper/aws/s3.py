@@ -76,9 +76,11 @@ class S3Bridge(dpEngine):
 
 
 class S3Helper(dpHelper):
+    @dpHelper.decorators.deprecated
     def connect(self, public, secret):
         return S3Bridge(public, secret)
 
+    @dpHelper.decorators.deprecated
     def set_contents_from_file(self,
                                aws_access_key_id,
                                aws_secret_access_key,
@@ -98,6 +100,7 @@ class S3Helper(dpHelper):
 
         s3.upload_file(fp, bucket_name, key, ExtraArgs=ExtraArgs)
 
+    @dpHelper.decorators.deprecated
     def copy(self,
              aws_access_key_id,
              aws_secret_access_key,
@@ -123,6 +126,7 @@ class S3Helper(dpHelper):
 
         return True
 
+    @dpHelper.decorators.deprecated
     def prepare_post(self,
                      aws_access_key_id,
                      aws_secret_access_key,
@@ -213,6 +217,7 @@ class S3Helper(dpHelper):
             'fields': [{'name': k, 'value': v} for k, v in payload['fields'].items()]
         }
 
+    @dpHelper.decorators.deprecated
     def generate_url_with_filename(self,
                                    aws_access_key_id,
                                    aws_secret_access_key,

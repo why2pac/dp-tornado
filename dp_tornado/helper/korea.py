@@ -6,6 +6,7 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 
 class KoreaHelper(dpHelper):
+    @dpHelper.decorators.deprecated
     def readable_phone_number(self, number, separator='-'):
         number = str(self.helper.numeric.extract_numbers(number))
         l = len(number)
@@ -29,6 +30,7 @@ class KoreaHelper(dpHelper):
         else:
             return number
 
+    @dpHelper.decorators.deprecated
     def weekday(self, w, short=False, isoweekday=True):
         weekdays = {
             0: '월',

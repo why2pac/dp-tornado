@@ -38,23 +38,27 @@ class UrlHelper(dpHelper):
     def urlparse(self):
         return urlparse
 
+    @dpHelper.decorators.deprecated
     def quote(self, s):
         if self.helper.system.py_version <= 2:
             return _parse.quote_plus(s)
         else:
             return _parse.quote_plus(s)
 
+    @dpHelper.decorators.deprecated
     def build(self, url, params):
         if self.helper.system.py_version <= 2:
             return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
         else:
             return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
 
+    @dpHelper.decorators.deprecated
     def urlencode(self, string):
         import requests.utils
 
         return requests.utils.quote(string)
 
+    @dpHelper.decorators.deprecated
     def parse(self, request):
         if self.helper.string.is_str(request):
             uri = self.helper.string.to_str(request)

@@ -73,15 +73,18 @@ class _DynamicObject(object):
 
 
 class ObjectHelper(dpHelper):
+    @dpHelper.decorators.deprecated
     def create(self):
         return _DynamicObject()
 
+    @dpHelper.decorators.deprecated
     def pickle(self, o):
         try:
             return cPickle.dumps(o)
         except:
             return False
 
+    @dpHelper.decorators.deprecated
     def unpickle(self, o):
         try:
             return cPickle.loads(o)

@@ -18,6 +18,7 @@ except:
 
 
 class CryptoHelper(dpHelper):
+    @dpHelper.decorators.deprecated
     def encode(self, clear, method='base64'):
         if method != 'base64':
             raise NotImplementedError()
@@ -27,6 +28,7 @@ class CryptoHelper(dpHelper):
 
         return base64.standard_b64encode(clear).decode('utf8')
 
+    @dpHelper.decorators.deprecated
     def decode(self, clear, method='base64'):
         if method != 'base64':
             raise NotImplementedError()
@@ -36,6 +38,7 @@ class CryptoHelper(dpHelper):
 
         return base64.standard_b64decode(clear).decode('utf8')
 
+    @dpHelper.decorators.deprecated
     def encrypt(self, clear, randomized=False, expire_in=0, key=CRYPTO_KEY):
         if isinstance(clear, (tuple, list, dict)):
             clear = self.helper.json.dumps(clear, separators=(',', ':'))
@@ -73,6 +76,7 @@ class CryptoHelper(dpHelper):
 
         return self.encode(self.helper.string.to_str("".join(enc)))
 
+    @dpHelper.decorators.deprecated
     def decrypt(self, enc, key=CRYPTO_KEY):
         try:
             dec = []
@@ -105,8 +109,10 @@ class CryptoHelper(dpHelper):
         except:
             return False
 
+    @dpHelper.decorators.deprecated
     def md5_hash(self, plain):
         return hashlib.md5(str(plain).encode()).hexdigest()
 
+    @dpHelper.decorators.deprecated
     def sha224_hash(self, plain):
         return hashlib.sha224(str(plain).encode()).hexdigest()

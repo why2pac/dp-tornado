@@ -4,23 +4,23 @@
 import tornado.escape
 
 
-def trim(c, t):
-    return t.strip()
+def trim(c, text):
+    return text.strip()
 
 
-def nl2br(c, t, escape=True):
-    if not t:
+def nl2br(c, text, escape=True, break_tag='<br />'):
+    if not text:
         return ''
 
-    t = tornado.escape.xhtml_escape(t) if escape else t
-    return t.replace('\r\n', '<br />').replace('\r', '<br />').replace('\n', '<br />')
+    text = tornado.escape.xhtml_escape(text) if escape else text
+    return text.replace('\r\n', break_tag).replace('\r', break_tag).replace('\n', break_tag)
 
 
-def truncate(c, t, l, s='..'):
-    if len(t) > l:
-        return '%s%s' % (t[0:l], s)
+def truncate(c, text, length, ellipsis='..'):
+    if len(text) > length:
+        return '%s%s' % (text[0:length], ellipsis)
 
-    return t
+    return text
 
 
 def yyyymmdd(c, datetime=None, timestamp=None, ms=False, concat='.'):
@@ -28,30 +28,27 @@ def yyyymmdd(c, datetime=None, timestamp=None, ms=False, concat='.'):
 
 
 def mmdd(c, datetime=None, timestamp=None, ms=False, concat='.'):
-    return c.helper.datetime.date.yyyymmdd(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
+    return c.helper.datetime.date.mmdd(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def hhiiss(c, datetime=None, timestamp=None, ms=False, concat='.'):
+def hhiiss(c, datetime=None, timestamp=None, ms=False, concat=':'):
     return c.helper.datetime.time.hhiiss(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def hhii(c, datetime=None, timestamp=None, ms=False, concat='.'):
+def hhii(c, datetime=None, timestamp=None, ms=False, concat=':'):
     return c.helper.datetime.time.hhii(datetime=datetime, timestamp=timestamp, ms=ms, concat=concat)
 
 
-def weekday(c, datetime=None, timestamp=None, ms=False):
-    return c.helper.datetime.date.weekday(datetime=datetime, timestamp=timestamp, ms=ms)
+def weekday(c, datetime=None, timestamp=None, ms=False, isoweekday=True):
+    return c.helper.datetime.date.weekday(datetime=datetime, timestamp=timestamp, ms=ms, isoweekday=isoweekday)
 
 
-def request_uri(c, s=False, d=' ', p='_', e=False, q=True):
+def request_uri(c, with_queries=True, query_quote=False, s=False, d=' ', p='_'):
     r = ('%s%s' % (d, p)).join(c.request.uri.split('/')).strip() if s else c.request.uri
     r = prefix(c, r)
-    r = r if q else r.split('?')[0:1][0]
-    return c.helper.url.quote(r) if e else r
+    r = r if with_queries else r.split('?')[0:1][0]
 
-
-def i18n(c):
-    return c.helper.i18n
+    return c.helper.url.quote(r) if query_quote else r
 
 
 def m17n(c, m17n_lang=None):
@@ -66,12 +63,11 @@ def c(c):
 
 
 def get(c, arg, default=None):
-    uri = c.helper.url.parse(c.request.uri)
-    return uri.query[arg] if uri.query and arg in uri.query else default
+    return c.get_argument(arg, default=default)
 
 
 def number_format(c, val):
-    return "{:,}".format(val)
+    return c.helper.numeric.number_format(val)
 
 
 def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):

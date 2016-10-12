@@ -30,3 +30,13 @@ class CastHelper(dpHelper):
                 raise e
 
             return False
+
+    def float(self, a, raise_exception=False):
+        try:
+            return float(a) if a else 0
+
+        except ValueError as e:
+            if raise_exception:
+                raise e
+
+            return False

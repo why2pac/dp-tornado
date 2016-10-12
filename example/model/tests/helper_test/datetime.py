@@ -8,10 +8,11 @@ from dp_tornado.engine.model import Model as dpModel
 
 class DatetimeModel(dpModel):
     def switch_timezone(self, zone):
-        before_zone = os.environ['TZ']
+        before_zone = os.environ['TZ'] if 'TZ' in os.environ else None
         os.environ['TZ'] = zone
 
         return before_zone
 
     def set_timezone(self, zone):
-        os.environ['TZ'] = zone
+        if zone:
+            os.environ['TZ'] = zone

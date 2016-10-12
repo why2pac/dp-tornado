@@ -22,6 +22,22 @@ def run(main):
     test_helper.datetime_time()
     test_helper.datetime_timestamp()
 
+    from . import test_view_ui_methods
+
+    test_view_ui_methods.engine()
+    test_view_ui_methods.yyyymmdd()
+    test_view_ui_methods.mmdd()
+    test_view_ui_methods.hhiiss()
+    test_view_ui_methods.hhii()
+    test_view_ui_methods.weekday()
+    test_view_ui_methods.get()
+    test_view_ui_methods.get_with_param()
+    test_view_ui_methods.nl2br()
+    test_view_ui_methods.number_format()
+    test_view_ui_methods.request_uri()
+    test_view_ui_methods.trim()
+    test_view_ui_methods.truncate()
+
     from . import test_schema
 
     test_schema.migrate()

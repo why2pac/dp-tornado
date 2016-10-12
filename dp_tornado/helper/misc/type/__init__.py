@@ -8,9 +8,9 @@ class TypeHelper(dpHelper):
     @property
     def numeric(self):
         if self.helper.misc.system.py_version <= 2:
-            return int, long
+            return int, long, float
         else:
-            return int,
+            return int, float
 
     @property
     def string(self):

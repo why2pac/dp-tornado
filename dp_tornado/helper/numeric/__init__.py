@@ -25,7 +25,22 @@ class NumericHelper(dpHelper):
         return re.sub(r'\D+', '', string)
 
     def number_format(self, value, tsep=',', dsep='.'):
-        value = self.extract_numbers(value)
+        if self.helper.misc.type.check.string(value):
+            value = value.replace(',', '')
+
+            if '.' in value:
+                value_cast = self.helper.numeric.cast.float(value)
+            else:
+                value_cast = self.helper.numeric.cast.long(value)
+
+            if value_cast is not False:
+                value = value_cast
+            else:
+                value = self.extract_numbers(value)
+        elif self.helper.misc.type.check.numeric(value):
+            value = value
+        else:
+            raise Exception('Invalid value.')
 
         if not value:
             return '0'

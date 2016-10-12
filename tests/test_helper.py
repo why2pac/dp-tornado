@@ -18,3 +18,7 @@ def datetime_time():
 
 def datetime_timestamp():
     utils.expecting_text('get', '/helper/datetime/timestamp', None, 200)
+
+
+def locale_korea():
+    utils.expecting_text('get', '/helper/locale/korea', None, 200)

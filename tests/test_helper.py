@@ -36,5 +36,17 @@ def security_crypto_hash():
     utils.expecting_text('get', '/helper/security/crypto/hash', None, 200)
 
 
+def string():
+    utils.expecting_text('get', '/helper/string', None, 200)
+
+
+def string_cast():
+    utils.expecting_text('get', '/helper/string/cast', None, 200)
+
+
+def string_check():
+    utils.expecting_text('get', '/helper/string/check', None, 200)
+
+
 def string_serialization_json():
     utils.expecting_text('get', '/helper/string/serialization/json', None, 200)

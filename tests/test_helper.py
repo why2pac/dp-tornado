@@ -24,6 +24,10 @@ def locale_korea():
     utils.expecting_text('get', '/helper/locale/korea', None, 200)
 
 
+def security_crypto():
+    utils.expecting_text('get', '/helper/security/crypto', None, 200)
+
+
 def security_crypto_encoding():
     utils.expecting_text('get', '/helper/security/crypto/encoding', None, 200)
 

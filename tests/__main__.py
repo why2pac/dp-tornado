@@ -22,6 +22,7 @@ def run(main):
     test_helper.datetime_time()
     test_helper.datetime_timestamp()
 
+    test_helper.security_crypto()
     test_helper.security_crypto_encoding()
     test_helper.security_crypto_hash()
 

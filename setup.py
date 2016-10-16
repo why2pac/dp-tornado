@@ -87,6 +87,7 @@ setup(
         'requests==2.11.1',
         'croniter==0.3.12',
         'pytz==2016.7',
+        'pycrypto==2.6.1',
         'boto==2.42.0',
         'boto3==1.4.0',
         'SQLAlchemy==1.1.0',

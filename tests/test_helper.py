@@ -30,3 +30,7 @@ def security_crypto_encoding():
 
 def security_crypto_hash():
     utils.expecting_text('get', '/helper/security/crypto/hash', None, 200)
+
+
+def string_serialization_json():
+    utils.expecting_text('get', '/helper/string/serialization/json', None, 200)

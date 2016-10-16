@@ -25,6 +25,8 @@ def run(main):
     test_helper.security_crypto_encoding()
     test_helper.security_crypto_hash()
 
+    test_helper.string_serialization_json()
+
     test_helper.locale_korea()
 
     from . import test_view_ui_methods

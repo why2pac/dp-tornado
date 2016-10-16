@@ -34,7 +34,7 @@ class StringHelper(dpHelper):
         return self.is_string(s)
 
     def is_string(self, s):
-        if self.helper.system.py_version <= 2:
+        if self.helper.misc.system.py_version <= 2:
             types = basestring,
         else:
             types = str,
@@ -72,7 +72,7 @@ class StringHelper(dpHelper):
             s = str(s)
 
         if type(s) == unicode_type:
-            if self.helper.system.py_version <= 2:
+            if self.helper.misc.system.py_version <= 2:
                 return s.encode('UTF-8')
             else:
                 return s

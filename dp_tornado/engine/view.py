@@ -17,7 +17,7 @@ class View(dpSingleton):
 
     @staticmethod
     def render_string(controller, template_name, kwargs=None):
-        if engine.helper.system.py_version <= 2:
+        if engine.helper.misc.system.py_version <= 2:
             if kwargs:
                 return engine.helper.string.to_str(controller.parent.render_string(template_name, **kwargs))
             else:

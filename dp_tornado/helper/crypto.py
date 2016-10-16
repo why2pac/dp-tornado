@@ -23,7 +23,7 @@ class CryptoHelper(dpHelper):
         if method != 'base64':
             raise NotImplementedError()
 
-        if self.helper.system.py_version >= 3:
+        if self.helper.misc.system.py_version >= 3:
             clear = bytes(clear, 'utf8')
 
         return base64.standard_b64encode(clear).decode('utf8')
@@ -33,7 +33,7 @@ class CryptoHelper(dpHelper):
         if method != 'base64':
             raise NotImplementedError()
 
-        if self.helper.system.py_version >= 3 and self.helper.string.is_string(clear):
+        if self.helper.misc.system.py_version >= 3 and self.helper.string.is_string(clear):
             clear = bytes(clear, 'utf8')
 
         return base64.standard_b64decode(clear).decode('utf8')

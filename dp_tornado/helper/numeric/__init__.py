@@ -9,7 +9,7 @@ import re
 
 class NumericHelper(dpHelper):
     def extract_numbers(self, string):
-        if self.helper.system.py_version <= 2:
+        if self.helper.misc.system.py_version <= 2:
             types = basestring,
             types_num = (int, long)
         else:
@@ -74,7 +74,7 @@ class NumericHelper(dpHelper):
     @dpHelper.decorators.deprecated
     def int(self, a, raise_exception=True):
         try:
-            if self.helper.system.py_version <= 2:
+            if self.helper.misc.system.py_version <= 2:
                 return int(a) if a else 0
             else:
                 return int(a) if a else 0
@@ -88,7 +88,7 @@ class NumericHelper(dpHelper):
     @dpHelper.decorators.deprecated
     def long(self, a, raise_exception=True):
         try:
-            if self.helper.system.py_version <= 2:
+            if self.helper.misc.system.py_version <= 2:
                 return long(a) if a else long(0)
             else:
                 return int(a) if a else 0

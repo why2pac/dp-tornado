@@ -47,7 +47,7 @@ class SmtpSender(object):
                 for k, v in headers.items():
                     msg[k] = v
 
-            if self.e.helper.system.py_version <= 2:
+            if self.e.helper.misc.system.py_version <= 2:
                 self.connection.sendmail(from_user, to_user, msg.as_string())
             else:
                 self.connection.send_message(msg)

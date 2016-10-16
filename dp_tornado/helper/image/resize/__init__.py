@@ -59,7 +59,7 @@ class ResizeHelper(dpHelper):
             e_right = 0
             e_bottom = 0
 
-            if self.helper.system.py_version <= 2:
+            if self.helper.misc.system.py_version <= 2:
                 types_str = (basestring, )
                 types_num = (int, long)
             else:

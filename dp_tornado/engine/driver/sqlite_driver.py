@@ -198,7 +198,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
                 elif type is pickled:
                     try:
-                        if self.helper.system.py_version <= 2:
+                        if self.helper.misc.system.py_version <= 2:
                             return cPickle.loads(self.helper.string.to_str(result['val']))
                         else:
                             return cPickle.loads(result['val'])

@@ -481,7 +481,7 @@ class MySqlDriver(dpSchemaDriver):
             .replace('{auto_increment}', auto_increment) \
             .replace('{comment}', comment)
 
-        return ret.decode('utf8') if dpModel().helper.system.py_version <= 2 else ret
+        return ret.decode('utf8') if dpModel().helper.misc.system.py_version <= 2 else ret
 
     @staticmethod
     def migrate_indexes(proxy, table, indexes, exist):

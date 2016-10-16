@@ -40,14 +40,14 @@ class UrlHelper(dpHelper):
 
     @dpHelper.decorators.deprecated
     def quote(self, s):
-        if self.helper.system.py_version <= 2:
+        if self.helper.misc.system.py_version <= 2:
             return _parse.quote_plus(s)
         else:
             return _parse.quote_plus(s)
 
     @dpHelper.decorators.deprecated
     def build(self, url, params):
-        if self.helper.system.py_version <= 2:
+        if self.helper.misc.system.py_version <= 2:
             return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
         else:
             return '%s%s%s' % (url, '?' if params else '', _parse.urlencode(params))
@@ -67,7 +67,7 @@ class UrlHelper(dpHelper):
             uri = request.uri
             request = request
 
-        if self.helper.system.py_version <= 2:
+        if self.helper.misc.system.py_version <= 2:
             p = urlparse.urlparse(uri)
             query = dict(urlparse.parse_qsl(p.query, keep_blank_values=True))
         else:

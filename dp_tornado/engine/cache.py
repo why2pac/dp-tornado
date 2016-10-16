@@ -525,7 +525,7 @@ class Decorator(object):
                 else:
                     cached = None
 
-            cached = _engine_.helper.json.deserialize(cached) if cached else None
+            cached = _engine_.helper.string.serialization.deserialize(cached) if cached else None
 
             if cached is False:
                 raise Exception('cached value deserialization failed.')
@@ -559,7 +559,7 @@ class Decorator(object):
             'val': value
         }
 
-        serialized = _engine_.helper.json.serialize(payload)
+        serialized = _engine_.helper.string.serialization.serialize(payload, method='json')
 
         if not serialized:
             raise Exception('cache decorator supported serializable value only.')

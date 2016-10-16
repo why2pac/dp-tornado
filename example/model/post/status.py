@@ -22,6 +22,6 @@ class StatusModel(dpModel):
             }
         }
 
-        sets = self.helper.json.serialize(sets)
+        sets = self.helper.string.serialization.serialize(sets, method='json')
 
         return self.cache.set(self.key(key), sets, dsn_or_conn='foo.bar/memory', expire_in=3600*2)

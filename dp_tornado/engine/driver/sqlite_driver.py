@@ -182,7 +182,9 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
                 if result['type'] in self._types_required_serialize():
                     try:
-                        ret = self.helper.json.deserialize(result['val'], raise_exception=True)
+                        print('xxx')
+                        ret = self.helper.string.serialization.serialize(
+                            result['val'], method='json', raise_exception=True)
 
                         if type is tuple:
                             return tuple(ret)
@@ -237,7 +239,8 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             try:
                 try:
                     if type:
-                        val_serialized = self.helper.json.serialize(val, raise_exception=True)
+                        val_serialized = self.helper.string.serialization.serialize(
+                            val, method='json', raise_exception=True)
 
                     else:
                         raise Exception()

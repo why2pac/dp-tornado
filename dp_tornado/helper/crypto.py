@@ -41,7 +41,7 @@ class CryptoHelper(dpHelper):
     @dpHelper.decorators.deprecated
     def encrypt(self, clear, randomized=False, expire_in=0, key=CRYPTO_KEY):
         if isinstance(clear, (tuple, list, dict)):
-            clear = self.helper.json.dumps(clear, separators=(',', ':'))
+            clear = self.helper.string.serialization.serialize(clear, method='json', raise_exception=True)
             json_encode = True
 
         else:
@@ -62,7 +62,7 @@ class CryptoHelper(dpHelper):
             if json_encode:
                 plain['e'] = True
 
-            clear = self.helper.json.dumps(plain, separators=(',', ':'))
+            clear = self.helper.string.serialization.serialize(plain, method='json', raise_exception=True)
 
         else:
             clear = self.encode(clear)
@@ -90,7 +90,7 @@ class CryptoHelper(dpHelper):
             decoded = "".join(dec)
 
             try:
-                decoded = self.helper.json.loads(decoded)
+                decoded = self.helper.string.serialization.deserialize(decoded)
 
             except:
                 return self.decode(decoded)
@@ -99,7 +99,7 @@ class CryptoHelper(dpHelper):
                 return False
 
             if 'e' in decoded:
-                decoded['p'] = self.helper.json.loads(decoded['p'])
+                decoded['p'] = self.helper.string.serialization.deserialize(decoded['p'])
 
             if 'ts' in decoded:
                 return decoded['p'] if self.helper.datetime.timestamp.now() < decoded['ts'] else None

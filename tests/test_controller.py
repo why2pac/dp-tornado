@@ -22,3 +22,20 @@ def delete():
 
 def head():
     utils.expecting_text('head', '/', '', 200)
+
+
+def session_sessionid():
+    utils.expecting_text('get', '/controller/session/session_id', None, 200)
+
+
+def session_get_and_set():
+    # with expire
+    utils.expecting_text('get', '/controller/session/get/key', 'empty', 200, session=utils.expecting_text(
+        'get', '/controller/session/set/key/val/1', None, 200))
+
+    # without expire
+    utils.expecting_text('get', '/controller/session/get/key', 'val', 200, session=utils.expecting_text(
+        'get', '/controller/session/set/key/val', None, 200))
+
+    utils.expecting_text('get', '/controller/session/get/key', 'empty', 200)
+

@@ -15,6 +15,9 @@ def run(main):
     test_controller.delete()
     test_controller.head()
 
+    test_controller.session_sessionid()
+    test_controller.session_get_and_set()
+
     from . import test_helper
 
     test_helper.datetime()

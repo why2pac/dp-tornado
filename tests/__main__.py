@@ -22,6 +22,9 @@ def run(main):
     test_helper.datetime_time()
     test_helper.datetime_timestamp()
 
+    test_helper.security_crypto_encoding()
+    test_helper.security_crypto_hash()
+
     test_helper.locale_korea()
 
     from . import test_view_ui_methods

@@ -22,3 +22,11 @@ def datetime_timestamp():
 
 def locale_korea():
     utils.expecting_text('get', '/helper/locale/korea', None, 200)
+
+
+def security_crypto_encoding():
+    utils.expecting_text('get', '/helper/security/crypto/encoding', None, 200)
+
+
+def security_crypto_hash():
+    utils.expecting_text('get', '/helper/security/crypto/hash', None, 200)

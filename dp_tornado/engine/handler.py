@@ -91,7 +91,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         for e in (path or '').split('/'):
             if e.find('.') != -1:
-                uniqid = self.helper.random.uuid()
+                uniqid = self.helper.misc.uuid.v1()
                 paths.append(uniqid)
                 temp_paths[uniqid] = e
             else:

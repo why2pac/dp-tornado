@@ -14,4 +14,4 @@ class PostController(Controller):
 </form>
 </body>
 </html>
-""" % ('image', self.helper.random.uuid()))
+""" % ('image', self.helper.misc.uuid.v1()))

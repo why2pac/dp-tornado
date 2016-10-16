@@ -36,6 +36,10 @@ def security_crypto_hash():
     utils.expecting_text('get', '/helper/security/crypto/hash', None, 200)
 
 
+def misc_uuid():
+    utils.expecting_text('get', '/helper/misc/uuid', None, 200)
+
+
 def string():
     utils.expecting_text('get', '/helper/string', None, 200)
 

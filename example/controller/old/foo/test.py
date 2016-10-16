@@ -19,7 +19,7 @@ class TestController(Controller):
         self.model.foo.bar.create()
         print('table created')
 
-        uuid = self.helper.random.uuid()
+        uuid = self.helper.misc.uuid.v1()
 
         self.model.foo.bar.insert(uuid)
         print('inserted')

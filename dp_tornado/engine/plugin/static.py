@@ -173,7 +173,7 @@ class StaticURL(tornado.web.UIModule):
             return ''
 
         acquire_key = 'job/%s' % cache_key
-        acquire_identifier = self.handler.helper.random.uuid()
+        acquire_identifier = self.handler.helper.misc.uuid.v1()
 
         if not self.handler.cache.get(acquire_key, dsn_or_conn=self.handler.vars.static.cache_config):
             self.handler.cache.set(
@@ -185,7 +185,7 @@ class StaticURL(tornado.web.UIModule):
             options['proxy'] = True
             return self.render(*statics, **options)
 
-        filename = '%s.%s' % (self.handler.helper.security.crypto.hash.sha224(self.handler.helper.random.uuid()), ext)
+        filename = '%s.%s' % (self.handler.helper.security.crypto.hash.sha224(self.handler.helper.misc.uuid.v1()), ext)
         use_systmp = False
 
         if use_systmp:

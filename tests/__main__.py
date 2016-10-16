@@ -29,6 +29,8 @@ def run(main):
     test_helper.security_crypto_encoding()
     test_helper.security_crypto_hash()
 
+    test_helper.misc_uuid()
+
     test_helper.string()
     test_helper.string_cast()
     test_helper.string_check()

@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 from dp_tornado.engine.helper import Helper as dpHelper
 
-import uuid
 import random
 
 
@@ -25,6 +24,3 @@ class RandomHelper(dpHelper):
     def sample(self, population, k):
         return random.sample(population, k)
 
-    @dpHelper.decorators.deprecated
-    def uuid(self):  # make a UUID based on the host ID and current time
-        return str(uuid.uuid1())

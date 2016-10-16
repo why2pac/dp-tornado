@@ -304,7 +304,7 @@ class Table(object):
             if got != gox:
                 return False
 
-        identifier = dpEngine().helper.random.uuid()
+        identifier = dpEngine().helper.misc.uuid.v1()
         Table.__identifier = identifier
 
         dpEngine().cache.set(cache_key, identifier, dsn_or_conn=cache_config)

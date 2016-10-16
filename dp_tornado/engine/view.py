@@ -19,9 +19,9 @@ class View(dpSingleton):
     def render_string(controller, template_name, kwargs=None):
         if engine.helper.misc.system.py_version <= 2:
             if kwargs:
-                return engine.helper.string.to_str(controller.parent.render_string(template_name, **kwargs))
+                return engine.helper.string.cast.string(controller.parent.render_string(template_name, **kwargs))
             else:
-                return engine.helper.string.to_str(controller.parent.render_string(template_name))
+                return engine.helper.string.cast.string(controller.parent.render_string(template_name))
         else:
             if kwargs:
                 return str(controller.parent.render_string(template_name, **kwargs), 'UTF-8')

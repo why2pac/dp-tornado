@@ -101,7 +101,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         path = '/'.join(paths)
 
         module_path = '%s%s' % (self.prefix, '.%s' % path.replace('/', '.') if path else '')
-        module_paths = str.split(self.helper.string.to_str(module_path), '.')
+        module_paths = str.split(self.helper.string.cast.string(module_path), '.')
         parameters = []
         previous = None
 
@@ -377,7 +377,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         if not sessionid:
             try:
                 sessionid_from_cookie = self.get_secure_cookie('PSESSIONID')
-                sessionid = self.helper.string.to_str(sessionid_from_cookie)
+                sessionid = self.helper.string.cast.string(sessionid_from_cookie)
 
                 if not sessionid.isalnum():
                     sessionid = None

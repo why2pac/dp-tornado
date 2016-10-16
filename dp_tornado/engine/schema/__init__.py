@@ -408,8 +408,8 @@ class PirorityData(object):
 
             ov = getattr(other, k, None)
 
-            if dpEngine().helper.string.is_str(v):
-                if dpEngine().helper.string.to_unicode(v) != dpEngine().helper.string.to_unicode(ov):
+            if dpEngine().helper.misc.type.check.string(v):
+                if dpEngine().helper.string.cast.unicode(v) != dpEngine().helper.string.cast.unicode(ov):
                     return False
                 else:
                     continue

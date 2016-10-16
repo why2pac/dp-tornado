@@ -232,7 +232,7 @@ class S3Helper(dpHelper):
 
         response_headers = {
             'response-content-disposition':
-                '%s; filename="%s"' % (disposition, self.helper.url.urlencode(self.helper.string.to_str(file_name)))
+                '%s; filename="%s"' % (disposition, self.helper.url.urlencode(self.helper.string.cast.string(file_name)))
         }
 
         return s3.generate_url(expires_in, 'GET', bucket_name, key, response_headers=response_headers)

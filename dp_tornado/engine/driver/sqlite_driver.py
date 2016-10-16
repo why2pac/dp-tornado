@@ -199,7 +199,7 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                 elif type is pickled:
                     try:
                         if self.helper.misc.system.py_version <= 2:
-                            return cPickle.loads(self.helper.string.to_str(result['val']))
+                            return cPickle.loads(self.helper.string.cast.string(result['val']))
                         else:
                             return cPickle.loads(result['val'])
 
@@ -208,10 +208,10 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                         return None
 
                 elif type is str:
-                    return self.helper.string.to_str(result['val'])
+                    return self.helper.string.cast.string(result['val'])
 
                 elif type is unicode:
-                    return self.helper.string.to_unicode(result['val'])
+                    return self.helper.string.cast.unicode(result['val'])
 
                 elif type is int:
                     return int(result['val'])

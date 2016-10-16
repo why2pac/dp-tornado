@@ -60,8 +60,8 @@ class UrlHelper(dpHelper):
 
     @dpHelper.decorators.deprecated
     def parse(self, request):
-        if self.helper.string.is_str(request):
-            uri = self.helper.string.to_str(request)
+        if self.helper.misc.type.check.string(request):
+            uri = self.helper.string.cast.string(request)
             request = None
         else:
             uri = request.uri

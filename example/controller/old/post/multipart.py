@@ -102,7 +102,7 @@ class MultipartHandler(dpHandler):
             self.helper.datetime.date.month(),
             self.helper.datetime.date.day(),
             self.helper.datetime.time.hhiiss(),
-            self.helper.crypto.sha224_hash('%sx%s' % (width, height)))
+            self.helper.security.crypto.hash.sha224('%sx%s' % (width, height)))
 
         filename_thumb = '%s_thumb.%s' % (filename, ext)
         filename_large = '%s_large.%s' % (filename, ext)

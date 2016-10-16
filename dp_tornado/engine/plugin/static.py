@@ -139,7 +139,7 @@ class StaticURL(tornado.web.UIModule):
         elif not self.handler.vars.static.minify or (options and 'proxy' in options and options['proxy']):
             return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 
-        cache_key = 'key_%s_%s' % (len(statics), self.handler.helper.crypto.sha224_hash('/'.join(sorted(statics))))
+        cache_key = 'key_%s_%s' % (len(statics), self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))
         prepared = (self.handler.vars.static.prepared.__getattr__(cache_key) or
                     self.handler.cache.get(cache_key, dsn_or_conn=self.handler.vars.static.cache_config))
 
@@ -185,7 +185,7 @@ class StaticURL(tornado.web.UIModule):
             options['proxy'] = True
             return self.render(*statics, **options)
 
-        filename = '%s.%s' % (self.handler.helper.crypto.sha224_hash(self.handler.helper.random.uuid()), ext)
+        filename = '%s.%s' % (self.handler.helper.security.crypto.hash.sha224(self.handler.helper.random.uuid()), ext)
         use_systmp = False
 
         if use_systmp:

@@ -148,7 +148,12 @@ class Bootstrap(object):
 
         if exception_delegate:
             from dp_tornado.engine.engine import Engine as dpEngine
-            exception_delegate = eval('dpEngine().%s' % exception_delegate)
+
+            try:
+                exception_delegate = eval('dpEngine().%s' % exception_delegate)
+            except AttributeError:
+                logging.error('The specified exception delegate is invalid.')
+                exception_delegate = None
 
         tornado.options.define('exception_delegate', exception_delegate)
 

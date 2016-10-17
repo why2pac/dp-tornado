@@ -45,8 +45,7 @@ class ModelTestConfig(Config):
             'drv_redis': {
                 'driver': 'redis',
                 'host': '127.0.0.1',
-                'port': 6379,
-                'user': None,
+                'port': 6370,
                 'password': None,
                 'maxconn': 256
             },
@@ -54,8 +53,7 @@ class ModelTestConfig(Config):
                 'driver': 'redis',
                 'database': 2,
                 'host': '127.0.0.1',
-                'port': 6379,
-                'user': None,
+                'port': 6370,
                 'password': None,
                 'maxconn': 256
             }

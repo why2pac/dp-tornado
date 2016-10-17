@@ -25,6 +25,7 @@ class RedisCacheDriver(dpCacheDriver):
             host=host,
             port=port if port is not None else 6379,
             db=database if database is not None else 0,
+            password=password,
             max_connections=maxconn or None)
 
         return RedisCacheDriver(pool)

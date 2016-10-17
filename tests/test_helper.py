@@ -36,6 +36,38 @@ def security_crypto_hash():
     utils.expecting_text('get', '/helper/security/crypto/hash', None, 200)
 
 
+def security_web_csrf():
+    utils.expecting_text('get', '/helper/security/web/csrf/generate', None, 200)
+
+    session, status_code, response = utils.req_text('get', '/helper/security/web/csrf/generate')
+
+    assert status_code == 200
+
+    # Verify token
+
+    utils.expecting_text(
+        'get', '/helper/security/web/csrf/verify/by_value', None, 200, params={'csrf': response}, session=session)
+
+    # Used token
+
+    utils.expecting_text(
+        'get', '/helper/security/web/csrf/verify/by_value', None, 400, params={'csrf': response}, session=session)
+
+    session, status_code, response = utils.req_text('get', '/helper/security/web/csrf/generate')
+
+    assert status_code == 200
+
+    # Verify token
+
+    utils.expecting_text(
+        'get', '/helper/security/web/csrf/verify/by_param', None, 200, params={'csrf': response}, session=session)
+
+    # Used token
+
+    utils.expecting_text(
+        'get', '/helper/security/web/csrf/verify/by_param', None, 400, params={'csrf': response}, session=session)
+
+
 def misc_uuid():
     utils.expecting_text('get', '/helper/misc/uuid', None, 200)
 

@@ -28,6 +28,7 @@ def run(main):
     test_helper.security_crypto()
     test_helper.security_crypto_encoding()
     test_helper.security_crypto_hash()
+    test_helper.security_web_csrf()
 
     test_helper.misc_uuid()
 

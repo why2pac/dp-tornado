@@ -4,5 +4,5 @@
 from dp_tornado.engine.controller import Controller
 
 
-class SecurityController(Controller):
+class VerifyController(Controller):
     pass

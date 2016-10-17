@@ -45,6 +45,8 @@ def run(main):
 
     test_helper.locale_korea()
 
+    test_helper.validator_email()
+
     from . import test_view_ui_methods
 
     test_view_ui_methods.engine()

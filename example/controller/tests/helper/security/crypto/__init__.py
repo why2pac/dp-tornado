@@ -30,6 +30,6 @@ class CryptoController(Controller):
         assert(decrypted == plain)
 
         import time
-        time.sleep(1)
+        time.sleep(1.6)
 
         assert(self.helper.security.crypto.decrypt(encrypted, key=key) is False)

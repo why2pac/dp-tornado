@@ -1,7 +1,20 @@
 # -*- coding: utf-8 -*-
 
 
+import re
+
 from dp_tornado.engine.helper import Helper as dpHelper
+
+
+regex_phone_number = re.compile(
+    u"^("
+    u"((\+82)(-)\d{1}(-)\d{3,4}(-)\d{4})|"
+    u"((\+82)?(-)?\d{3}(-)?\d{4}(-)?\d{4})|"
+    u"((\+82)?(-)?\d{3}(-)?\d{3}(-)?\d{4})|"
+    u"((\+82)?(-)?\d{2}(-)?\d{4}(-)?\d{4})|"
+    u"((\+82)?(-)?\d{2}(-)?\d{3}(-)?\d{4})|"
+    u"((\+82)?(-)?\d{4}(-)?\d{4})"
+    u")$")
 
 
 class KoreaHelper(dpHelper):
@@ -27,6 +40,9 @@ class KoreaHelper(dpHelper):
             return '%s%s%s%s%s' % (number[0:3], separator, number[3:7], separator, number[7:11])
         else:
             return number
+
+    def validate_phone_number(self, number):
+        return True if re.match(regex_phone_number, number) else False
 
     def weekday(self, w, short=False, isoweekday=True):
         weekdays = {

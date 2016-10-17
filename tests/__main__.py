@@ -42,6 +42,7 @@ def run(main):
 
     test_helper.web_email()
     test_helper.web_http()
+    test_helper.web_html()
 
     test_helper.locale_korea()
 

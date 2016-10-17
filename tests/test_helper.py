@@ -104,6 +104,10 @@ def web_http():
     utils.expecting_text('get', '/helper/web/http', None, 200)
 
 
+def web_html():
+    utils.expecting_text('get', '/helper/web/html', None, 200)
+
+
 def validator_email():
     utils.expecting_text('get', '/helper/validator/email', None, 200)
 

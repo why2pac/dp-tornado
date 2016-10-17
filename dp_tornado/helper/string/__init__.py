@@ -31,3 +31,7 @@ class StringHelper(dpHelper):
     @property
     def printable(self):
         return string.printable
+
+    @property
+    def whitespace(self):
+        return string.whitespace

@@ -36,6 +36,8 @@ def run(main):
     test_helper.string_check()
     test_helper.string_serialization_json()
 
+    test_helper.web_email()
+
     test_helper.locale_korea()
 
     from . import test_view_ui_methods

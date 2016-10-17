@@ -92,7 +92,8 @@ setup(
         'boto3==1.4.0',
         'SQLAlchemy==1.1.0',
         'futures==3.0.5',
-        'Pillow==3.4.1'
+        'Pillow==3.4.1',
+        'validate_email==1.3'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

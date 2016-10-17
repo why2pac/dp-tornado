@@ -37,6 +37,7 @@ def run(main):
     test_helper.string_serialization_json()
 
     test_helper.web_email()
+    test_helper.web_http()
 
     test_helper.locale_korea()
 

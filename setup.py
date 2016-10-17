@@ -93,7 +93,8 @@ setup(
         'SQLAlchemy==1.1.0',
         'futures==3.0.5',
         'Pillow==3.4.1',
-        'validate_email==1.3'
+        'validate_email==1.3',
+        'BeautifulSoup4==4.5.1'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

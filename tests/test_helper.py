@@ -58,3 +58,7 @@ def string_serialization_json():
 
 def web_email():
     utils.expecting_text('get', '/helper/web/email', None, 200)
+
+
+def web_http():
+    utils.expecting_text('get', '/helper/web/http', None, 200)

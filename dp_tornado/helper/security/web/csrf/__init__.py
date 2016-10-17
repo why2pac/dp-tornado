@@ -13,7 +13,7 @@ class CsrfHelper(dpHelper):
                                   self.helper.string.punctuation + \
                                   self.helper.string.ascii_letters
 
-        token = ''.join(self.helper.random.sample(CsrfHelper._strings, token_length))
+        token = ''.join(self.helper.misc.random.sample(CsrfHelper._strings, token_length))
         controller.session('csrf:%s' % token, 'yes', expire_in=token_expire_in)
 
         return token

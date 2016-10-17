@@ -72,6 +72,10 @@ def misc_uuid():
     utils.expecting_text('get', '/helper/misc/uuid', None, 200)
 
 
+def numeric_random():
+    utils.expecting_text('get', '/helper/numeric/random', None, 200)
+
+
 def string():
     utils.expecting_text('get', '/helper/string', None, 200)
 
@@ -86,6 +90,10 @@ def string_check():
 
 def string_serialization_json():
     utils.expecting_text('get', '/helper/string/serialization/json', None, 200)
+
+
+def string_random():
+    utils.expecting_text('get', '/helper/string/random', None, 200)
 
 
 def web_email():

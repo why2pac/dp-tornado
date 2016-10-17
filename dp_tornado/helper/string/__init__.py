@@ -31,6 +31,3 @@ class StringHelper(dpHelper):
     @property
     def printable(self):
         return string.printable
-
-    def random_string(self, length):
-        return ''.join(self.helper.random.sample(self.ascii_letters, length))

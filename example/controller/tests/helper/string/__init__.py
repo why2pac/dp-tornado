@@ -12,7 +12,6 @@ class StringController(Controller):
         punctuation = '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'
         digits = '0123456789'
         printable = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'
-        random_string = 'xxxxxxxxxx'
 
         assert(self.helper.string.ascii_uppercase == ascii_uppercase)
         assert(self.helper.string.ascii_lowercase == ascii_lowercase)
@@ -20,4 +19,5 @@ class StringController(Controller):
         assert(self.helper.string.punctuation == punctuation)
         assert(self.helper.string.digits == digits)
         assert(self.helper.string.printable.startswith(printable))
-        assert(len(self.helper.string.random_string(10)) == len(random_string))
+
+        self.finish('done')

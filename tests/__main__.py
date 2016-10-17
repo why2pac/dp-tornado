@@ -32,10 +32,13 @@ def run(main):
 
     test_helper.misc_uuid()
 
+    test_helper.numeric_random()
+
     test_helper.string()
     test_helper.string_cast()
     test_helper.string_check()
     test_helper.string_serialization_json()
+    test_helper.string_random()
 
     test_helper.web_email()
     test_helper.web_http()

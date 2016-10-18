@@ -59,6 +59,7 @@ def run(main):
     from . import test_view_module
 
     test_view_module.pagination()
+    test_view_module.pagination_prefix()
 
     from . import test_view_ui_methods
 

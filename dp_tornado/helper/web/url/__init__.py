@@ -19,8 +19,11 @@ except ImportError:
 class UrlParse(object):
     def __init__(self, request=None, scheme='', netloc='', path='', params=None, query=None, framgment=''):
         if request and 'X-Proxy-Prefix' in request.headers:
-            if path.startswith(request.headers['X-Proxy-Prefix']):
-                path = path[(len(request.headers['X-Proxy-Prefix']) - 1):]
+            prefix_path = request.headers['X-Proxy-Prefix'].strip()
+            prefix_path = prefix_path[:-1] if prefix_path.endswith('/') else prefix_path
+
+            if path.startswith(prefix_path):
+                path = path[len(prefix_path):] or '/'
 
         self.request = request
         self.scheme = scheme

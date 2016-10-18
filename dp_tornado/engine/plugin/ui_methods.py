@@ -94,7 +94,7 @@ def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, 
         static_url = c.helper.web.url.build(uri.path, uri.query)
 
     if prefix or 'X-Proxy-Prefix' in c.request.headers:
-        p = prefix_alternative or prefix or c.request.headers['X-Proxy-Prefix']
+        p = prefix_alternative or prefix or c.request.headers['X-Proxy-Prefix'].strip()
         p = p[:-1] if p.endswith('/') else p
 
         if static_url.startswith(p):

@@ -439,11 +439,11 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     def prefixize(self, url):
         if 'X-Proxy-Prefix' in self.request.headers:
-            prefix = self.request.headers['X-Proxy-Prefix']
-            prefix = prefix[:-1] if prefix.endswith('/') else prefix
+            prefix_path = self.request.headers['X-Proxy-Prefix'].strip()
+            prefix_path = prefix_path[:-1] if prefix_path.endswith('/') else prefix_path
 
-            if url.startswith(prefix):
-                url = url[len(prefix):] or '/'
+            if url.startswith(prefix_path):
+                url = url[len(prefix_path):] or '/'
 
         return url
 

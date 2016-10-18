@@ -26,14 +26,18 @@ addons:
   apt:
     packages:
       - nginx
-      - net-tools
 
 before_script:
   - sudo /etc/init.d/nginx restart
   - sudo cp ./travis/conf/nginx.conf /etc/nginx/nginx.conf
   - sudo cat /etc/nginx/nginx.conf
   - sudo ps -ef | grep nginx
-  - sudo netstat -anl | grep 8923
+
+  - wget http://127.0.0.1:18923 -o wget_test
+  - cat wget_test
+  - wget http://127.0.0.1:28923 -o wget_test
+  - cat wget_test
+  - rm wget_test
 
   - mysql -e "DROP DATABASE IF EXISTS dp_test_db;" -u root
   - mysql -e "CREATE DATABASE IF NOT EXISTS dp_test_db;" -u root

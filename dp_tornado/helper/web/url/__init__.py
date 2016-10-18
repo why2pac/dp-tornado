@@ -5,4 +5,5 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 
 class UrlHelper(dpHelper):
-    pass
+    def validate(self, e):
+        return self.helper.validator.url.validate(e)

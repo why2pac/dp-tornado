@@ -96,7 +96,8 @@ setup(
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
         'lxml==3.6.4',
-        'httpagentparser==1.7.8'
+        'httpagentparser==1.7.8',
+        'validators==0.11.0'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

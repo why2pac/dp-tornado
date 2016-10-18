@@ -50,6 +50,7 @@ def run(main):
 
     test_helper.validator_email()
     test_helper.validator_phone()
+    test_helper.validator_url()
 
     from . import test_view_ui_methods
 

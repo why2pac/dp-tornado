@@ -114,3 +114,7 @@ def validator_email():
 
 def validator_phone():
     utils.expecting_text('get', '/helper/validator/phone', None, 200)
+
+
+def validator_url():
+    utils.expecting_text('get', '/helper/validator/url', None, 200)

@@ -33,11 +33,6 @@ before_script:
   - sudo cat /etc/nginx/nginx.conf
   - sudo ps -ef | grep nginx
 
-  - sudo which wget
-  - sudo wget http://127.0.0.1:28923 -o wget_test
-  - sudo cat wget_test
-  - sudo rm wget_test
-
   - mysql -e "DROP DATABASE IF EXISTS dp_test_db;" -u root
   - mysql -e "CREATE DATABASE IF NOT EXISTS dp_test_db;" -u root
 

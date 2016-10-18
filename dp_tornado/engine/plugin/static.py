@@ -138,6 +138,10 @@ class StaticURL(tornado.web.UIModule):
         explicit = 'skip' if 'skip' in options and options['skip'] else explicit
         explicit = 'local' if 'local' in options and options['local'] else explicit
         explicit = 's3' if 's3' in options and options['s3'] else explicit
+        explicit_proxy = True if options and 'proxy' in options and options['proxy'] else False
+
+        if explicit_proxy:
+            explicit = None
 
         if explicit == 's3' and not self.handler.vars.static.aws_configured:
             explicit = 'local'
@@ -148,10 +152,7 @@ class StaticURL(tornado.web.UIModule):
             mtime = self.handler.vars.compressor.helper.datetime.timestamp.now(ms=True)
             return '\n'.join([self._template('%s?%s' % (t, mtime)) for t in statics])
 
-        elif explicit == 'skip' or \
-                (not explicit and (
-                            not self.handler.vars.static.minify or (
-                                        options and 'proxy' in options and options['proxy']))):
+        elif explicit == 'skip' or (not explicit and (not self.handler.vars.static.minify or explicit_proxy)):
             return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 
         cache_key = 'key_%s_%s' % (explicit, self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))

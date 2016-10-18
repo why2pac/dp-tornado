@@ -47,4 +47,7 @@ class UrlController(Controller):
 
         assert(pa_google_pa_url.query['foo'] == 'baz')
 
+        assert(self.helper.web.url.join('/path/file.html', 'new.html') == '/path/new.html')
+        assert(self.helper.web.url.join('/path/file.html', '../new.html') == '/new.html')
+
         self.finish('done')

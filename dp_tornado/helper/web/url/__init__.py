@@ -76,6 +76,14 @@ class UrlHelper(dpHelper):
     def validate(self, e):
         return self.helper.validator.url.validate(e)
 
+    def join(self, *args):
+        base = ''
+
+        for e in args:
+            base = urlparse.urljoin(base, e)
+
+        return base
+
     def parse(self, e):
         if self.helper.misc.type.check.string(e):
             uri = self.helper.string.cast.string(e)

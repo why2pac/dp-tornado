@@ -100,15 +100,15 @@ class Controller(dpEngine):
     def session(self, name, value=None, expire_in=session_default_expire_in):
         return self.parent.session(name, value=value, expire_in=expire_in)
 
-    def prefix(self, url):
-        return self.parent.prefix(url)
+    def prefixize(self, url):
+        return self.parent.prefixize(url)
 
     def redirect(self, url, prefix=False, permanent=False, status=None, safe=False):
         if self.parent._headers_written:
             return
 
         if prefix:
-            url = self.prefix(url)
+            url = self.prefixize(url)
 
         if safe and url and not url.startswith('/'):
             url = '/'
@@ -120,7 +120,7 @@ class Controller(dpEngine):
 
     def request_uri(self, s=False, d=' ', p='_', e=False, q=True):
         r = ('%s%s' % (d, p)).join(self.request.uri.split('/')).strip() if s else self.request.uri
-        r = self.prefix(r)
+        r = self.prefixize(r)
         r = r if q else r.split('?')[0:1][0]
 
         return self.helper.url.quote(r) if e else r

@@ -27,6 +27,7 @@ addons:
   apt:
     packages:
       - nginx
+      - nodejs
 
 before_script:
   - sudo cp ./travis/conf/nginx.conf /etc/nginx/nginx.conf

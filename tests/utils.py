@@ -29,7 +29,9 @@ def req(session, method, url, params=None, retry=3, retry_delay=1, host=None):
 
             return session, o
 
-        except Exception:
+        except Exception as e:
+            logging.exception(e)
+
             time.sleep(retry_delay)
 
     logging.error(url)

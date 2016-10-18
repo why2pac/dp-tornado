@@ -12,6 +12,7 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 
 class ResizeHelper(dpHelper):
+    @dpHelper.decorators.deprecated
     def rounded_mask(self, size, radius, factor=2):
         width, height = size
         radius = min(radius, *size)
@@ -30,6 +31,7 @@ class ResizeHelper(dpHelper):
 
         return mask
 
+    @dpHelper.decorators.deprecated
     def resizing(self, filename, size, **kwargs):
         mode = kwargs['mode'] if 'mode' in kwargs else None
         scale = int(kwargs['scale']) if 'scale' in kwargs else 1

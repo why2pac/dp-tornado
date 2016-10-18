@@ -2,6 +2,7 @@
 
 
 from . import utils
+from . import consts
 
 
 def pagination():
@@ -9,4 +10,4 @@ def pagination():
 
 
 def pagination_prefix():
-    utils.expecting_text('get', '/view/module/pagination/prefix', None, 200)
+    utils.expecting_text('get', '/view/module/pagination/prefix', None, 200, host=consts.dp_testing_nginx_host)

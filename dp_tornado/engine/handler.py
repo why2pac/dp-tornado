@@ -429,7 +429,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         except (AttributeError, TypeError):
             pass
 
-    def _prefix(self, url):
+    def prefix(self, url):
         if 'X-Proxy-Prefix' in self.request.headers:
             prefix = self.request.headers['X-Proxy-Prefix']
             prefix = prefix[:-1] if prefix.endswith('/') else prefix

@@ -29,6 +29,6 @@ class EmailController(Controller):
             userid='',
             password='')
 
-        assert(smtp_sent is True)
+        #assert(smtp_sent is True)
 
         self.finish('done')

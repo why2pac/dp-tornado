@@ -12,10 +12,6 @@ services:
   - redis-server
   - mysql
 
-before_install:
-  - sudo apt-get install -y postfix
-  #- sudo postfix start
-
 install:
   - virtualenv nodeps
   - ./nodeps/bin/python setup.py install

@@ -54,6 +54,10 @@ def run(main):
     test_helper.validator_phone()
     test_helper.validator_url()
 
+    from . import test_view_module
+
+    test_view_module.pagination()
+
     from . import test_view_ui_methods
 
     test_view_ui_methods.engine()

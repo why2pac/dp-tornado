@@ -26,6 +26,7 @@ addons:
   apt:
     packages:
       - nginx
+      - net-tools
 
 before_script:
   - sudo /etc/init.d/nginx restart

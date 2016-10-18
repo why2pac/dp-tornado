@@ -22,7 +22,17 @@ install:
   - pip install CyMySQL==0.8.9
   - pip freeze
 
+addons:
+  apt:
+    packages:
+      - nginx
+
 before_script:
+  - sudo /etc/init.d/nginx restart
+  - sudo cp ./travis/conf/nginx.conf /etc/nginx/nginx.conf
+  - sudo cat /etc/nginx/nginx.conf
+  - sudo ps -ef | grep nginx
+
   - mysql -e "DROP DATABASE IF EXISTS dp_test_db;" -u root
   - mysql -e "CREATE DATABASE IF NOT EXISTS dp_test_db;" -u root
 

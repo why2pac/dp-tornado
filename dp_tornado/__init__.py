@@ -29,7 +29,6 @@ from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
 from dp_tornado.engine.scheduler import Scheduler
 from dp_tornado.engine.plugin.static import Compressor
 from dp_tornado.engine.plugin.static import StaticURL
-from dp_tornado.engine.plugin.prefix import PrefixURL
 from dp_tornado.engine.plugin.pagination import Pagination
 from dp_tornado.engine.plugin import ui_methods
 
@@ -39,7 +38,6 @@ class RestfulApplication(tornado.web.Application):
         self.startup_at = int(round(time.time() * 1000))
 
         kwargs['ui_modules']['Static'] = StaticURL
-        kwargs['ui_modules']['Prefix'] = PrefixURL
         kwargs['ui_modules']['Pagination'] = Pagination
         kwargs['ui_methods'] = ui_methods
 

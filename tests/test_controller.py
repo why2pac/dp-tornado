@@ -2,6 +2,7 @@
 
 
 from . import utils
+from . import consts
 
 
 def get():
@@ -47,3 +48,6 @@ def session_get_and_set():
 
     utils.expecting_text('get', '/controller/session/get/key', 'empty', 200)
 
+
+def prefix():
+    utils.expecting_text('get', '/controller/methods/request_uri/prefix', None, 200, host=consts.dp_testing_nginx_host)

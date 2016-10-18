@@ -34,8 +34,6 @@ before_script:
   - sudo ps -ef | grep nginx
 
   - sudo which wget
-  - sudo wget http://127.0.0.1:18923 -o wget_test
-  - sudo cat wget_test
   - sudo wget http://127.0.0.1:28923 -o wget_test
   - sudo cat wget_test
   - sudo rm wget_test

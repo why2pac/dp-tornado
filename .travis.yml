@@ -35,6 +35,8 @@ before_script:
   - sudo /etc/init.d/nginx restart
   - sudo ps -ef | grep nginx
 
+  - which minify
+
   - mysql -e "DROP DATABASE IF EXISTS dp_test_db;" -u root
   - mysql -e "CREATE DATABASE IF NOT EXISTS dp_test_db;" -u root
 

@@ -123,7 +123,7 @@ class Controller(dpEngine):
         r = self.prefixize(r)
         r = r if q else r.split('?')[0:1][0]
 
-        return self.helper.url.quote(r) if e else r
+        return self.helper.web.url.quote(r) if e else r
 
     def render(self, template_name, kwargs=None):
         self._render = {'t': template_name, 'k': kwargs}

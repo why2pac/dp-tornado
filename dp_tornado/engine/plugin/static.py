@@ -207,7 +207,7 @@ class StaticURL(tornado.web.UIModule):
         # AWS not configured, compressed files are stored local storage.
         if not self.handler.vars.static.aws_configured:
             prepared = template % {
-                'url': self.handler.vars.compressor.helper.url.urlparse.urljoin(
+                'url': self.handler.vars.compressor.helper.web.url.join(
                     self.handler.vars.static.combined_prefix, filename)}
 
             test = os.path.exists(tempname)
@@ -238,7 +238,7 @@ class StaticURL(tornado.web.UIModule):
 
             os.remove(tempname)
 
-            prepared_url = self.handler.vars.compressor.helper.url.urlparse.urljoin(
+            prepared_url = self.handler.vars.compressor.helper.web.url.join(
                 self.handler.vars.static.aws_endpoint, filename)
             prepared = template % {'url': prepared_url}
 
@@ -257,7 +257,7 @@ class StaticURL(tornado.web.UIModule):
 
     def _template(self, path, replaced=True):
         if replaced:
-            url = self.handler.vars.compressor.helper.url.urlparse.urljoin(self.handler.vars.static.prefix, path)
+            url = self.handler.vars.compressor.helper.web.url.join(self.handler.vars.static.prefix, path)
             return self._template(path, replaced=False) % {'url': url}
 
         extension = path.split('?')[0].split('.')[-1].lower()

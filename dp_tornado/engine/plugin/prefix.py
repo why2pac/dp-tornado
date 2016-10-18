@@ -9,7 +9,7 @@ from dp_tornado.engine.engine import Engine as dpEngine
 class PrefixURL(tornado.web.UIModule, dpEngine):
     def render(self, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
         if combine_request_query:
-            uri = self.helper.url.parse(self.handler.request.uri)
+            uri = self.helper.web.url.parse(self.handler)
 
             if query and isinstance(query, dict):
                 query = dict(uri.query, **query)
@@ -18,7 +18,7 @@ class PrefixURL(tornado.web.UIModule, dpEngine):
                 query = uri.query
 
         if query and isinstance(query, dict):
-            uri = self.helper.url.parse(static_url)
+            uri = self.helper.web.url.parse(static_url)
 
             for k in query.keys():
                 v = query[k]
@@ -28,7 +28,7 @@ class PrefixURL(tornado.web.UIModule, dpEngine):
                 elif v is not None:
                     uri.query[k] = v
 
-            static_url = self.helper.url.build(uri.path, uri.query)
+            static_url = self.helper.web.url.build(uri.path, uri.query)
 
         if prefix or 'X-Proxy-Prefix' in self.handler.request.headers:
             prefix = prefix_alternative or prefix or self.handler.request.headers['X-Proxy-Prefix']

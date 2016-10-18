@@ -48,7 +48,7 @@ def request_uri(c, with_queries=True, query_quote=False, s=False, d=' ', p='_'):
     r = prefix(c, r)
     r = r if with_queries else r.split('?')[0:1][0]
 
-    return c.helper.url.quote(r) if query_quote else r
+    return c.helper.web.url.quote(r) if query_quote else r
 
 
 def m17n(c, m17n_lang=None):
@@ -72,7 +72,7 @@ def number_format(c, val):
 
 def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
     if combine_request_query:
-        uri = c.helper.url.parse(c.request.uri)
+        uri = c.helper.web.url.parse(c.request)
 
         if query and isinstance(query, dict):
             query = dict(uri.query, **query)
@@ -81,7 +81,7 @@ def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, 
             query = uri.query
 
     if query and isinstance(query, dict):
-        uri = c.helper.url.parse(static_url)
+        uri = c.helper.web.url.parse(static_url)
 
         for k in query.keys():
             v = query[k]
@@ -91,7 +91,7 @@ def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, 
             elif v is not None:
                 uri.query[k] = v
 
-        static_url = c.helper.url.build(uri.path, uri.query)
+        static_url = c.helper.web.url.build(uri.path, uri.query)
 
     if prefix or 'X-Proxy-Prefix' in c.request.headers:
         p = prefix_alternative or prefix or c.request.headers['X-Proxy-Prefix']

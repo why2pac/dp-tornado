@@ -135,7 +135,7 @@ class ModelSingleton(dpEngine, dpSingleton):
 
                 connection_url = '%s://%s:%s@%s:%s/%s' \
                                  % (conf.driver, conf.user, conf.password, conf.host, conf.port, conf.database)
-                connection_url = self.helper.url.build(connection_url, connection_url_args)
+                connection_url = self.helper.web.url.build(connection_url, connection_url_args)
 
             params = {
                 'convert_unicode': conf.convert_unicode if conf.convert_unicode is not None else True,

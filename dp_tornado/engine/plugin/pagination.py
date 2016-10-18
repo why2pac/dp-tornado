@@ -68,7 +68,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
             link_prefix = 'javascript:%s(\'' % link_function
             link_suffix = '\');'
 
-        uri = self.helper.url.parse(self.request)
+        uri = self.helper.web.url.parse(self)
         url = link_url or uri.path
         params = uri.query
         params = dict(params, **link_params)
@@ -95,7 +95,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         # First
         if first and current_block > 1:
             params['page'] = 1
-            s = self.helper.url.build(url, params)
+            s = self.helper.web.url.build(url, params)
             output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
                       % (output,
                          self.link_tag,
@@ -110,7 +110,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         # Prev Block
         if prev_block and current_block > 1:
             params['page'] = ((current_block - 2) * rpb) + 1
-            s = self.helper.url.build(url, params)
+            s = self.helper.web.url.build(url, params)
             output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
                       % (output,
                          self.link_tag,
@@ -125,7 +125,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         # Prev Button
         if prev_btn and current_block > 1:
             params['page'] = page - 1
-            s = self.helper.url.build(url, params)
+            s = self.helper.web.url.build(url, params)
             output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
                       % (output,
                          self.link_tag,
@@ -159,7 +159,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
                           % (output, current_tag, current_class, i, current_tag))
             else:
                 params['page'] = i
-                s = self.helper.url.build(url, params)
+                s = self.helper.web.url.build(url, params)
 
                 output = ('%s<%s%s href="%s%s%s">%s</%s>'
                           % (output,
@@ -175,7 +175,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         if next_btn and current_block < last_block:
             params['page'] = page + 1
             params['page'] = last_page if params['page'] > last_page else params['page']
-            s = self.helper.url.build(url, params)
+            s = self.helper.web.url.build(url, params)
 
             output = ('%s%s<%s href="%s%s%s" class="%s">%s</%s>'
                       % (output,
@@ -192,7 +192,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         if next_block and current_block < last_block:
             params['page'] = (current_block * rpb) + 1
             params['page'] = last_page if params['page'] > last_page else params['page']
-            s = self.helper.url.build(url, params)
+            s = self.helper.web.url.build(url, params)
 
             output = ('%s%s<%s href="%s%s%s" class="%s">%s</%s>'
                       % (output,
@@ -208,7 +208,7 @@ class Pagination(tornado.web.UIModule, dpEngine):
         # Last
         if last and last_block > 1 and current_block < last_block:
             params['page'] = last_page
-            s = self.helper.url.build(url, params)
+            s = self.helper.web.url.build(url, params)
             output = ('%s<%s href="%s%s%s" class="%s">%s</%s>%s'
                       % (output,
                          self.link_tag,

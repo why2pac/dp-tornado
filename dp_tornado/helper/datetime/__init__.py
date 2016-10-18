@@ -35,7 +35,7 @@ class DatetimeHelper(dpHelper):
         else:
             return abs_datetime.datetime.fromtimestamp(timestamp, tz=timezone)
 
-    def convert(self, datetime=None, timezone=None, timestamp=None, ms=False):
+    def convert(self, datetime=None, timezone=None, timestamp=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
         if isinstance(datetime, abs_datetime.datetime):
             if timezone:
                 datetime = self.from_datetime(datetime=datetime, timezone=timezone)
@@ -44,6 +44,31 @@ class DatetimeHelper(dpHelper):
                 datetime = self.from_timestamp(timestamp=timestamp, timezone=timezone, ms=ms)
             else:
                 raise Exception('The specified timestamp value is invalid.')
+        elif yyyymmdd:
+            if len(self.helper.numeric.extract_numbers(str(yyyymmdd))) == 8:
+                timestamp = self.helper.datetime.timestamp.mktime(
+                    year=int(yyyymmdd[0:4]),
+                    month=int(yyyymmdd[4:6]),
+                    day=int(yyyymmdd[6:8]),
+                    ms=ms)
+
+                return self.convert(timestamp=timestamp, timezone=timezone, ms=ms)
+            else:
+                raise Exception('The spcified yyyymmdd value is invalid.')
+        elif yyyymmddhhiiss:
+            if len(self.helper.numeric.extract_numbers(str(yyyymmddhhiiss))) == 14:
+                timestamp = self.helper.datetime.timestamp.mktime(
+                    year=int(yyyymmddhhiiss[0:4]),
+                    month=int(yyyymmddhhiiss[4:6]),
+                    day=int(yyyymmddhhiiss[6:8]),
+                    hour=int(yyyymmddhhiiss[8:10]),
+                    minute=int(yyyymmddhhiiss[10:12]),
+                    second=int(yyyymmddhhiiss[12:14]),
+                    ms=ms)
+
+                return self.convert(timestamp=timestamp, timezone=timezone, ms=ms)
+            else:
+                raise Exception('The spcified yyyymmdd value is invalid.')
         elif not datetime:
             datetime = self.now(timezone=timezone)
         else:

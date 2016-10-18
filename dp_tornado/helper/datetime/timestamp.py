@@ -22,14 +22,14 @@ class TimestampHelper(dpHelper):
     def to_datetime(self, *args, **kwargs):
         return self.helper.datetime.from_timestamp(*args, **kwargs)
 
-    def from_datetime(self, datetime, ms=False):
+    def mktime(self, year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0, ms=False):
         p_tuple = (
-            datetime.year,
-            datetime.month,
-            datetime.day,
-            datetime.hour,
-            datetime.minute,
-            datetime.second,
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
             0,
             0,
             0
@@ -40,8 +40,26 @@ class TimestampHelper(dpHelper):
         if not ms:
             return timestamp
         else:
-            return (timestamp * 1000) + (datetime.microsecond // 1000)
+            return (timestamp * 1000) + microsecond
 
-    def convert(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        datetime = self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def from_datetime(self, datetime, ms=False):
+        return self.mktime(
+            year=datetime.year,
+            month=datetime.month,
+            day=datetime.day,
+            hour=datetime.hour,
+            minute=datetime.minute,
+            second=datetime.second,
+            microsecond=datetime.microsecond // 1000,
+            ms=ms)
+
+    def convert(self, datetime=None, timezone=None, timestamp=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+        datetime = self.helper.datetime.convert(
+            datetime=datetime,
+            timezone=timezone,
+            timestamp=timestamp,
+            yyyymmdd=yyyymmdd,
+            yyyymmddhhiiss=yyyymmddhhiiss,
+            ms=ms)
+
         return self.from_datetime(datetime=datetime, ms=ms)

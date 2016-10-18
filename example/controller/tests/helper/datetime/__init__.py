@@ -86,6 +86,22 @@ class DatetimeController(Controller):
         assert_tuple(convert_tuple(datetime=conv_mts_w_tz_a, ms=True), [1989, 2, 3, 9, 20, 30, 369000, tzx_seoul])
         assert_tuple(convert_tuple(datetime=conv_mts_w_tz_b, ms=True), [1989, 2, 3, 8, 20, 30, 369000, tzx_shanghai])
 
+        mktime_dt = self.helper.datetime.convert(yyyymmdd='19890203')
+        mktime_da = self.helper.datetime.convert(yyyymmddhhiiss='19890203092030')
+        mktime_dt_ms = self.helper.datetime.convert(yyyymmdd='19890203', ms=True)
+        mktime_da_ms = self.helper.datetime.convert(yyyymmddhhiiss='19890203092030', ms=True)
+
+        assert_tuple(convert_tuple(datetime=mktime_dt), [1989, 2, 3, 0, 0, 0])
+        assert_tuple(convert_tuple(datetime=mktime_da), [1989, 2, 3, 9, 20, 30])
+        assert_tuple(convert_tuple(datetime=mktime_dt_ms, ms=True), [1989, 2, 3, 0, 0, 0, 0])
+        assert_tuple(convert_tuple(datetime=mktime_da_ms, ms=True), [1989, 2, 3, 9, 20, 30, 0])
+
+        mktime_da_tz_a = self.helper.datetime.convert(yyyymmddhhiiss='19890203092030', timezone=tzx_seoul)
+        mktime_da_tz_b = self.helper.datetime.convert(yyyymmddhhiiss='19890203092030', timezone=tzx_shanghai)
+
+        assert_tuple(convert_tuple(datetime=mktime_da_tz_a), [1989, 2, 3, 9, 20, 30, tzx_seoul])
+        assert_tuple(convert_tuple(datetime=mktime_da_tz_b), [1989, 2, 3, 8, 20, 30, tzx_shanghai])
+
         self.model.tests.helper_test.datetime.set_timezone(backup_zone)
 
         self.finish('done')

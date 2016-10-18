@@ -30,8 +30,9 @@ class DateHelper(dpHelper):
         datetime = self.helper.datetime.from_timestamp(timestamp=timestamp, timezone=timezone, ms=ms)
         return self.from_datetime(datetime=datetime)
 
-    def convert(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        datetime = self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def convert(self, datetime=None, timezone=None, timestamp=None, yyyymmdd=None, ms=False):
+        datetime = self.helper.datetime.convert(
+            datetime=datetime, timezone=timezone, timestamp=timestamp, yyyymmdd=yyyymmdd, ms=ms)
         return self.from_datetime(datetime=datetime)
 
     def year(self, datetime=None, timezone=None, timestamp=None, ms=False):

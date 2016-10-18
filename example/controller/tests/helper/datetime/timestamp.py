@@ -39,6 +39,11 @@ class TimestampController(Controller):
         assert(self.helper.datetime.timestamp.convert(timestamp=epoch_yesterday) == epoch_yesterday)
         assert(self.helper.datetime.timestamp.convert(datetime=dt_tomorrow, ms=True) == epoch_ms_tomorrow)
 
+        mktime_args = {'year': 1989, 'month': 2, 'day': 3, 'hour': 9, 'minute': 20, 'second': 30}
+
+        assert(self.helper.datetime.timestamp.mktime(**mktime_args) == epoch)
+        assert(self.helper.datetime.timestamp.mktime(microsecond=369, ms=True, **mktime_args) == epoch_ms)
+
         self.model.tests.helper_test.datetime.set_timezone(backup_zone)
 
         self.finish('done')

@@ -95,7 +95,8 @@ setup(
         'Pillow==3.4.1',
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
-        'lxml==3.6.4'
+        'lxml==3.6.4',
+        'httpagentparser==1.7.8'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

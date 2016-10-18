@@ -69,8 +69,8 @@ class Controller(dpEngine):
 
         return ret
 
-    def get_user_agent(self, parsed=True):
-        return self.parent.get_user_agent(parsed=parsed)
+    def get_user_agent(self, parsed=True, user_agent=None):
+        return self.parent.get_user_agent(parsed=parsed, user_agent=user_agent)
 
     @property
     def remote_ip(self):

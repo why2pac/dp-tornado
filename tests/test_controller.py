@@ -24,6 +24,10 @@ def head():
     utils.expecting_text('head', '/', '', 200)
 
 
+def methods_get_user_agent():
+    utils.expecting_text('get', '/controller/methods/get_user_agent', None, 200)
+
+
 def session_sessionid():
     utils.expecting_text('get', '/controller/session/session_id', None, 200)
 

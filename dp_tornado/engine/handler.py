@@ -14,6 +14,7 @@ from .response import Response as dpResponse
 from .engine import Engine as dpEngine
 from .engine import EngineSingleton as dpEngineSingleton
 from .model import InValueModelConfig as dpInValueModelConfig
+from .plugin.user_agent import UserAgent
 
 
 class ConcurrentDecorator(object):
@@ -439,65 +440,15 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         return url
 
-    def get_user_agent(self, parsed=True):
+    def get_user_agent(self, parsed=True, user_agent=None):
+        if user_agent:
+            return UserAgent(user_agent)
+
         if not parsed:
             return self.request.headers['User-Agent'] if 'User-Agent' in self.request.headers else ''
 
         else:
-            from .plugin import http_agent_parser
-
-            ua = self.get_user_agent(False)
-            ua = http_agent_parser.detect(ua)
-
-            p_name = ua['platform']['name'] if 'platform' in ua and 'name' in ua['platform'] else 'Unknown'
-            p_version = ua['platform']['version'] if 'platform' in ua and 'version' in ua['platform'] else 'Unknown'
-
-            try:
-                p_version_major = int(float(p_version.split('.')[0])) if p_version else 0
-            except ValueError:
-                p_version_major = 0
-
-            platform = '_p-%s-%s' % (p_name, p_version)
-            platform = platform.lower().replace(' ', '-').replace('.', '-')
-
-            platform_major = '_p-%s-%s' % (p_name, p_version_major)
-            platform_major = platform_major.lower().replace(' ', '-').replace('.', '-')
-
-            os_name = ua['os']['name'] if 'os' in ua and 'name' in ua['os'] else 'Unknown'
-            os_version = ua['os']['version'] if 'os' in ua and 'version' in ua['os'] else 'Unknown'
-
-            os = '_o-%s-%s' % (os_name, os_version)
-            os = os.lower().replace(' ', '-').replace('.', '-')
-
-            os_name = '_o-%s' % os_name
-            os_name = os_name.lower().replace(' ', '-').replace('.', '-')
-
-            browser_name = ua['browser']['name'] if 'browser' in ua and 'name' in ua['browser'] else 'Unknown'
-            browser_version = ua['browser']['version'] if 'browser' in ua and 'version' in ua['browser'] else 'Unknown'
-
-            try:
-                browser_version_major = int(float(browser_version.split('.')[0]))
-            except ValueError:
-                browser_version_major = 0
-
-            browser = '_b-%s-%s' % (browser_name, browser_version)
-            browser = browser.lower().replace(' ', '-').replace('.', '-')
-
-            browser_major = '_b-%s-%s' % (browser_name, browser_version_major)
-            browser_major = browser_major.lower().replace(' ', '-').replace('.', '-')
-
-            browser_type = '_b-%s' % browser_name
-            browser_type = browser_type.lower().replace(' ', '-').replace('.', '-')
-
-            ua['platform_str'] = platform
-            ua['platform_major_str'] = platform_major
-            ua['os_str'] = os
-            ua['os_name_str'] = os_name
-            ua['browser_str'] = browser
-            ua['browser_major_str'] = browser_major
-            ua['browser_type_str'] = browser_type
-
-            return ua
+            return UserAgent(self.get_user_agent(False))
 
     def on_interrupt(self):
         pass

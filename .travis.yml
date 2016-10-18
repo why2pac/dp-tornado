@@ -12,6 +12,9 @@ services:
   - redis-server
   - mysql
 
+env:
+  - TRAVIS_NODE_VERSION="6"
+
 install:
   - virtualenv nodeps
   - ./nodeps/bin/python setup.py install
@@ -21,6 +24,8 @@ install:
   - pip install nose
   - pip install CyMySQL==0.8.9
   - pip freeze
+
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
   - npm install -g minifier@0.8.0
 
 addons:

@@ -430,6 +430,13 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         except (AttributeError, TypeError):
             pass
 
+    def request_uri(self, prefixize=True, with_query=True, urlencode=False):
+        uri = self.request.uri
+        uri = self.prefixize(uri) if prefixize else uri
+        uri = uri if with_query else uri.split('?')[0:1][0]
+
+        return self.helper.web.url.quote(uri) if urlencode else uri
+
     def prefixize(self, url):
         if 'X-Proxy-Prefix' in self.request.headers:
             prefix = self.request.headers['X-Proxy-Prefix']

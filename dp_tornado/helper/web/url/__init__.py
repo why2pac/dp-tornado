@@ -90,7 +90,15 @@ class UrlHelper(dpHelper):
             request = None
         else:
             request = e.request
-            uri = '%s://%s%s' % (request.protocol, request.host, e.request_uri())
+
+            if hasattr(e, 'request_uri'):
+                request_uri = e.request_uri()
+            elif hasattr(request, 'uri'):
+                request_uri = request.uri
+            else:
+                raise Exception
+
+            uri = '%s://%s%s' % (request.protocol, request.host, request_uri)
 
         if self.helper.misc.system.py_version <= 2:
             p = urlparse.urlparse(uri)
@@ -115,8 +123,14 @@ class UrlHelper(dpHelper):
 
         return uri.build()
 
-    def quote(self, e):
-        return requests.utils.quote(e)
+    def encode(self, *args, **kwargs):
+        return self.quote(*args, **kwargs)
 
-    def unquote(self, e):
-        return requests.utils.unquote(e)
+    def decode(self, *args, **kwargs):
+        return self.unquote(*args, **kwargs)
+
+    def quote(self, e, safe='', **kwargs):
+        return requests.utils.quote(e, safe=safe, **kwargs)
+
+    def unquote(self, e, **kwargs):
+        return requests.utils.unquote(e, **kwargs)

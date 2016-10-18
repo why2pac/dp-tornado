@@ -15,3 +15,6 @@ class EmailHelper(dpHelper):
             return email[:pos]
         else:
             return None
+
+    def send(self, *args, **kwargs):
+        return self.helper.web.email.smtp.send(*args, **kwargs)

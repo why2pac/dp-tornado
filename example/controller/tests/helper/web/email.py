@@ -19,4 +19,16 @@ class EmailController(Controller):
         assert(self.helper.web.email.username_from_email('username@domain.com') == 'username')
         assert(self.helper.web.email.username_from_email('username-only') is None)
 
+        smtp_sent = self.helper.web.email.send(
+            to_user='receiver@dummy',
+            subject='dp test',
+            content='dp test',
+            from_user='sender@dummy',
+            host='localhost',
+            port=25,
+            userid='',
+            password='')
+
+        assert(smtp_sent is True)
+
         self.finish('done')

@@ -48,34 +48,39 @@ class SmtpSender(object):
                     msg[k] = v
 
             if self.e.helper.misc.system.py_version <= 2:
-                self.connection.sendmail(from_user, to_user, msg.as_string())
+                return self.connection.sendmail(from_user, to_user, msg.as_string())
             else:
-                self.connection.send_message(msg)
+                return self.connection.send_message(msg)
 
         return False
 
     def quit(self):
         if self.connected:
-            self.connection.quit()
+            return self.connection.quit()
 
         return False
 
 
 class SmtpHelper(dpHelper):
-    @dpHelper.decorators.deprecated
     def send(self, to_user, subject, content, from_user=None, cc=None, attach=None,
              host=None, port=None, userid=None, password=None, ehlo=None, tls=False, html=True, subject_charset=None):
-        s = SmtpSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
-        s.connect()
+        try:
+            s = SmtpSender(e=self, host=host, port=port, userid=userid, password=password, ehlo=ehlo, tls=tls)
+            s.connect()
 
-        s.send(
-            subject=subject,
-            content=content,
-            from_user=from_user,
-            to_user=to_user,
-            html=html,
-            subject_charset=subject_charset)
+            s.send(
+                subject=subject,
+                content=content,
+                from_user=from_user,
+                to_user=to_user,
+                html=html,
+                subject_charset=subject_charset)
 
-        s.quit()
+            s.quit()
 
-        return True
+            return True
+
+        except Exception as e:
+            self.logging.exception(e)
+
+            return False

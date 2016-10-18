@@ -24,7 +24,7 @@ class Compressor(dpEngine):
             self.provider['minifier'] = self.compressors['minifier']
 
     def _commands(self, path, files, ext, tempname):
-        files = [os.path.join(path, fn) for fn in files]
+        files = [os.path.join(path, fn[1:] if fn.startswith('/') else fn) for fn in files]
 
         if ext == 'js':
             return [self.provider['minifier'], '--output', tempname] + files
@@ -130,23 +130,38 @@ class StaticURL(tornado.web.UIModule):
             self.handler.vars.static.aws_configured = True if (self.handler.vars.static.aws_id and
                                                                self.handler.vars.static.aws_secret and
                                                                self.handler.vars.static.aws_bucket and
+                                                               self.handler.vars.static.aws_region and
                                                                self.handler.vars.static.aws_endpoint) else False
 
+        explicit = None
+        explicit = 'debug' if 'debug' in options and options['debug'] else explicit
+        explicit = 'skip' if 'skip' in options and options['skip'] else explicit
+        explicit = 'local' if 'local' in options and options['local'] else explicit
+        explicit = 's3' if 's3' in options and options['s3'] else explicit
+
+        if explicit == 's3' and not self.handler.vars.static.aws_configured:
+            explicit = 'local'
+            self.handler.logging.warning('Required AWS configuration. explicit option is ignored.')
+
         # for Debugging Mode, do not minify css or js.
-        if self.handler.settings.get('debug'):
-            return '\n'.join(
-                [self._template('%s?%s' % (t, self.handler.vars.compressor.helper.datetime.timestamp.time(ms=True))) for t in statics])
-        elif not self.handler.vars.static.minify or (options and 'proxy' in options and options['proxy']):
+        if explicit == 'debug' or (not explicit and self.handler.settings.get('debug')):
+            mtime = self.handler.vars.compressor.helper.datetime.timestamp.now(ms=True)
+            return '\n'.join([self._template('%s?%s' % (t, mtime)) for t in statics])
+
+        elif explicit == 'skip' or \
+                (not explicit and (
+                            not self.handler.vars.static.minify or (
+                                        options and 'proxy' in options and options['proxy']))):
             return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
 
-        cache_key = 'key_%s_%s' % (len(statics), self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))
+        cache_key = 'key_%s_%s' % (explicit, self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))
         prepared = (self.handler.vars.static.prepared.__getattr__(cache_key) or
                     self.handler.cache.get(cache_key, dsn_or_conn=self.handler.vars.static.cache_config))
 
         if prepared:
             return prepared
 
-        if 'separate' not in options or not options['separate']:
+        if '_separate' not in options or not options['_separate']:
             extensions = {}
 
             for static in statics:
@@ -161,7 +176,7 @@ class StaticURL(tornado.web.UIModule):
                 return ''
 
             if len(extensions) > 1:
-                options['separate'] = False
+                options['_separate'] = False
                 return '\n'.join(self.render(*static, **options) for static in list(extensions.values()))
             else:
                 statics = list(extensions.values())[0]
@@ -205,7 +220,7 @@ class StaticURL(tornado.web.UIModule):
             return self.render(*statics, **options)
 
         # AWS not configured, compressed files are stored local storage.
-        if not self.handler.vars.static.aws_configured:
+        if explicit == 'local' or not self.handler.vars.static.aws_configured:
             prepared = template % {
                 'url': self.handler.vars.compressor.helper.web.url.join(
                     self.handler.vars.static.combined_prefix, filename)}
@@ -257,6 +272,7 @@ class StaticURL(tornado.web.UIModule):
 
     def _template(self, path, replaced=True):
         if replaced:
+            path = path[1:] if path.startswith('/') else path
             url = self.handler.vars.compressor.helper.web.url.join(self.handler.vars.static.prefix, path)
             return self._template(path, replaced=False) % {'url': url}
 

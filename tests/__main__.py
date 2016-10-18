@@ -8,7 +8,7 @@ def run(main):
     server.wait_server()
 
     from . import test_controller
-
+    
     test_controller.get()
     test_controller.post()
     test_controller.put()
@@ -58,6 +58,7 @@ def run(main):
 
     from . import test_view_module
 
+    test_view_module.static()
     test_view_module.pagination()
     test_view_module.pagination_prefix()
 

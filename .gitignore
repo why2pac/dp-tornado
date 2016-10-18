@@ -3,6 +3,7 @@
 
 # Combined
 example/static/combined
+example/static/shared
 
 # Macintosh
 .DS_Store

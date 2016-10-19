@@ -51,13 +51,21 @@ class FileHelper(dpHelper):
             if mode:
                 kwargs['mode'] = mode
 
-            os.makedirs(path, **kwargs)
+            if not self.is_dir(path):
+                os.makedirs(path, **kwargs)
 
         except Exception as e:
             self.logging.exception(e)
             pass
 
         return self.is_dir(path)
+
+    def write(self, path, content, mode='w'):
+        with open(path, mode) as fp:
+            fp.write(content)
+
+    def explore(self, path):
+        return [os.path.join(path, e) for e in os.listdir(path)]
 
     def is_dir(self, path):
         return True if os.path.isdir(path) else False

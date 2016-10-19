@@ -106,11 +106,11 @@ class Controller(dpEngine):
     def finish_with_error(self, status_code, message='An error has occurred'):
         return self.parent.finish_with_error(status_code=status_code, message=message)
 
-    def redirect(self, url, prefix=False, permanent=False, status=None, safe=False):
+    def redirect(self, url, prefixize=False, permanent=False, status=None, safe=False):
         if self.parent._headers_written:
             return
 
-        if prefix:
+        if prefixize:
             url = self.prefixize(url)
 
         if safe and url and not url.startswith('/'):

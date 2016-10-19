@@ -203,7 +203,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
             except dpResponse as e:
                 self.set_status(e.http_status_code)
-                self.finish(e.response())
+                handler.finish(e.response())
 
                 return handler
 

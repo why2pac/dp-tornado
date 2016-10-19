@@ -8,7 +8,7 @@ def run(main):
     server.wait_server()
 
     from . import test_controller
-    
+
     test_controller.get()
     test_controller.post()
     test_controller.put()
@@ -16,6 +16,7 @@ def run(main):
     test_controller.head()
 
     test_controller.methods_get_user_agent()
+    test_controller.methods_set_header()
     test_controller.methods_request_uri()
     test_controller.methods_redirect()
     test_controller.methods_redirect_prefix()

@@ -285,7 +285,11 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         if not x:
             return
-        elif x._render:
+
+        for k, v in x._headers:
+            self.set_header(k, v)
+
+        if x._render:
             self.__render(x)
         elif x._finish:
             self.__finish(x)

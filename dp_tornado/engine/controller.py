@@ -24,6 +24,7 @@ class Controller(dpEngine):
         self._write = []
         self._finish = None
         self._render = None
+        self._headers = []
 
         self.head_requested = False
         self.post_requested = False
@@ -123,6 +124,9 @@ class Controller(dpEngine):
 
     def request_uri(self, *args, **kwargs):
         return self.parent.request_uri(*args, **kwargs)
+
+    def set_header(self, name, value):
+        self._headers.append((name, value))
 
     def render(self, template_name, kwargs=None):
         self._render = {'t': template_name, 'k': kwargs}

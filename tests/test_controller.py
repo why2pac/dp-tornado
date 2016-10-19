@@ -29,6 +29,12 @@ def methods_get_user_agent():
     utils.expecting_text('get', '/controller/methods/get_user_agent', None, 200)
 
 
+def methods_set_header():
+    session, o = utils.req(None, 'get', '/controller/methods/set_header')
+
+    assert o.headers['Header-Name'] == 'Header-Value'
+
+
 def methods_request_uri():
     utils.expecting_text('get', '/controller/methods/request_uri', None, 200)
 

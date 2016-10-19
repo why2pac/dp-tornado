@@ -15,8 +15,11 @@ class SchedulerHandler(Handler):
 
     @tornado.web.asynchronous
     @tornado.gen.coroutine
+    def get(self, path=None):
+        yield self.get_process(path=path)
+
     @tornado.concurrent.run_on_executor
-    def get(self, path):
+    def get_process(self, path):
         try:
             module = importlib.import_module(path)
             runner = getattr(module, 'Scheduler')()

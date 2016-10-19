@@ -33,6 +33,14 @@ def methods_request_uri():
     utils.expecting_text('get', '/controller/methods/request_uri', None, 200)
 
 
+def methods_redirect():
+    utils.expecting_text('get', '/controller/methods/redirect', 'done', 200)
+
+
+def methods_redirect_prefix():
+    utils.expecting_text('get', '/controller/methods/redirect/prefix', 'done', 200, host=consts.dp_testing_nginx_host)
+
+
 def methods_finish_with_error():
     utils.expecting_text('get', '/controller/methods/finish_with_error', '400:error', 400)
 

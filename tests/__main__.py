@@ -17,6 +17,9 @@ def run(main):
 
     test_controller.methods_get_user_agent()
     test_controller.methods_request_uri()
+    test_controller.methods_redirect()
+    test_controller.methods_redirect_prefix()
+    test_controller.methods_finish_with_error()
 
     test_controller.session_sessionid()
     test_controller.session_get_and_set()

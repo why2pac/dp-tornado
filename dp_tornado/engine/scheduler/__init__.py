@@ -90,7 +90,7 @@ class Scheduler(threading.Thread, Engine):
                         # Scheduler Mode : Web
                         elif e['m'] == 'web':
                             requests.get(
-                                'http://127.0.0.1:%s/__scheduler__/%s' % (tornado.options.options.port, e['c']))
+                                'http://127.0.0.1:%s/dp/scheduler/%s' % (tornado.options.options.port, e['c']))
 
                     except Exception as e:
                         self.logging.exception(e)

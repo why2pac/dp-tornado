@@ -100,6 +100,10 @@ def io_file():
     utils.expecting_text('get', '/helper/io/file', None, 200)
 
 
+def io_file_zip():
+    utils.expecting_text('get', '/helper/io/file/zip', None, 200)
+
+
 def web_email():
     utils.expecting_text('get', '/helper/web/email', None, 200)
 

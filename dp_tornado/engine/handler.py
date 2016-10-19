@@ -275,6 +275,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.routed = True
         self.__processor('put', path)
 
+    @property
+    def headers_written(self):
+        return self._headers_written
+
     def postprocess(self, x):
         if self._headers_written:
             return

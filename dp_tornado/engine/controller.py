@@ -107,7 +107,7 @@ class Controller(dpEngine):
         return self.parent.finish_with_error(status_code=status_code, message=message)
 
     def redirect(self, url, prefixize=False, permanent=False, status=None, safe=False):
-        if self.parent._headers_written:
+        if self.parent.headers_written:
             return
 
         if prefixize:

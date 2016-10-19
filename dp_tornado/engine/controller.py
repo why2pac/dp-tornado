@@ -103,6 +103,9 @@ class Controller(dpEngine):
     def prefixize(self, url):
         return self.parent.prefixize(url)
 
+    def finish_with_error(self, status_code, message='An error has occurred'):
+        return self.parent.finish_with_error(status_code=status_code, message=message)
+
     def redirect(self, url, prefix=False, permanent=False, status=None, safe=False):
         if self.parent._headers_written:
             return

@@ -33,6 +33,10 @@ def methods_request_uri():
     utils.expecting_text('get', '/controller/methods/request_uri', None, 200)
 
 
+def methods_finish_with_error():
+    utils.expecting_text('get', '/controller/methods/finish_with_error', '400:error', 400)
+
+
 def session_sessionid():
     utils.expecting_text('get', '/controller/session/session_id', None, 200)
 

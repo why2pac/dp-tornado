@@ -12,6 +12,8 @@ class FormController(Controller):
         self.process()
 
     def process(self):
+        backup_zone = self.model.tests.helper_test.datetime.switch_timezone('Asia/Seoul')
+
         testset = (
             (
                 (
@@ -98,9 +100,10 @@ class FormController(Controller):
 
                 assert res == exp
 
+            self.model.tests.helper_test.datetime.set_timezone(backup_zone)
+
             return self.finish('done')
 
-        backup_zone = self.model.tests.helper_test.datetime.switch_timezone('Asia/Seoul')
         p_offset = self.get_argument('offset', cast=int)
 
         form = {}

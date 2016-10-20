@@ -12,6 +12,8 @@ class GetArgumentController(Controller):
         self.process()
 
     def process(self):
+        backup_zone = self.model.tests.helper_test.datetime.switch_timezone('Asia/Seoul')
+
         prepared = (
             ({'default': ' bar ', 'strip': False}, None, ' bar '),
             ({'default': ' bar ', 'strip': True}, None, ' bar '),
@@ -124,10 +126,10 @@ class GetArgumentController(Controller):
 
             status_code, response = self.helper.web.http.post.text(self.helper.web.url.build(url), data=queries)
 
+            self.model.tests.helper_test.datetime.set_timezone(backup_zone)
+
             assert status_code == 200
             return self.finish(response)
-
-        backup_zone = self.model.tests.helper_test.datetime.switch_timezone('Asia/Seoul')
 
         offset = 0
         for e in prepared:

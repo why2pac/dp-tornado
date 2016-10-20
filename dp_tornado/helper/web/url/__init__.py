@@ -133,7 +133,13 @@ class UrlHelper(dpHelper):
         return self.unquote(*args, **kwargs)
 
     def quote(self, e, safe='', **kwargs):
-        return requests.utils.quote(e, safe=safe, **kwargs)
+        if self.helper.misc.system.py_version <= 2:
+            return requests.utils.quote(e, safe=safe)
+        else:
+            return requests.utils.quote(e, safe=safe, **kwargs)
 
     def unquote(self, e, **kwargs):
-        return requests.utils.unquote(e, **kwargs)
+        if self.helper.misc.system.py_version <= 2:
+            return requests.utils.unquote(e)
+        else:
+            return requests.utils.unquote(e, **kwargs)

@@ -232,24 +232,14 @@ class StaticURL(tornado.web.UIModule):
             content_length = os.path.getsize(tempname)
             filename = '%s/%s' % (self.handler.vars.static.combined_url, filename)
 
-            if not self.handler.vars.static.aws_region:
-                fp = open(tempname, 'r')
-
-                s3bridge = self.handler.helper.aws.s3.connect(
-                    self.handler.vars.static.aws_id, self.handler.vars.static.aws_secret)
-
-                s3bridge.set_contents_from_file(self.handler.vars.static.aws_bucket, filename, fp)
-
-                fp.close()
-
-            else:
-                self.handler.helper.aws.s3.set_contents_from_file(
-                    aws_access_key_id=self.handler.vars.static.aws_id,
-                    aws_secret_access_key=self.handler.vars.static.aws_secret,
-                    bucket_name=self.handler.vars.static.aws_bucket,
-                    region_name=self.handler.vars.static.aws_region,
-                    key=filename,
-                    fp=tempname, ExtraArgs={'ContentType': 'text/%s' % ('javascript' if ext == 'js' else ext)})
+            self.handler.helper.web.aws.s3.upload(
+                dest=filename,
+                src=tempname,
+                access_key_id=self.handler.vars.static.aws_id,
+                secret_access_key=self.handler.vars.static.aws_secret,
+                bucket_name=self.handler.vars.static.aws_bucket,
+                region_name=self.handler.vars.static.aws_region,
+                ExtraArgs={'ContentType': 'text/%s' % ('javascript' if ext == 'js' else ext)})
 
             os.remove(tempname)
 

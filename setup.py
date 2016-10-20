@@ -88,7 +88,6 @@ setup(
         'croniter==0.3.12',
         'pytz==2016.7',
         'pycrypto==2.6.1',
-        'boto==2.42.0',
         'boto3==1.4.1',
         'SQLAlchemy==1.1.1',
         'futures==3.0.5',

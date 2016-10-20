@@ -104,6 +104,14 @@ def io_file_zip():
     utils.expecting_text('get', '/helper/io/file/zip', None, 200)
 
 
+def web_aws_s3():
+    utils.expecting_text('get', '/helper/web/aws/s3', None, 200)
+
+
+def web_aws_s3_post():
+    utils.expecting_text('get', '/helper/web/aws/s3/post', None, 200)
+
+
 def web_email():
     utils.expecting_text('get', '/helper/web/email', None, 200)
 

@@ -26,7 +26,7 @@ class Controller(dpEngine):
         self._write = []
         self._finish = None
         self._render = None
-        self._headers = []
+        self._headers = [('Server', 'dp')]
 
         self.head_requested = False
         self.post_requested = False

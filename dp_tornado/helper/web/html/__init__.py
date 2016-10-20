@@ -32,6 +32,14 @@ re_on_attrs = re.compile('.*\s+(on[a-z]+\s*=).*')
 
 
 class HtmlHelper(dpHelper):
+    def validate(self, s):
+        s_id = '_____dp_s_xss_____'
+        s = '<div id="%s">%s</div>' % (s_id, s)
+        s = BeautifulSoup(s, 'lxml')
+
+        s = str(s.find(id=s_id))
+        return s[s.find('>')+1:s.rfind('<')]
+
     def strip_xss(self, s, whitelist=None):
         if whitelist is None:
             whitelist = (

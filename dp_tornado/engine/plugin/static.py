@@ -4,7 +4,6 @@
 import os
 import requests
 import tornado.web
-import tornado.options
 import subprocess
 import tempfile
 
@@ -121,11 +120,11 @@ class StaticURL(tornado.web.UIModule):
             self.handler.vars.static.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
             self.handler.vars.static.cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
 
-            self.handler.vars.static.aws_id = tornado.options.options.static_aws_id
-            self.handler.vars.static.aws_secret = tornado.options.options.static_aws_secret
-            self.handler.vars.static.aws_bucket = tornado.options.options.static_aws_bucket
-            self.handler.vars.static.aws_region = tornado.options.options.static_aws_region
-            self.handler.vars.static.aws_endpoint = tornado.options.options.static_aws_endpoint
+            self.handler.vars.static.aws_id = self.handler.ini.static.aws_id
+            self.handler.vars.static.aws_secret = self.handler.ini.static.aws_secret
+            self.handler.vars.static.aws_bucket = self.handler.ini.static.aws_bucket
+            self.handler.vars.static.aws_region = self.handler.ini.static.aws_region
+            self.handler.vars.static.aws_endpoint = self.handler.ini.static.aws_endpoint
 
             self.handler.vars.static.aws_configured = True if (self.handler.vars.static.aws_id and
                                                                self.handler.vars.static.aws_secret and

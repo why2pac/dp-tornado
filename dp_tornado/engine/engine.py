@@ -15,25 +15,12 @@ class EngineSingleton(dpSingleton):
         return self._decorators
 
     @property
-    def options(self):
-        if not hasattr(self, '_options'):
-            import tornado.options
+    def ini(self):
+        if not hasattr(self, '_ini'):
+            from .ini import Initialization as dpIni
+            self._ini = dpIni()
 
-            class TornadoOptions(object):
-                _options = tornado.options.options
-
-                def __getattr__(self, item):
-                    try:
-                        return self._options.__getattr__(item)
-                    except AttributeError:
-                        return None
-
-            self._options = TornadoOptions()
-
-        try:
-            return self._options
-        except AttributeError:
-            return None
+        return self._ini
 
     @property
     def config(self):
@@ -105,16 +92,16 @@ class EngineSingleton(dpSingleton):
 
     def executor(self, identifier):
         if not hasattr(self, '_executor_%s' % identifier):
-            if self.options.max_worker is None:
+
+            if self.ini.server.max_worker is None:
                 return None
 
             import tornado.concurrent
-            import tornado.options
 
-            if self.options.max_worker:
+            if self.ini.server.max_worker:
                 setattr(self,
                         '_executor_%s' % identifier,
-                        tornado.concurrent.futures.ThreadPoolExecutor(self.options.max_worker))
+                        tornado.concurrent.futures.ThreadPoolExecutor(self.ini.server.max_worker))
             else:
                 setattr(self, '_executor_%s' % identifier, None)
 
@@ -123,6 +110,10 @@ class EngineSingleton(dpSingleton):
 
 class Engine(object):
     decorators = EngineSingleton().decorators
+
+    @property
+    def ini(self):
+        return EngineSingleton().ini
 
     @property
     def options(self):

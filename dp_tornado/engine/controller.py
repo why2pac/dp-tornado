@@ -2,12 +2,14 @@
 
 
 import sys
-import tornado.options
 
 from .engine import Engine as dpEngine
 
-allowed_m17n = tornado.options.options.m17n
-session_default_expire_in = tornado.options.options.session_exp_in or 7200
+
+class NoneValue(object):
+    pass
+
+none_value = NoneValue()
 py_version = sys.version_info[0]
 
 if py_version >= 3:
@@ -95,10 +97,16 @@ class Controller(dpEngine):
     def get_session_value_ttl(self, name):
         return self.parent.get_session_value_ttl(name)
 
-    def set_session_value(self, name, value, expire_in=session_default_expire_in):
+    def set_session_value(self, name, value, expire_in=none_value):
+        if expire_in is none_value:
+            expire_in = self.ini.session.expire_in
+
         return self.parent.set_session_value(name, value, expire_in=expire_in)
 
-    def session(self, name, value=None, expire_in=session_default_expire_in):
+    def session(self, name, value=None, expire_in=none_value):
+        if expire_in is none_value:
+            expire_in = self.ini.session.expire_in
+
         return self.parent.session(name, value=value, expire_in=expire_in)
 
     def prefixize(self, url):
@@ -146,6 +154,6 @@ class Controller(dpEngine):
     def m17n_lang(self, lang=None):
         if lang is None:
             m17n = self.parent.get_cookie('__m17n__')
-            return m17n if m17n in allowed_m17n else allowed_m17n[0]
+            return m17n if m17n in self.ini.server.m17n else self.ini.server.m17n[0]
 
         return self.parent.m17n_lang(lang)

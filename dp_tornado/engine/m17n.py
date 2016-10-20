@@ -2,9 +2,11 @@
 
 
 import importlib
-import tornado.options
 
-allowed_m17n = tornado.options.options.m17n
+from .engine import EngineSingleton as dpEnginSingleton
+
+
+engine = dpEnginSingleton()
 
 
 class M17n(object):
@@ -14,7 +16,7 @@ class M17n(object):
         if not m17n_lang:
             controller.clear_cookie('__m17n__')
 
-        if m17n_lang not in allowed_m17n:
+        if m17n_lang not in engine.ini.server.m17n:
             raise Exception('Not allowed multilingual language.')
 
         return controller.set_cookie('__m17n__', m17n_lang, expires_days=365*10)
@@ -22,8 +24,8 @@ class M17n(object):
     def get(self, m17n_lang=None):
         if m17n_lang and isinstance(m17n_lang, (list, tuple)):
             m17n_lang = m17n_lang[0]
-        elif not m17n_lang or m17n_lang not in allowed_m17n:
-            m17n_lang = allowed_m17n[0]
+        elif not m17n_lang or m17n_lang not in engine.ini.server.m17n:
+            m17n_lang = engine.ini.server.m17n[0]
 
         if m17n_lang in M17n._prepared:
             return M17n._prepared[m17n_lang]

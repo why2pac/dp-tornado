@@ -5,7 +5,6 @@ import tornado.web
 import tornado.ioloop
 import tornado.gen
 import tornado.concurrent
-import tornado.options
 
 import inspect
 import importlib
@@ -52,7 +51,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.interrupted = False
         self.handlers = []
 
-        session_dsn = tornado.options.options.session_dsn
+        session_dsn = self.ini.session.dsn
 
         self._sessionid = None
         self._sessiondb = session_dsn or dpInValueModelConfig(driver='sqlite', database='session')
@@ -414,7 +413,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     @property
     def session_default_expire_in(self):
-        return tornado.options.options.session_exp_in or 7200
+        return self.ini.session.expire_in or 7200
 
     def set_session_value(self, name, value, expire_in=None):
         sessionid = self.get_sessionid()
@@ -470,9 +469,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
     def m17n_lang(self, lang=None):
         if lang is None:
-            import tornado.options
-
-            allowed_m17n = tornado.options.options.m17n
+            allowed_m17n = self.ini.server.m17n
             m17n = self.get_cookie('__m17n__')
 
             return m17n if m17n in allowed_m17n else allowed_m17n[0]

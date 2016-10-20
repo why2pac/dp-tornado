@@ -15,7 +15,6 @@
 import tornado.web
 import tornado.ioloop
 import tornado.httpserver
-import tornado.options
 
 import logging
 import logging.handlers
@@ -25,12 +24,16 @@ import os
 import multiprocessing
 import importlib
 
+from dp_tornado.engine.engine import EngineSingleton as dpEngineSingleton
 from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
 from dp_tornado.engine.scheduler import Scheduler
 from dp_tornado.engine.plugin.static import Compressor
 from dp_tornado.engine.plugin.static import StaticURL
 from dp_tornado.engine.plugin.pagination import Pagination
 from dp_tornado.engine.plugin import ui_methods
+
+
+engine = dpEngineSingleton()
 
 
 class RestfulApplication(tornado.web.Application):
@@ -51,10 +54,13 @@ class Bootstrap(object):
 
         custom_scheduler = kwargs['scheduler'] if 'scheduler' in kwargs else None
         custom_service = kwargs['service'] if 'service' in kwargs else None
-        custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else None
+        custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
 
         engine_path = os.path.join(os.path.dirname(os.path.realpath(__file__)))
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
+
+        os.environ['DP_APPLICATION_PATH'] = application_path
+        os.environ['DP_APPLICATION_INI'] = custom_config_file
 
         if 'initialize' in kwargs and kwargs['initialize']:
             EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path)
@@ -101,12 +107,12 @@ class Bootstrap(object):
 
         # Clear combined files
         Compressor.clear(settings['combined_static_path'])
-        num_processed = (tornado.options.options.num_processes
-                         if tornado.options.options.num_processes else multiprocessing.cpu_count())
+        num_processed = engine.ini.server.num_processes if engine.ini.server.num_processes \
+            else multiprocessing.cpu_count()
 
-        logging.info('Server Mode : %s' % ('Production' if not tornado.options.options.debug else 'Debugging'))
+        logging.info('Server Mode : %s' % ('Production' if not engine.ini.server.debug else 'Debugging'))
         logging.info('Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
-        logging.info('Server Port : %s' % tornado.options.options.port)
+        logging.info('Server Port : %s' % engine.ini.server.port)
         logging.info('Processors  : %s' % num_processed)
         logging.info('CPU Count   : %d' % multiprocessing.cpu_count())
         logging.info('---------------------------------')
@@ -122,9 +128,9 @@ class Bootstrap(object):
         service = tornado.httpserver.HTTPServer(
             application,
             xheaders=True,
-            max_body_size=tornado.options.options.max_body_size)
-        service.bind(tornado.options.options.port, '')
-        service.start(tornado.options.options.num_processes)
+            max_body_size=engine.ini.server.max_body_size)
+        service.bind(engine.ini.server.port, '')
+        service.start(engine.ini.server.num_processes)
 
         import random
         application.identifier = random.randint(100000, 999999)

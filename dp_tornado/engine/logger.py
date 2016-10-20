@@ -4,7 +4,6 @@
 import logging
 import traceback
 import threading
-import tornado.options
 
 from .singleton import Singleton as dpSingleton
 
@@ -17,7 +16,7 @@ except ImportError:
 class Logger(dpSingleton):
     def __init__(self, engine=None):
         self.engine = engine
-        self.delegate_handler = tornado.options.options.exception_delegate
+        self.delegate_handler = self.engine.ini.logging.exception_delegate
 
         if self.delegate_handler:
             self.delegate_queue = queue.Queue()

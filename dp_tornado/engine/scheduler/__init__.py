@@ -5,12 +5,11 @@ import os
 import time
 import threading
 import subprocess
-import tornado.options
 import pytz
 import requests
 
 from dp_tornado.engine.scheduler import tornado_subprocess
-from dp_tornado.engine.engine import Engine
+from dp_tornado.engine.engine import Engine as dpEngine
 
 
 try:
@@ -19,24 +18,24 @@ except ImportError:
     croniter = None
 
 
-class Scheduler(threading.Thread, Engine):
+class Scheduler(threading.Thread, dpEngine):
     def __init__(self, schedules):
         self.interrupted = False
         self.schedules = []
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.path = os.path.join(self.path, 'runner.py')
-        self.python = tornado.options.options.python
-        self.application_path = tornado.options.options.application_path
+        self.python = self.ini.server.python
+        self.application_path = self.ini.server.application_path
         self.ts = self.helper.datetime.timestamp.now()
         self.start_time = self.helper.datetime.now()
         self.reference_count = 0
 
-        if tornado.options.options.scheduler_mode not in ('web', 'process'):
+        if self.ini.scheduler.mode not in ('web', 'process'):
             raise Exception('The specified scheduler mode is invalid.')
 
         # Replace timezone
-        if tornado.options.options.scheduler_timezone:
-            tz = pytz.timezone(tornado.options.options.scheduler_timezone)
+        if self.ini.scheduler.timezone:
+            tz = pytz.timezone(self.ini.scheduler.timezone)
             self.start_time = self.helper.datetime.now(timezone=tz)
 
         for e in schedules:
@@ -53,7 +52,7 @@ class Scheduler(threading.Thread, Engine):
                     'c': e[1],
                     's': s,
                     'n': self.ts + 5 if isinstance(e[0], int) else s.get_next(),
-                    'm': o['mode'] if 'mode' in o else tornado.options.options.scheduler_mode
+                    'm': o['mode'] if 'mode' in o else self.ini.scheduler.mode
                 })
 
         threading.Thread.__init__(self)
@@ -90,7 +89,7 @@ class Scheduler(threading.Thread, Engine):
                         # Scheduler Mode : Web
                         elif e['m'] == 'web':
                             requests.get(
-                                'http://127.0.0.1:%s/dp/scheduler/%s' % (tornado.options.options.port, e['c']))
+                                'http://127.0.0.1:%s/dp/scheduler/%s' % (self.ini.server.port, e['c']))
 
                     except Exception as e:
                         self.logging.exception(e)
@@ -98,7 +97,7 @@ class Scheduler(threading.Thread, Engine):
             time.sleep(0.2)
 
 
-class SchedulerHandler(Engine):
+class SchedulerHandler(dpEngine):
     args = None
     ref = 0
 
@@ -136,6 +135,6 @@ class SchedulerHandler(Engine):
             args=self.args).start()
 
 
-class Processor(Engine):
+class Processor(dpEngine):
     def run(self):
         raise NotImplementedError

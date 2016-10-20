@@ -44,8 +44,7 @@ class CryptoHelper(dpHelper):
             key = getattr(self, '__crypto_default_key__', None)
 
             if not key:
-                import tornado.options
-                key = tornado.options.options.crypto_key
+                key = self.ini.crypto.key
                 setattr(self, '__crypto_default_key__', key)
 
         r_key = key * max(1, int(self.helper.numeric.math.ceil(32.0 / (len(key) * 1.0))))

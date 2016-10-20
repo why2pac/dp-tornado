@@ -9,7 +9,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
 
 import threading
-import tornado.options
 
 
 class InValueModelConfig(object):
@@ -100,7 +99,7 @@ class ModelSingleton(dpEngine, dpSingleton):
                 if conf.identifier:
                     identifier = conf.identifier
 
-                app_path = tornado.options.options.application_path
+                app_path = self.ini.server.application_path
                 path = '%s/resource/database/sqlite/cache_%s_%s.db' \
                        % (app_path, delegate['config'], identifier)
 
@@ -116,7 +115,7 @@ class ModelSingleton(dpEngine, dpSingleton):
                 if conf.path:
                     path = conf.path
                 else:
-                    app_path = tornado.options.options.application_path
+                    app_path = self.ini.server.application_path
                     path = '%s/resource/database/sqlite/%s_%s.db' \
                            % (app_path, delegate['config'], identifier)
 

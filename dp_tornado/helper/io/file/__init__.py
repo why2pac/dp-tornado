@@ -45,6 +45,9 @@ class FileHelper(dpHelper):
         return removed
 
     def mkdir(self, path, mode=None):
+        if self.is_file(path):
+            path = self.dirname(path)
+
         try:
             kwargs = {}
 
@@ -72,3 +75,6 @@ class FileHelper(dpHelper):
 
     def is_file(self, path):
         return True if os.path.isfile(path) else False
+
+    def dirname(self, path):
+        return os.path.dirname(path)

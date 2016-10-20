@@ -65,6 +65,7 @@ def run(main):
     test_helper.locale_korea()
 
     test_helper.validator_email()
+    test_helper.validator_form()
     test_helper.validator_phone()
     test_helper.validator_url()
 

@@ -29,6 +29,8 @@ else:
 
 dp_requires_additional = []
 
+CyMySQL = 'CyMySQL==0.8.9'
+
 
 class CustomInstallCommand(install):
     user_options = install.user_options + [
@@ -45,8 +47,8 @@ class CustomInstallCommand(install):
     def finalize_options(self):
         install.finalize_options(self)
 
-        if not self.dp_without_mysql:
-            dp_requires_additional.append('CyMySQL==0.8.9')
+        if self.dp_without_mysql:
+            dp_requires_additional.remove(CyMySQL)
 
         dist = getattr(core, '_setup_distribution', None) if core else None
 
@@ -96,7 +98,8 @@ setup(
         'BeautifulSoup4==4.5.1',
         'lxml==3.6.4',
         'httpagentparser==1.7.8',
-        'validators==0.11.0'
+        'validators==0.11.0',
+        CyMySQL
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

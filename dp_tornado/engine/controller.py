@@ -149,6 +149,10 @@ class Controller(dpEngine):
         self._write.append(chunk)
 
     def finish(self, chunk=None):
+        if isinstance(chunk, (list, tuple, dict)):
+            self.set_header('Content-Type', 'application/json; charset=UTF-8')
+            chunk = self.helper.string.serialization.serialize(chunk, method='json')
+
         self._finish = chunk
 
     def m17n_lang(self, lang=None):

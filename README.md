@@ -36,6 +36,9 @@ To install the package run:
     
 ## Run
 
+    $ pip install virtualenv  # if required.
+    $ virtualenv ./venv
+    $ . ./venv/bin/activate
     $ pip install dp-tornado
     $ python __init__.py
 
@@ -45,14 +48,3 @@ To install the package run:
 - [Python 3.x](https://www.python.org)
 - [Python 2.7](https://www.python.org)
 - [Minifier](https://www.npmjs.com/package/minifier) Minify CSS, Javascript
-
-
-## Dependencies
-
-* [tornado](http://www.tornadoweb.org) Network Library
-* [SQLAlchemy](http://www.sqlalchemy.org) Model Implementation
-* [redis](https://github.com/andymccurdy/redis-py) Redis Cache
-* [Croniter](https://pypi.python.org/pypi/croniter/) Scheduler
-* [Boto](http://docs.pythonboto.org) AWS Helper
-* [Requests](http://docs.python-requests.org) HTTP Reuqest
-* [futures](https://pypi.python.org/pypi/futures) concurrent.futures

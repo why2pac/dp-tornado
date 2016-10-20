@@ -6,6 +6,25 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 class TypeHelper(dpHelper):
     @property
+    def int(self):
+        return int
+
+    @property
+    def long(self):
+        if self.helper.misc.system.py_version <= 2:
+            return long
+        else:
+            return int
+
+    @property
+    def float(self):
+        return float
+
+    @property
+    def bool(self):
+        return bool
+
+    @property
     def numeric(self):
         if self.helper.misc.system.py_version <= 2:
             return int, long, float

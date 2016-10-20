@@ -98,7 +98,7 @@ class Controller(dpEngine):
             elif value in ('0', 'no', 'n', 'false', 'f'):
                 return False
             else:
-                return None
+                return -1
         elif value and (cast == 'json' or fmt == 'json'):  # to Json
             return self.helper.string.serialization.deserialize(value)
 

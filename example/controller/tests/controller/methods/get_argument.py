@@ -81,7 +81,7 @@ class GetArgumentController(Controller):
             ({'cast': self.helper.misc.type.bool}, 'F', False),
             ({'cast': self.helper.misc.type.bool}, 'NO', False),
             ({'cast': self.helper.misc.type.bool}, 'FALSE', False),
-            ({'cast': self.helper.misc.type.bool}, 'OK', None),
+            ({'cast': self.helper.misc.type.bool}, 'OK', -1),
 
             ({'fmt': 'json'}, 'dummy', False),
             ({'cast': 'json'}, 'dummy', False),

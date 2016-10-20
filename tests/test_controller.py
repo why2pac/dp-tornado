@@ -67,5 +67,12 @@ def session_get_and_set():
     utils.expecting_text('get', '/controller/session/get/key', 'empty', 200)
 
 
+def cookie_get_and_set():
+    utils.expecting_text('get', '/controller/cookie/get/key', 'val', 200, session=utils.expecting_text(
+        'get', '/controller/cookie/set/key/val', None, 200))
+
+    utils.expecting_text('get', '/controller/cookie/get/key', 'empty', 200)
+
+
 def prefix():
     utils.expecting_text('get', '/controller/methods/request_uri/prefix', None, 200, host=consts.dp_testing_nginx_host)

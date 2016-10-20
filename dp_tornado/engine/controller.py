@@ -85,6 +85,12 @@ class Controller(dpEngine):
     def get_secure_cookie(self, name, value=None, max_age_days=31, min_version=None):
         return self.parent.get_secure_cookie(name, value=value, max_age_days=max_age_days, min_version=min_version)
 
+    def secure_cookie(self, name, value=None, **kwargs):
+        return self.parent.secure_cookie(name=name, value=value, **kwargs)
+
+    def cookie(self, name, value=None, **kwargs):
+        return self.parent.cookie(name=name, value=value, **kwargs)
+
     def get_sessionid(self):
         return self.parent.get_sessionid()
 

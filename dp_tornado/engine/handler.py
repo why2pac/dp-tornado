@@ -378,6 +378,25 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         else:
             return None
 
+    def secure_cookie(self, name, value=None, expires_days=30, version=2, **kwargs):
+        if value is not None:
+            return self.set_secure_cookie(
+                name=name,
+                value=value,
+                expires_days=expires_days,
+                version=version,
+                **kwargs)
+
+        else:
+            return self.get_secure_cookie(
+                name=name,
+                value=kwargs['get_value'] if 'get_value' in kwargs else None,
+                max_age_days=kwargs['max_age_days'] if 'max_age_days' in kwargs else 31,
+                min_version=kwargs['min_version'] if 'min_version' in kwargs else None)
+
+    def cookie(self, **kwargs):
+        return self.secure_cookie(**kwargs)
+
     def get_sessionid(self):
         return self._sessionid if self._sessionid else self.set_sessionid()
 

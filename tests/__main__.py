@@ -16,6 +16,7 @@ def run(main):
     test_controller.head()
 
     test_controller.methods_get_user_agent()
+    test_controller.methods_get_argument()
     test_controller.methods_set_header()
     test_controller.methods_request_uri()
     test_controller.methods_redirect()

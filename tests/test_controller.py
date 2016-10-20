@@ -29,6 +29,10 @@ def methods_get_user_agent():
     utils.expecting_text('get', '/controller/methods/get_user_agent', None, 200)
 
 
+def methods_get_argument():
+    utils.expecting_text('get', '/controller/methods/get_argument', None, 200)
+
+
 def methods_set_header():
     session, o = utils.req(None, 'get', '/controller/methods/set_header')
 

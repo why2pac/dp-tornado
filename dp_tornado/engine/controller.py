@@ -43,34 +43,94 @@ class Controller(dpEngine):
     def request(self):
         return self.parent.request
 
-    def get_argument(self, name, default=None, strip=True, cast=None, fmt=None, delimiter=None):
-        ret = self.parent.get_argument(name, default, strip)
+    def get_argument(
+            self, name, default=None, strip=True, cast=None, fmt=None, lrange=None, delimiter=None, value=None, **ext):
+        value = self.parent.get_argument(name, default, strip) if not value else value
 
-        try:
-            if ret and cast == int and fmt == 'yyyymmdd':
-                try:
-                    return self.helper.datetime.timestamp.now(
-                        self.helper.datetime.date.convert(
-                            yyyymmdd=self.helper.numeric.extract_numbers(ret or '')))
+        if value and (cast == 'numeric' or fmt == 'numeric'):  # to Numeric
+            value = self.helper.numeric.extract_numbers(value)
 
-                except:
+        if value and cast == object and fmt in ('yyyymmdd', 'yyyymmddhhiiss'):  # to Datetime Object
+            if fmt == 'yyyymmdd':
+                value = self.helper.numeric.extract_numbers(value or '')
+
+                if len(value) != 8:
+                    return False
+            elif fmt == 'yyyymmddhhiiss':
+                value = self.helper.numeric.extract_numbers(value or '')
+
+                if len(value) != 14:
+                    return False
+            else:
+                return False
+            value = self.helper.datetime.convert(**{fmt: value})
+        elif value and cast in self.helper.misc.type.numeric and fmt in ('yyyymmdd', 'yyyymmddhhiiss'):  # to Timestamp
+            if fmt == 'yyyymmdd':
+                value = self.helper.numeric.extract_numbers(value or '')
+
+                if len(value) != 8:
+                    return False
+            elif fmt == 'yyyymmddhhiiss':
+                value = self.helper.numeric.extract_numbers(value or '')
+
+                if len(value) != 14:
+                    return False
+            else:
+                return False
+            value = self.helper.datetime.timestamp.convert(**{fmt: value})
+
+            if cast == self.helper.misc.type.float:
+                value = self.helper.numeric.cast.float(value)
+            elif cast == self.helper.misc.type.long:
+                value = self.helper.numeric.cast.long(value)
+
+        elif value and cast == self.helper.misc.type.int:  # to int
+            value = self.helper.numeric.cast.int(value)
+        elif value and cast == self.helper.misc.type.long:  # to long
+            value = self.helper.numeric.cast.long(value)
+        elif value and cast == self.helper.misc.type.float:  # to float
+            value = self.helper.numeric.cast.float(value)
+        elif value and cast == bool:  # to boolean
+            value = str(value).lower()
+
+            if value in ('1', 'yes', 'y', 'true', 't'):
+                return True
+            elif value in ('0', 'no', 'n', 'false', 'f'):
+                return False
+            else:
+                return None
+        elif value and (cast == 'json' or fmt == 'json'):  # to Json
+            return self.helper.string.serialization.deserialize(value)
+
+        if value and fmt == 'url' and not self.helper.validator.url.validate(value):  # URL
+            return False
+        elif value and fmt == 'email' and not self.helper.validator.email.validate(value):  # Email
+            return False
+        elif value and fmt == 'email-username' and not self.helper.validator.email.validate('%s@a.com' % value):
+            return False
+        elif value and fmt == 'email-domain' and not self.helper.validator.email.validate('user@%s' % value):
+            return False
+        elif value and isinstance(fmt, (list, tuple)) and value not in fmt:
+            return False
+
+        if value and fmt == 'html':
+            value = self.helper.web.html.validate(value)
+        elif value and fmt == 'xss':
+            value = self.helper.web.html.strip_xss(value)
+
+        if lrange and len(lrange) == 2:
+            if self.helper.misc.type.check.string(value):
+                if lrange[1] > len(value) or len(value) > lrange[1]:
+                    return False
+            elif self.helper.misc.type.check.numeric(value):
+                if lrange[1] > value or value > lrange[1]:
                     return False
 
-            elif ret and cast == int:
-                return int(ret)
-            elif ret and cast == long:
-                return long(ret)
-            elif ret and cast == float:
-                return float(ret)
-            elif ret and cast == bool:
-                return True if ret in ('1', 'yes', 'true', 'True', 'TRUE') else False
-            elif delimiter:
-                ret = ret.split(delimiter) if ret else ret
+        # Split
+        if value and delimiter and not cast:
+            value = value.split(delimiter)
 
-        except ValueError:
-            return default
-
-        return ret
+        return value
 
     def get_user_agent(self, parsed=True, user_agent=None):
         return self.parent.get_user_agent(parsed=parsed, user_agent=user_agent)

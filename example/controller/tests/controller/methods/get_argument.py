@@ -142,7 +142,7 @@ class GetArgumentController(Controller):
                 val = str([str(e) for e in val])
                 exp = str([str(e) for e in exp])
 
-            print(val == exp, '[%s]' % exp, '[%s]' % val, type(val))
+            # print(val == exp, '[%s]' % exp, '[%s]' % val, type(val))
             assert val == exp
 
         self.model.tests.helper_test.datetime.set_timezone(backup_zone)

@@ -1,4 +1,47 @@
-import os
+# -*- coding: utf-8 -*-
+"""
+MVC Web Application Framework with Tornado, Python 2 and 3
+
+To install the package run:
+
+    pip install dp-tornado
+
+
+Bootstrap Code
+-----
+
+    # -*- coding: utf-8 -*-
+    # __init__.py
+
+
+    import os
+
+    from dp_tornado import Bootstrap
+
+    kwargs = {
+        'initialize': True,  # If this value specified True, create default directories and files.
+        'application_path': os.path.join(os.path.dirname(os.path.realpath(__file__))),
+        'scheduler': [
+            ('* * * * *', 'scheduler.foo')
+        ]
+    }
+
+    bootstrap = Bootstrap()
+    bootstrap.run(**kwargs)
+
+
+Run
+-----
+
+    $ pip install virtualenv  # if required.
+    $ virtualenv ./venv
+    $ . ./venv/bin/activate
+    $ pip install dp-tornado
+    $ python __init__.py
+
+"""
+
+
 import logging
 
 
@@ -19,13 +62,6 @@ try:
 except ImportError:
     from distutils.command.install import install
 
-
-description = 'MVC Web Application Framework with Tornado.'
-
-if os.path.exists('README.md'):
-    long_description = open('README.md').read()
-else:
-    long_description = description
 
 dp_requires_additional = []
 
@@ -74,8 +110,8 @@ setup(
     author_email='oss@dp.farm',
     maintainer='YoungYong Park',
     maintainer_email='oss@dp.farm',
-    description=description,
-    long_description=long_description,
+    description='MVC Web Application Framework with Tornado.',
+    long_description=__doc__,
     packages=[
         'dp_tornado'],
     include_package_data=True,

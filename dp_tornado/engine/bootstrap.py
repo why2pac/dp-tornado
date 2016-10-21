@@ -94,6 +94,9 @@ class Bootstrap(object):
         if args.port:
             engine.ini.server.set('port', args.port)
 
+        # Identifier
+        engine.ini.server.set('identifier', engine.helper.misc.uuid.v1())
+
         # Setup Options
         engine.ini.server.get('max_worker', default=1)
         engine.ini.server.get('num_processes', default=0)

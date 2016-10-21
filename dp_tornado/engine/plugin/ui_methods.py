@@ -70,9 +70,9 @@ def number_format(c, val):
     return c.helper.numeric.number_format(val)
 
 
-def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
+def prefixize(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
     if combine_request_query:
-        uri = c.helper.web.url.parse(c.request)
+        uri = c.helper.web.url.parse(c)
 
         if query and isinstance(query, dict):
             query = dict(uri.query, **query)

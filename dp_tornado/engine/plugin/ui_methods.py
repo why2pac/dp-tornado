@@ -45,7 +45,7 @@ def weekday(c, datetime=None, timestamp=None, ms=False, isoweekday=True):
 
 def request_uri(c, with_queries=True, query_quote=False, s=False, d=' ', p='_'):
     r = ('%s%s' % (d, p)).join(c.request.uri.split('/')).strip() if s else c.request.uri
-    r = prefix(c, r)
+    r = prefixize(c, r)
     r = r if with_queries else r.split('?')[0:1][0]
 
     return c.helper.web.url.quote(r) if query_quote else r
@@ -70,9 +70,9 @@ def number_format(c, val):
     return c.helper.numeric.number_format(val)
 
 
-def prefix(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
+def prefixize(c, static_url, query=None, combine_request_query=False, prefix=None, prefix_alternative=None):
     if combine_request_query:
-        uri = c.helper.web.url.parse(c.request)
+        uri = c.helper.web.url.parse(c)
 
         if query and isinstance(query, dict):
             query = dict(uri.query, **query)

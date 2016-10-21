@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-import os
 import time
 import threading
 import pytz
-import requests
+import tornado.httpclient
 
 from dp_tornado.engine.engine import Engine as dpEngine
 
@@ -22,7 +21,6 @@ class Scheduler(threading.Thread, dpEngine):
         self.schedules = []
         self.ts = self.helper.datetime.timestamp.now()
         self.start_time = self.helper.datetime.now()
-        self.reference_count = 0
 
         if self.ini.scheduler.mode not in ('web', ):
             raise Exception('The specified scheduler mode is invalid.')
@@ -33,21 +31,42 @@ class Scheduler(threading.Thread, dpEngine):
             self.start_time = self.helper.datetime.now(timezone=tz)
 
         for e in schedules:
-            i = e[2] if len(e) >= 3 and isinstance(e[2], int) else 1
-            o = e[2] if len(e) >= 3 and isinstance(e[2], dict) else {}
+            opts = e[2] if len(e) >= 3 and isinstance(e[2], dict) else {}  # options
+            mode = opts['mode'] if 'mode' in opts and opts['mode'] else self.ini.scheduler.mode  # mode
+            period = e[0]  # period or crontab config
+            command = e[1]
 
-            if 'iter' in o:
-                i = o['iter']
+            clone = 1  # clone count
+            repeat = 0  # repeat count (0: infinitely)
 
-            for i in range(i):
-                s = e[0] if isinstance(e[0], int) else croniter(e[0], start_time=self.start_time)
+            if 'clone' in opts:
+                clone = opts['clone']
 
+            if 'repeat' in opts:
+                repeat = opts['repeat']
+
+            # init. period config
+            if self.helper.misc.type.check.string(period):
+                period = croniter(period, start_time=self.start_time)  # crontab
+                next_exec = period.get_next()
+            else:
+                period = self.helper.numeric.cast.int(period) or 1
+                next_exec = self.ts
+
+            for i in range(clone):
                 self.schedules.append({
-                    'c': e[1],
-                    's': s,
-                    'n': self.ts + 5 if isinstance(e[0], int) else s.get_next(),
-                    'm': o['mode'] if 'mode' in o else self.ini.scheduler.mode
+                    'command': command,
+                    'repeat': repeat,
+                    'period': period,
+                    'next': next_exec,
+                    'mode': mode,
+                    'ref': 0,
+                    'busy': False,
+                    'enabled': True
                 })
+
+                dt_next = self.helper.datetime.convert(timestamp=next_exec)
+                self.logging.info('Scheduler registered %s, first fetching at %s' % (command, dt_next))
 
         threading.Thread.__init__(self)
 
@@ -55,24 +74,65 @@ class Scheduler(threading.Thread, dpEngine):
         if not self.schedules:
             return
 
+        self.logging.set_level('requests', self.logging.level.WARNING)
+
+        while not self.interrupted:
+            code, res = self.helper.web.http.get.text('%s/ping' % self.request_host)
+
+            if res == 'pong':
+                break
+
+            self.logging.info('Scheduler waiting server ...')
+
+            time.sleep(0.5)
+
+        self.logging.set_level('requests', self.logging.level.INFO)
+
         while not self.interrupted:
             ts = self.helper.datetime.timestamp.now()
 
             for e in self.schedules:
-                if ts >= e['n']:
+                if not isinstance(e, dict):
+                    continue
+
+                if e['enabled'] and ts >= e['next']:
+                    # init. period config
+                    if self.helper.misc.type.check.numeric(e['period']):
+                        e['next'] = ts + e['period']
+                    else:
+                        e['next'] = e['period'].get_next()  # crontab
+
+                    dt_next = self.helper.datetime.convert(timestamp=e['next'])
+
+                    if e['busy']:
+                        self.logging.warning('Scheduler busy skipped %s, next fetching at %s' % (e['command'], dt_next))
+                        continue
+
+                    e['ref'] += 1
+                    e['busy'] = True
+
                     try:
-                        e['n'] = ts + e['s'] if isinstance(e['s'], int) else e['s'].get_next()
-                        self.reference_count += 1
+                        self.request(e)
 
-                        # Scheduler Mode : Web
-                        if e['m'] == 'web':
-                            requests.get(
-                                'http://127.0.0.1:%s/dp/scheduler/%s' % (self.ini.server.port, e['c']))
+                    except Exception as ex:
+                        self.logging.exception(ex)
 
-                        else:
-                            raise Exception('The specified scheduler mode is invalid.')
-
-                    except Exception as e:
-                        self.logging.exception(e)
+                    if e['ref'] >= e['repeat']:
+                        e['enabled'] = False
+                        self.logging.info('Scheduler executed %s, last execution. done.' % e['command'])
+                    else:
+                        self.logging.info('Scheduler executed %s, next fetching at %s' % (e['command'], dt_next))
 
             time.sleep(0.2)
+
+    @property
+    def request_host(self):
+        return 'http://127.0.0.1:%s/dp/scheduler' % self.ini.server.port
+
+    def request(self, payload):
+        def handle_response(o):
+            payload['busy'] = False
+
+        url = '%s/%s' % (self.request_host, payload['command'])
+        http_client = tornado.httpclient.AsyncHTTPClient()
+        http_client.fetch(url, handle_response)

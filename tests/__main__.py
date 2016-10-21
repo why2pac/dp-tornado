@@ -91,6 +91,10 @@ def run(main):
     test_view_ui_methods.trim()
     test_view_ui_methods.truncate()
 
+    from . import test_scheduler
+
+    test_scheduler.period()
+
     from . import test_schema
 
     test_schema.migrate()

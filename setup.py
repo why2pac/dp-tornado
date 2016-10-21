@@ -103,7 +103,7 @@ class CustomInstallCommand(install):
 
 setup(
     name='dp-tornado',
-    version="0.9.1",
+    version="0.9.2",
     url='http://github.com/why2pac/dp-tornado',
     license='MIT',
     author='YoungYong Park',

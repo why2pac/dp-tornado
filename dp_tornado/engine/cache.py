@@ -533,7 +533,7 @@ class Decorator(object):
             elif not cached:
                 continue
 
-            elif cached['exp'] and _engine_.datetime.timestamp.now() > cached['exp']:  # Value expired
+            elif cached['exp'] and _engine_.helper.datetime.timestamp.now() > cached['exp']:  # Value expired
                 if not dsn:
                     delattr(_cached_, cache_key)
 
@@ -555,7 +555,7 @@ class Decorator(object):
 
     def _cache(self, cache_key, value):
         payload = {
-            'exp': _engine_.datetime.timestamp.now() + self._expire_in if self._expire_in else None,
+            'exp': _engine_.helper.datetime.timestamp.now() + self._expire_in if self._expire_in else None,
             'val': value
         }
 
@@ -579,7 +579,7 @@ class Decorator(object):
         identifier = self._cached(identifier_key) if not ident_renew else None
 
         if not identifier:
-            identifier = _engine_.datetime.timestamp.now(ms=True)
+            identifier = _engine_.helper.datetime.timestamp.now(ms=True)
             self._cache(identifier_key, identifier)
         else:
             identifier = identifier['val']

@@ -20,10 +20,6 @@ class Scheduler(threading.Thread, dpEngine):
     def __init__(self, schedules):
         self.interrupted = False
         self.schedules = []
-        self.path = os.path.dirname(os.path.realpath(__file__))
-        self.path = os.path.join(self.path, 'runner.py')
-        self.python = self.ini.server.python
-        self.application_path = self.ini.server.application_path
         self.ts = self.helper.datetime.timestamp.now()
         self.start_time = self.helper.datetime.now()
         self.reference_count = 0

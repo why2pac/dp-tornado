@@ -4,11 +4,9 @@
 import os
 import time
 import threading
-import subprocess
 import pytz
 import requests
 
-from dp_tornado.engine.scheduler import tornado_subprocess
 from dp_tornado.engine.engine import Engine as dpEngine
 
 
@@ -30,7 +28,7 @@ class Scheduler(threading.Thread, dpEngine):
         self.start_time = self.helper.datetime.now()
         self.reference_count = 0
 
-        if self.ini.scheduler.mode not in ('web', 'process'):
+        if self.ini.scheduler.mode not in ('web', ):
             raise Exception('The specified scheduler mode is invalid.')
 
         # Replace timezone
@@ -70,71 +68,15 @@ class Scheduler(threading.Thread, dpEngine):
                         e['n'] = ts + e['s'] if isinstance(e['s'], int) else e['s'].get_next()
                         self.reference_count += 1
 
-                        # Scheduler Mode : Process
-                        if e['m'] == 'process':
-                            args = [
-                                self.python,
-                                self.path,
-                                '--app-path', self.application_path,
-                                '--scheduler-path', e['c']
-                            ]
-
-                            if subprocess.mswindows:
-                                subprocess.Popen(
-                                    ' '.join(args), shell=True, close_fds=False if subprocess.mswindows else True)
-                            else:
-                                h = SchedulerHandler()
-                                h.attach(args=args, timeout=0, ref=self.reference_count)
-
                         # Scheduler Mode : Web
-                        elif e['m'] == 'web':
+                        if e['m'] == 'web':
                             requests.get(
                                 'http://127.0.0.1:%s/dp/scheduler/%s' % (self.ini.server.port, e['c']))
+
+                        else:
+                            raise Exception('The specified scheduler mode is invalid.')
 
                     except Exception as e:
                         self.logging.exception(e)
 
             time.sleep(0.2)
-
-
-class SchedulerHandler(dpEngine):
-    args = None
-    ref = 0
-
-    def on_done(self, status, stdout, stderr, has_timed_out):
-        if has_timed_out:
-            self.logging.error('Scheduler done with timed out [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-
-            if stdout:
-                self.logging.error(stdout)
-            if stderr:
-                self.logging.error(stderr)
-
-            return
-
-        if stdout:
-            self.logging.info('Scheduler done with stdout [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-            self.logging.info(stdout)
-            return
-
-        if stderr:
-            self.logging.error('Scheduler done with stderr [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-            self.logging.error(stderr)
-            return
-
-        self.logging.info('Scheduler done [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-
-    def attach(self, args, timeout=0, ref=None):
-        self.args = args
-        self.ref = ref
-        self.logging.info('Scheduler attach [%s] (%s)' % (' '.join(self.args[2:]), self.ref))
-
-        tornado_subprocess.Subprocess(
-            callback=self.on_done,
-            timeout=timeout or 3600*24*7,
-            args=self.args).start()
-
-
-class Processor(dpEngine):
-    def run(self):
-        raise NotImplementedError

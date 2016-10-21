@@ -13,8 +13,8 @@ kwargs = {
     ],
     'scheduler': [
         ('22 16 * * *', 'scheduler.foo'),
-        (600, 'scheduler.tests.periodic.iter_2', {'iter': 2, 'mode': 'web'}),
-        (600, 'scheduler.tests.periodic.iter_1', {'iter': 1, 'mode': 'process'})
+        (600, 'scheduler.tests.periodic.iter_2', {'iter': 2}),
+        (600, 'scheduler.tests.periodic.iter_1', {'iter': 1})
     ]
 }
 

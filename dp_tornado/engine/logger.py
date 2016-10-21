@@ -6,6 +6,7 @@ import traceback
 import threading
 
 from .singleton import Singleton as dpSingleton
+from collections import namedtuple
 
 try:
     import Queue as queue
@@ -51,6 +52,29 @@ class Logger(dpSingleton):
     def delegate_interrupt(self):
         if self.delegate_handler:
             self.delegate_queue.put(False)
+
+    def set_level(self, logger_name, level):
+        logging.getLogger(logger_name).setLevel(level)
+
+    @property
+    def level(self):
+        if hasattr(self, '_level'):
+            return getattr(self, '_level')
+
+        levels = namedtuple('LoggingLevel', ('CRITICAL', 'ERROR', 'WARN', 'WARNING', 'INFO', 'DEBUG', 'NOTSET'))
+
+        _level = levels(
+            logging.CRITICAL,
+            logging.ERROR,
+            logging.WARN,
+            logging.WARNING,
+            logging.INFO,
+            logging.DEBUG,
+            logging.NOTSET)
+
+        setattr(self, '_level', _level)
+
+        return _level
 
 
 class LoggerDelegate(threading.Thread):

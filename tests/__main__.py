@@ -121,6 +121,7 @@ def run(main):
     test_model_cache.redis_flushdb()
     test_model_cache.redis_flushall()
 
+    test_model_cache.decorator_caching()
     test_model_cache.decorator_run_alone()
 
     from . import test_m17n

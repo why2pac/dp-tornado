@@ -43,7 +43,6 @@ Run
 
 
 import logging
-import dp_tornado.version
 
 
 try:
@@ -64,8 +63,13 @@ except ImportError:
     from distutils.command.install import install
 
 
+with open('dp_tornado/version.py', 'r') as fp_v:
+    for c in fp_v.read().split('\n'):
+        exec(c)
+
+
 dp_project_name = 'dp-tornado'
-dp_version = dp_tornado.version.__version__
+dp_version = __version__
 dp_github_url = 'http://github.com/why2pac/dp-tornado'
 dp_license = 'MIT'
 

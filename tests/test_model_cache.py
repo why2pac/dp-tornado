@@ -115,3 +115,6 @@ def redis_flushall(key=None):
     utils.expecting_text('get', '/model/cache/redis/flushall', 'done', 200)
     utils.expecting_text('get', '/model/cache/redis/get/%s' % key, 'cached-redis:%s=empty' % key, 200)
 
+
+def decorator_run_alone():
+    utils.expecting_text('get', '/model/cache/decorator/run_alone', 'done', 200)

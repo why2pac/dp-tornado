@@ -15,6 +15,8 @@ class RunAloneController(Controller):
         }
 
         self._request('tests/model/cache/decorator/run_alone/test', 'done', cb)
+
+        time.sleep(0.5)
         self._request('tests/model/cache/decorator/run_alone/test', 'busy', cb)
 
         for e in range(10):
@@ -31,6 +33,8 @@ class RunAloneController(Controller):
         cb['fail'] = 0
 
         self._request('tests/model/cache/decorator/run_alone/test_with_exp', 'done', cb)
+
+        time.sleep(0.5)
         self._request('tests/model/cache/decorator/run_alone/test_with_exp', 'busy', cb)
 
         time.sleep(3)

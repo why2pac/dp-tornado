@@ -465,7 +465,7 @@ class LockDecorator(object):
         def wrapped_f(*args, **kwargs):
             fn_args = args[1:]
 
-            cache_key = 'dp:lock:val:%s:%s' % (args[0].__class__, f.__name__)
+            cache_key = 'dp:lock:val:%s:%s:%s' % (args[0].__class__, f.__name__, _engine_.ini.server.identifier)
             acquired = _engine_.cache.setnx(cache_key, self._expire_at, self._dsn, expire_in=self._expire_in)
 
             if not acquired:

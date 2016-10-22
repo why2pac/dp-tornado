@@ -35,7 +35,7 @@ from dp_tornado.engine.plugin import ui_methods
 
 engine = dpEngineSingleton()
 
-version = "0.9.0"
+version = "0.9.2"
 version_info = (0, 9, 2, 0)
 
 

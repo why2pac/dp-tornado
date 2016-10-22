@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
+"""Controller
+The model directly manages the data, logic, and rules of the application. `<Wikipedia>
+<https://en.wikipedia.org/wiki/Model–view–controller>`_
 
+Here is a `foo_bar` model example:
+
+.. testcode::
+
+    from dp_tornado.engine.model import Model as dpModel
+
+    class FooBarModel(dpModel):
+        def add(self, a, b):
+            return a + b
+"""
 
 from .engine import Engine as dpEngine
 from .singleton import Singleton as dpSingleton

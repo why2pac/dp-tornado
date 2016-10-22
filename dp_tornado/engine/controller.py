@@ -1,4 +1,18 @@
 # -*- coding: utf-8 -*-
+"""Controller
+Accepts input and converts it to commands for the model or view. `<Wikipedia>
+<https://en.wikipedia.org/wiki/Model–view–controller>`_
+
+Here is a `foo_bar` controller example:
+
+.. testcode::
+
+    from dp_tornado.engine.controller import Controller
+
+    class FooBarController(Controller):
+        def get(self):
+            self.finish('done')
+"""
 
 
 import sys
@@ -17,6 +31,9 @@ if py_version >= 3:
 
 
 class Controller(dpEngine):
+    """Base class for HTTP request.
+    """
+
     def __init__(self, application, request, **kwargs):
         super(Controller, self).__init__()
 

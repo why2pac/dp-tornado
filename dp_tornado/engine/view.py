@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
+"""Controller
+A view can be any output representation of information, such as a chart or a diagram. `<Wikipedia>
+<https://en.wikipedia.org/wiki/Model–view–controller>`_
 
+Here is a view example:
+
+.. testcode::
+
+    from dp_tornado.engine.controller import Controller
+
+    class FooBarController(Controller):
+        def get(self):
+            self.render('index.html')
+"""
 
 from .singleton import Singleton as dpSingleton
 from .engine import Engine as dpEngine

@@ -63,6 +63,19 @@ except ImportError:
     from distutils.command.install import install
 
 
+dp_project_name = 'dp-tornado'
+dp_version = '0.9.0'
+dp_github_url = 'http://github.com/why2pac/dp-tornado'
+dp_license = 'MIT'
+
+dp_author = 'Parker'
+dp_author_email = 'oss@dp.farm'
+
+dp_maintainer = dp_author
+dp_maintainer_email = dp_author_email
+
+dp_description = 'MVC Web Application Framework with Tornado.'
+
 dp_requires_additional = []
 
 CyMySQL = 'CyMySQL==0.8.9'
@@ -102,22 +115,19 @@ class CustomInstallCommand(install):
 
 
 setup(
-    name='dp-tornado',
-    version="0.9.0",
-    url='http://github.com/why2pac/dp-tornado',
-    license='MIT',
-    author='YoungYong Park',
-    author_email='oss@dp.farm',
-    maintainer='YoungYong Park',
-    maintainer_email='oss@dp.farm',
-    description='MVC Web Application Framework with Tornado.',
+    name=dp_project_name,
+    version=dp_version,
+    url=dp_github_url,
+    license=dp_license,
+    author=dp_author,
+    author_email=dp_author_email,
+    maintainer=dp_maintainer,
+    maintainer_email=dp_maintainer_email,
+    description=dp_description,
     long_description=__doc__,
-    packages=[
-        'dp_tornado'],
+    packages=['dp_tornado'],
     include_package_data=True,
-    cmdclass={
-        'install': CustomInstallCommand,
-    },
+    cmdclass={'install': CustomInstallCommand},
     install_requires=[
         'argparse==1.4.0',
         'tornado==4.4.2',

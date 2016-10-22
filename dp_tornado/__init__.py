@@ -35,6 +35,9 @@ from dp_tornado.engine.plugin import ui_methods
 
 engine = dpEngineSingleton()
 
+version = "0.9.0"
+version_info = (0, 9, 2, 0)
+
 
 class RestfulApplication(tornado.web.Application):
     def __init__(self, handlers, kwargs):

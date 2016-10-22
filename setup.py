@@ -43,6 +43,7 @@ Run
 
 
 import logging
+import dp_tornado
 
 
 try:
@@ -64,7 +65,7 @@ except ImportError:
 
 
 dp_project_name = 'dp-tornado'
-dp_version = '0.9.0'
+dp_version = dp_tornado.version
 dp_github_url = 'http://github.com/why2pac/dp-tornado'
 dp_license = 'MIT'
 

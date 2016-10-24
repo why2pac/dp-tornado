@@ -65,6 +65,40 @@ class S3Helper(dpHelper):
 
         return True if self.helper.io.file.is_file(dest) else False
 
+    def copy(self,
+             region_name,
+             src_bucket_name,
+             src_key,
+             dest_bucket_name,
+             dest_key,
+             access_key_id,
+             secret_access_key,
+             copied_check=True):
+        import boto3
+
+        s3 = boto3.client(
+            service_name='s3',
+            region_name=region_name,
+            aws_access_key_id=access_key_id,
+            aws_secret_access_key=secret_access_key)
+
+        copy_source = {
+            'Bucket': src_bucket_name,
+            'Key': src_key
+        }
+
+        s3.copy(copy_source, dest_bucket_name, dest_key)
+
+        if copied_check:
+            return self.exists(
+                key=dest_key,
+                access_key_id=access_key_id,
+                secret_access_key=secret_access_key,
+                bucket_name=dest_bucket_name,
+                region_name=region_name)
+
+        return True
+
     def exists(self, key, access_key_id, secret_access_key, bucket_name, region_name):
         s3 = boto3.client(
             service_name='s3',

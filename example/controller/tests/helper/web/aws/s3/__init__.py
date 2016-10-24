@@ -32,6 +32,21 @@ class S3Controller(Controller):
 
             assert uploaded
 
+        # COPY
+
+        s3_key_copy = 'foo/bar/copy/%s' % filename
+
+        copied = self.helper.web.aws.s3.copy(
+            access_key_id=self.ini.static.aws_id,
+            secret_access_key=self.ini.static.aws_secret,
+            region_name=self.ini.static.aws_region,
+            src_bucket_name=self.ini.static.aws_bucket,
+            src_key=s3_key,
+            dest_bucket_name=self.ini.static.aws_bucket,
+            dest_key=s3_key_copy)
+
+        assert copied
+
         # DOWNLOAD
 
         download_path = '%s/download_%s' % (filepath, filename)

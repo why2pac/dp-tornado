@@ -45,7 +45,7 @@ class ZipController(Controller):
         self.helper.io.file.zip.archive(destfile=zip_archive, srcfiles=zip_files)
         self.helper.io.file.zip.unarchive(srcfile=zip_archive, destpath=zip_unarchive)
 
-        assert len(self.helper.io.file.explore(zip_unarchive)) == 3
+        assert len(self.helper.io.file.browse(zip_unarchive)) == 3
         assert self.helper.io.file.remove(dir_tree)
 
         self.finish('done')

@@ -67,7 +67,7 @@ class FileHelper(dpHelper):
         with open(path, mode) as fp:
             fp.write(content)
 
-    def explore(self, path):
+    def browse(self, path):
         return [os.path.join(path, e) for e in os.listdir(path)]
 
     def is_dir(self, path):

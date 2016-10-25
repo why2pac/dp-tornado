@@ -19,7 +19,7 @@ class ZipController(Controller):
         self.helper.io.file.remove(dir_tree)
 
         for d in dir_tree:
-            assert self.helper.io.file.mkdir(d)
+            assert self.helper.io.path.mkdir(d)
 
         file_tree = [
             ('%s/foo.bar' % dir_tree[0], 'this is file, foo.bar'),
@@ -30,7 +30,7 @@ class ZipController(Controller):
 
         for f in file_tree:
             self.helper.io.file.write(f[0], f[1])
-            assert self.helper.io.file.is_file(f[0])
+            assert self.helper.io.path.is_file(f[0])
 
         zip_files = [
             file_tree[2][0],
@@ -45,7 +45,7 @@ class ZipController(Controller):
         self.helper.io.file.zip.archive(destfile=zip_archive, srcfiles=zip_files)
         self.helper.io.file.zip.unarchive(srcfile=zip_archive, destpath=zip_unarchive)
 
-        assert len(self.helper.io.file.browse(zip_unarchive)) == 3
+        assert len(self.helper.io.path.browse(zip_unarchive)) == 3
         assert self.helper.io.file.remove(dir_tree)
 
         self.finish('done')

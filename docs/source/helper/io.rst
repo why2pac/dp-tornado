@@ -12,4 +12,5 @@
 .. toctree::
 
    io/file
+   io/path
    io/image

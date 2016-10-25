@@ -16,7 +16,7 @@ class FileController(Controller):
         self.helper.io.file.remove(dir_tree)
 
         for d in dir_tree:
-            assert self.helper.io.file.mkdir(d)
+            assert self.helper.io.path.mkdir(d)
 
         assert self.helper.io.file.remove(dir_tree)
 

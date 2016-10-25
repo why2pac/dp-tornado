@@ -316,13 +316,13 @@ class ImageHelper(dpHelper):
                 return None
 
             if not ext and self.helper.misc.type.check.string(dest):
-                ext = self.helper.io.file.ext(dest, dot='').lower()
+                ext = self.helper.io.path.ext(dest, dot='').lower()
 
             if not ext and self.helper.misc.type.check.string(src):
-                ext = self.helper.io.file.ext(src, dot='').lower()
+                ext = self.helper.io.path.ext(src, dot='').lower()
 
             if not ext and '_org' in kwargs and kwargs['_org'] and self.helper.misc.type.check.string(kwargs['_org']):
-                ext = self.helper.io.file.ext(kwargs['_org'], dot='').lower()
+                ext = self.helper.io.path.ext(kwargs['_org'], dot='').lower()
 
             if dest == 's3':
                 # TODO

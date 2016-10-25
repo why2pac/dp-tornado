@@ -16,7 +16,7 @@ class S3Controller(Controller):
         s3_key = '%s/foo/bar/%s' % (key_prefix, filename)
 
         self.helper.io.file.remove(filepath)
-        assert self.helper.io.file.mkdir(filepath)
+        assert self.helper.io.path.mkdir(filepath)
 
         self.helper.io.file.write('%s/%s' % (filepath, filename), content)
 

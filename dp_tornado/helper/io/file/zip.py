@@ -32,10 +32,10 @@ class ZipHelper(dpHelper):
         return True
 
     def _archive_append(self, archive, path, arcname, compress_type):
-        if self.helper.io.file.is_file(path):
+        if self.helper.io.path.is_file(path):
             archive.write(filename=path, arcname=arcname, compress_type=compress_type)
-        elif self.helper.io.file.is_dir(path):
-            for e in self.helper.io.file.browse(path):
+        elif self.helper.io.path.is_dir(path):
+            for e in self.helper.io.path.browse(path):
                 self._archive_append(archive=archive, path=e, arcname=arcname, compress_type=compress_type)
 
     def unarchive(self, srcfile, destpath, mode='r', compression=zipfile.ZIP_STORED, allowZip64=False):

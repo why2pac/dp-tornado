@@ -59,7 +59,7 @@ class ManipulateController(Controller):
 
         save_prefix = 'dp_image_test'
 
-        self.helper.io.file.mkdir(save_prefix)
+        self.helper.io.path.mkdir(save_prefix)
 
         # Crop
 

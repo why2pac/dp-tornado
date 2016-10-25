@@ -18,7 +18,7 @@ class S3Helper(dpHelper):
                uploaded_check=True,
                ExtraArgs=None):
         if self.helper.misc.type.check.string(src):
-            if not self.helper.io.file.is_file(src):
+            if not self.helper.io.path.is_file(src):
                 return False
         elif self.helper.misc.system.py_version <= 2 and not isinstance(src, file):
             return False
@@ -60,10 +60,10 @@ class S3Helper(dpHelper):
             aws_access_key_id=access_key_id,
             aws_secret_access_key=secret_access_key)
 
-        self.helper.io.file.mkdir(self.helper.io.file.dirname(dest))
+        self.helper.io.path.mkdir(self.helper.io.path.dirname(dest))
         s3.download_file(bucket_name, src, dest, ExtraArgs=kwargs)
 
-        return True if self.helper.io.file.is_file(dest) else False
+        return True if self.helper.io.path.is_file(dest) else False
 
     def copy(self,
              access_key_id,

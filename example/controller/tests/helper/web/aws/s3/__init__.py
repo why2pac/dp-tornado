@@ -12,7 +12,8 @@ class S3Controller(Controller):
         filepath = 'aws'
         filename = 'temp_%s.txt' % self.helper.datetime.timestamp.now()
 
-        s3_key = 'foo/bar/%s' % filename
+        key_prefix = 'tests/%s' % self.ini.server.identifier
+        s3_key = '%s/foo/bar/%s' % (key_prefix, filename)
 
         self.helper.io.file.remove(filepath)
         assert self.helper.io.file.mkdir(filepath)
@@ -34,7 +35,7 @@ class S3Controller(Controller):
 
         # COPY 1
 
-        s3_key_copy = 'foo/bar/copy/%s' % filename
+        s3_key_copy = '%s/foo/bar/copy/%s' % (key_prefix, filename)
 
         copied = self.helper.web.aws.s3.copy(
             access_key_id=self.ini.static.aws_id,
@@ -49,7 +50,7 @@ class S3Controller(Controller):
 
         # COPY 2
 
-        s3_key_copy_2 = 'foo/bar/copy2/%s' % filename
+        s3_key_copy_2 = '%s/foo/bar/copy2/%s' % (key_prefix, filename)
 
         copied = self.helper.web.aws.s3.copy(
             access_key_id=self.ini.static.aws_id,
@@ -69,7 +70,7 @@ class S3Controller(Controller):
             secret_access_key=self.ini.static.aws_secret,
             region_name=self.ini.static.aws_region,
             bucket_name=self.ini.static.aws_bucket,
-            prefix='foo/bar/')
+            prefix='%s/foo/bar/' % key_prefix)
 
         assert isinstance(items, (list, tuple))
         assert len([e for e in items if len(e) == 2 and e[0] == s3_key]) == 1
@@ -109,6 +110,6 @@ class S3Controller(Controller):
             secret_access_key=self.ini.static.aws_secret,
             region_name=self.ini.static.aws_region,
             bucket_name=self.ini.static.aws_bucket,
-            prefix='foo')
+            prefix='%s/foo' % key_prefix)
 
-        assert len(removed) > 1 and len([True for e in removed if e in (s3_key_copy_2, s3_key)]) == 2
+        assert len(removed) == 2 and len([True for e in removed if e in (s3_key_copy_2, s3_key)]) == 2

@@ -18,9 +18,5 @@ class ModeHelper(dpHelper):
         return 'fill'
 
     @property
-    def auto(self):
-        return 'auto'
-
-    @property
     def modes(self):
-        return [self.resize, self.center, self.fill, self.auto]
+        return [self.resize, self.center, self.fill]

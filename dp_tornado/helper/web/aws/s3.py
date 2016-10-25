@@ -144,6 +144,72 @@ class S3Helper(dpHelper):
         except Exception:
             return False
 
+    def remove(self, access_key_id, secret_access_key, region_name, bucket_name, key=None, prefix=None, deleted_check=True):
+        assert key or prefix
+        assert not (key and prefix)
+
+        try:
+            s3 = boto3.client(
+                service_name='s3',
+                region_name=region_name,
+                aws_access_key_id=access_key_id,
+                aws_secret_access_key=secret_access_key)
+
+            # with specified key, single key
+            if key:
+                deleted = s3.delete_object(Bucket=bucket_name, Key=key)
+
+                # Check response
+                if not deleted or 'ResponseMetadata' not in deleted \
+                        or 'HTTPStatusCode' not in deleted['ResponseMetadata'] \
+                        or deleted['ResponseMetadata']['HTTPStatusCode'] % 200 > 99:
+                    return False
+
+                if deleted_check:
+                    if self.exists(
+                            key=key,
+                            access_key_id=access_key_id,
+                            secret_access_key=secret_access_key,
+                            bucket_name=bucket_name,
+                            region_name=region_name):
+                        return False
+
+                return key,
+
+            # with prefix, multiple keys
+            elif prefix:
+                keys = self.browse(
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    bucket_name=self.ini.static.aws_bucket,
+                    region_name=self.ini.static.aws_region,
+                    prefix=prefix)
+
+                if keys is False:
+                    return False
+
+                elif not keys:
+                    return None
+
+                delete = {'Objects': [{'Key': e[0]} for e in keys]}
+                deleted = s3.delete_objects(Bucket=bucket_name, Delete=delete)
+
+                # Check response
+                if not deleted or 'Deleted' not in deleted \
+                        or 'ResponseMetadata' not in deleted \
+                        or 'HTTPStatusCode' not in deleted['ResponseMetadata'] \
+                        or deleted['ResponseMetadata']['HTTPStatusCode'] % 200 > 99:
+                    return False
+
+                return tuple([e['Key'] for e in deleted['Deleted'] if 'Key' in e])
+
+            return False
+
+        except Exception as e:
+            self.logging.exception(e)
+
+            return False
+
     def generate_presigned_post(self,
                                 key,
                                 access_key_id,

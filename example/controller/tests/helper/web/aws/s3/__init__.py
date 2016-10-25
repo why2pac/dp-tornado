@@ -32,7 +32,7 @@ class S3Controller(Controller):
 
             assert uploaded
 
-        # COPY
+        # COPY 1
 
         s3_key_copy = 'foo/bar/copy/%s' % filename
 
@@ -44,6 +44,21 @@ class S3Controller(Controller):
             src_key=s3_key,
             dest_bucket_name=self.ini.static.aws_bucket,
             dest_key=s3_key_copy)
+
+        assert copied
+
+        # COPY 2
+
+        s3_key_copy_2 = 'foo/bar/copy2/%s' % filename
+
+        copied = self.helper.web.aws.s3.copy(
+            access_key_id=self.ini.static.aws_id,
+            secret_access_key=self.ini.static.aws_secret,
+            region_name=self.ini.static.aws_region,
+            src_bucket_name=self.ini.static.aws_bucket,
+            src_key=s3_key,
+            dest_bucket_name=self.ini.static.aws_bucket,
+            dest_key=s3_key_copy_2)
 
         assert copied
 
@@ -76,3 +91,23 @@ class S3Controller(Controller):
             assert fp.read() == content
 
         self.helper.io.file.remove(filepath)
+
+        # REMOVE
+
+        removed = self.helper.web.aws.s3.remove(
+            access_key_id=self.ini.static.aws_id,
+            secret_access_key=self.ini.static.aws_secret,
+            bucket_name=self.ini.static.aws_bucket,
+            region_name=self.ini.static.aws_region,
+            key=s3_key_copy)
+
+        assert len(removed) == 1 and removed[0] == s3_key_copy
+
+        removed = self.helper.web.aws.s3.remove(
+            access_key_id=self.ini.static.aws_id,
+            secret_access_key=self.ini.static.aws_secret,
+            bucket_name=self.ini.static.aws_bucket,
+            region_name=self.ini.static.aws_region,
+            prefix='foo')
+
+        assert len(removed) > 1 and len([True for e in removed if e in (s3_key_copy_2, s3_key)]) == 2

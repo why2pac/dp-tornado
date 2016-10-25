@@ -9,12 +9,12 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 class S3Helper(dpHelper):
     def upload(self,
-               src,
-               dest,
                access_key_id,
                secret_access_key,
                bucket_name,
                region_name,
+               src,
+               dest,
                uploaded_check=True,
                ExtraArgs=None):
         if self.helper.misc.type.check.string(src):
@@ -47,12 +47,12 @@ class S3Helper(dpHelper):
         return True
 
     def download(self,
-                 src,
-                 dest,
                  access_key_id,
                  secret_access_key,
                  bucket_name,
                  region_name,
+                 src,
+                 dest,
                  **kwargs):
         s3 = boto3.client(
             service_name='s3',
@@ -66,13 +66,13 @@ class S3Helper(dpHelper):
         return True if self.helper.io.file.is_file(dest) else False
 
     def copy(self,
+             access_key_id,
+             secret_access_key,
              region_name,
              src_bucket_name,
              src_key,
              dest_bucket_name,
              dest_key,
-             access_key_id,
-             secret_access_key,
              copied_check=True):
         s3 = boto3.client(
             service_name='s3',

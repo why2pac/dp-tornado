@@ -12,12 +12,26 @@ class TimestampHelper(dpHelper):
     def now(self, ms=False):
         return self.helper.numeric.cast.long(abs_time.time() if not ms else round(abs_time.time() * 1000))
 
-    def yesterday(self, timestamp=None, ms=False):
-        timestamp = timestamp if timestamp else self.now(ms=ms)
+    def yesterday(self, timestamp=None, datetime=None, timezone=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+        timestamp = self.convert(
+            timestamp=timestamp,
+            datetime=datetime,
+            timezone=timezone,
+            yyyymmdd=yyyymmdd,
+            yyyymmddhhiiss=yyyymmddhhiiss,
+            ms=ms)
+        
         return timestamp - (3600*24*(1 if not ms else 1000))
 
-    def tommorow(self, timestamp=None, ms=False):
-        timestamp = timestamp if timestamp else self.now(ms=ms)
+    def tommorow(self, timestamp=None, datetime=None, timezone=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+        timestamp = self.convert(
+            timestamp=timestamp,
+            datetime=datetime,
+            timezone=timezone,
+            yyyymmdd=yyyymmdd,
+            yyyymmddhhiiss=yyyymmddhhiiss,
+            ms=ms)
+
         return timestamp + (3600*24*(1 if not ms else 1000))
 
     def to_datetime(self, *args, **kwargs):

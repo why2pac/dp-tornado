@@ -44,6 +44,21 @@ class TimestampController(Controller):
         assert(self.helper.datetime.timestamp.mktime(**mktime_args) == epoch)
         assert(self.helper.datetime.timestamp.mktime(microsecond=369, ms=True, **mktime_args) == epoch_ms)
 
+        tommorow_from_dt = self.helper.datetime.timestamp.tommorow(datetime=dt_yesterday)
+        yesterday_from_dt = self.helper.datetime.timestamp.yesterday(datetime=dt_tomorrow)
+
+        assert_tuple(
+            self.helper.datetime.tuple(timestamp=tommorow_from_dt),
+            self.helper.datetime.tuple(timestamp=yesterday_from_dt))
+
+        dt = self.helper.datetime.convert(timestamp=epoch)
+
+        yesterday_from_dt = self.helper.datetime.timestamp.yesterday(datetime=dt)
+        tommorow_from_dt = self.helper.datetime.timestamp.tommorow(datetime=dt)
+
+        assert_tuple(self.helper.datetime.tuple(timestamp=yesterday_from_dt), [1989, 2, 2, 9, 20, 30])
+        assert_tuple(self.helper.datetime.tuple(timestamp=tommorow_from_dt), [1989, 2, 4, 9, 20, 30])
+
         self.model.tests.helper_test.datetime.set_timezone(backup_zone)
 
         self.finish('done')

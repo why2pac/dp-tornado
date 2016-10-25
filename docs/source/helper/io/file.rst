@@ -11,4 +11,5 @@
 
 .. toctree::
 
+   file/path
    file/zip

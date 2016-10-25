@@ -5,6 +5,7 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 import shutil
 import os
+import filecmp
 
 
 class FileHelper(dpHelper):
@@ -78,3 +79,28 @@ class FileHelper(dpHelper):
 
     def dirname(self, path):
         return os.path.dirname(path)
+
+    def ext(self, path, dot='.'):
+        ext = os.path.splitext(path)[-1]
+
+        return '%s%s' % (dot or '', ext[1:]) if ext else ''
+
+    def compare(self, *files):
+        if not files:
+            return None
+
+        def _iter():
+            l = len(files)
+            for i in range(l-1):
+                yield files[i], files[i+1]
+
+        try:
+            for f1, f2 in _iter():
+                if not filecmp.cmp(f1, f2):
+                    return False
+        except Exception as e:
+            self.logging.exception(e)
+
+            return False
+
+        return True

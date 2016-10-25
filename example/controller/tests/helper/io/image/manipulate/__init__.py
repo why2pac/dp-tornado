@@ -19,8 +19,8 @@ class ManipulateController(Controller):
         # Image from Filepath
 
         image_path = self.ini.server.application_path
-        image_path = self.helper.io.file.path.join(image_path, 'static', 'tests', 'helper', 'io', 'image')
-        sample_path = self.helper.io.file.path.join(image_path, 'sample.jpg')
+        image_path = self.helper.io.path.join(image_path, 'static', 'tests', 'helper', 'io', 'image')
+        sample_path = self.helper.io.path.join(image_path, 'sample.jpg')
 
         image_obj = self.helper.io.image.load(sample_path)
         image_size = self.helper.io.image.size(image_obj)
@@ -63,7 +63,7 @@ class ManipulateController(Controller):
 
         # Crop
 
-        cropped_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'crop.png')
+        cropped_img_compare = self.helper.io.path.join(image_path, 'compare', 'crop.png')
         cropped_img_dest = '%s/crop.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'crop': '27,10,15,10', 'dest': cropped_img_dest})
@@ -71,7 +71,7 @@ class ManipulateController(Controller):
 
         # Border
 
-        bordered_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'border.png')
+        bordered_img_compare = self.helper.io.path.join(image_path, 'compare', 'border.png')
         bordered_img_dest = '%s/border.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'border': 2, 'border_color': '#ff0000', 'dest': bordered_img_dest})
@@ -79,7 +79,7 @@ class ManipulateController(Controller):
 
         # Radius
 
-        radius_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'radius.png')
+        radius_img_compare = self.helper.io.path.join(image_path, 'compare', 'radius.png')
         radius_img_dest = '%s/radius.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'radius': 100, 'dest': radius_img_dest})
@@ -87,7 +87,7 @@ class ManipulateController(Controller):
 
         # Radius with border
 
-        radius_wb_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'radius_wb.png')
+        radius_wb_img_compare = self.helper.io.path.join(image_path, 'compare', 'radius_wb.png')
         radius_wb_img_dest = '%s/radius_wb.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'radius': 100, 'border': 2, 'border_color': '#ff0000', 'dest': radius_wb_img_dest})
@@ -95,7 +95,7 @@ class ManipulateController(Controller):
 
         # Resize
 
-        resize_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'resize.png')
+        resize_img_compare = self.helper.io.path.join(image_path, 'compare', 'resize.png')
         resize_img_dest = '%s/resize.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'size': (80, 150), 'dest': resize_img_dest})
@@ -103,7 +103,7 @@ class ManipulateController(Controller):
 
         # Resize - center w/ radius
 
-        resize_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'resize_center_wr.png')
+        resize_img_compare = self.helper.io.path.join(image_path, 'compare', 'resize_center_wr.png')
         resize_img_dest = '%s/resize_center_wr.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'size': (80, 150), 'background': '#00ff00', 'radius': 50, 'mode': self.helper.io.image.mode.center, 'dest': resize_img_dest})
@@ -111,7 +111,7 @@ class ManipulateController(Controller):
 
         # Resize - center
 
-        resize_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'resize_center.png')
+        resize_img_compare = self.helper.io.path.join(image_path, 'compare', 'resize_center.png')
         resize_img_dest = '%s/resize_center.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'size': (80, 150), 'background': '#ff0000', 'mode': self.helper.io.image.mode.center, 'dest': resize_img_dest})
@@ -119,7 +119,7 @@ class ManipulateController(Controller):
 
         # Resize - fill
 
-        resize_img_compare = self.helper.io.file.path.join(image_path, 'compare', 'resize_fill.png')
+        resize_img_compare = self.helper.io.path.join(image_path, 'compare', 'resize_fill.png')
         resize_img_dest = '%s/resize_fill.png' % save_prefix
 
         assert self.helper.io.image.manipulate(sample_path, **{'size': (80, 150), 'mode': self.helper.io.image.mode.fill, 'dest': resize_img_dest})

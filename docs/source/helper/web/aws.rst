@@ -11,4 +11,5 @@
     
 .. toctree::
 
+   aws/dynamodb
    aws/s3

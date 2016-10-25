@@ -60,6 +60,8 @@ def run(main):
 
     test_helper.web_aws_s3()
     test_helper.web_aws_s3_post()
+    test_helper.web_aws_dynamodb()
+
     test_helper.web_email()
     test_helper.web_http()
     test_helper.web_html()

@@ -47,6 +47,17 @@ class S3Controller(Controller):
 
         assert copied
 
+        # BROWSE
+
+        items = self.helper.web.aws.s3.browse(
+                access_key_id=self.ini.static.aws_id,
+                secret_access_key=self.ini.static.aws_secret,
+                bucket_name=self.ini.static.aws_bucket,
+                region_name=self.ini.static.aws_region, prefix='foo/bar/')
+
+        assert isinstance(items, (list, tuple))
+        assert len([e for e in items if len(e) == 2 and e[0] == s3_key]) == 1
+
         # DOWNLOAD
 
         download_path = '%s/download_%s' % (filepath, filename)

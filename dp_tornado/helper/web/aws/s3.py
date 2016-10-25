@@ -99,6 +99,41 @@ class S3Helper(dpHelper):
 
         return True
 
+    def browse(self, access_key_id, secret_access_key, region_name, bucket_name, prefix):
+        try:
+            s3 = boto3.client(
+                service_name='s3',
+                region_name=region_name,
+                aws_access_key_id=access_key_id,
+                aws_secret_access_key=secret_access_key)
+
+            result = s3.list_objects(Bucket=bucket_name, Prefix=prefix)
+
+            if 'Contents' not in result:
+                return []
+
+            contents = []
+
+            for e in result['Contents']:
+                if 'Key' not in e or 'Size' not in e:
+                    continue
+
+                attrs = {
+                    'Size': e['Size'],
+                    'LastModified': e['LastModified'] if 'LastModified' in e else None,
+                    'StorageClass': e['StorageClass'] if 'StorageClass' in e else None,
+                    'ETag': e['ETag'] if 'ETag' in e else None
+                }
+
+                contents.append((e['Key'], attrs))
+
+            return contents
+
+        except Exception as e:
+            self.logging.exception(e)
+
+            return False
+
     def exists(self, key, access_key_id, secret_access_key, bucket_name, region_name):
         s3 = boto3.client(
             service_name='s3',

@@ -11,8 +11,8 @@ class S3Helper(dpHelper):
     def upload(self,
                access_key_id,
                secret_access_key,
-               bucket_name,
                region_name,
+               bucket_name,
                src,
                dest,
                uploaded_check=True,
@@ -38,19 +38,19 @@ class S3Helper(dpHelper):
 
         if uploaded_check:
             return self.exists(
-                key=dest,
                 access_key_id=access_key_id,
                 secret_access_key=secret_access_key,
+                region_name=region_name,
                 bucket_name=bucket_name,
-                region_name=region_name)
+                key=dest)
 
         return True
 
     def download(self,
                  access_key_id,
                  secret_access_key,
-                 bucket_name,
                  region_name,
+                 bucket_name,
                  src,
                  dest,
                  **kwargs):
@@ -89,11 +89,11 @@ class S3Helper(dpHelper):
 
         if copied_check:
             return self.exists(
-                key=dest_key,
                 access_key_id=access_key_id,
                 secret_access_key=secret_access_key,
+                region_name=region_name,
                 bucket_name=dest_bucket_name,
-                region_name=region_name)
+                key=dest_key)
 
         return True
 
@@ -132,7 +132,7 @@ class S3Helper(dpHelper):
 
             return False
 
-    def exists(self, key, access_key_id, secret_access_key, bucket_name, region_name):
+    def exists(self, key, access_key_id, secret_access_key, region_name, bucket_name):
         s3 = boto3.client(
             service_name='s3',
             region_name=region_name,
@@ -167,11 +167,11 @@ class S3Helper(dpHelper):
 
                 if deleted_check:
                     if self.exists(
-                            key=key,
                             access_key_id=access_key_id,
                             secret_access_key=secret_access_key,
+                            region_name=region_name,
                             bucket_name=bucket_name,
-                            region_name=region_name):
+                            key=key):
                         return False
 
                 return key,
@@ -181,8 +181,8 @@ class S3Helper(dpHelper):
                 keys = self.browse(
                     access_key_id=self.ini.static.aws_id,
                     secret_access_key=self.ini.static.aws_secret,
-                    bucket_name=self.ini.static.aws_bucket,
                     region_name=self.ini.static.aws_region,
+                    bucket_name=self.ini.static.aws_bucket,
                     prefix=prefix)
 
                 if keys is False:
@@ -211,11 +211,11 @@ class S3Helper(dpHelper):
             return False
 
     def generate_presigned_post(self,
-                                key,
                                 access_key_id,
                                 secret_access_key,
-                                bucket_name,
                                 region_name,
+                                bucket_name,
+                                key,
                                 success_action_redirect=None,
                                 content_length_range=None,
                                 max_content_length=None,

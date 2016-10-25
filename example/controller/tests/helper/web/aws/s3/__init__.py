@@ -27,8 +27,8 @@ class S3Controller(Controller):
                 dest=s3_key,
                 access_key_id=self.ini.static.aws_id,
                 secret_access_key=self.ini.static.aws_secret,
-                bucket_name=self.ini.static.aws_bucket,
-                region_name=self.ini.static.aws_region)
+                region_name=self.ini.static.aws_region,
+                bucket_name=self.ini.static.aws_bucket)
 
             assert uploaded
 
@@ -65,10 +65,11 @@ class S3Controller(Controller):
         # BROWSE
 
         items = self.helper.web.aws.s3.browse(
-                access_key_id=self.ini.static.aws_id,
-                secret_access_key=self.ini.static.aws_secret,
-                bucket_name=self.ini.static.aws_bucket,
-                region_name=self.ini.static.aws_region, prefix='foo/bar/')
+            access_key_id=self.ini.static.aws_id,
+            secret_access_key=self.ini.static.aws_secret,
+            region_name=self.ini.static.aws_region,
+            bucket_name=self.ini.static.aws_bucket,
+            prefix='foo/bar/')
 
         assert isinstance(items, (list, tuple))
         assert len([e for e in items if len(e) == 2 and e[0] == s3_key]) == 1
@@ -82,8 +83,8 @@ class S3Controller(Controller):
             dest=download_path,
             access_key_id=self.ini.static.aws_id,
             secret_access_key=self.ini.static.aws_secret,
-            bucket_name=self.ini.static.aws_bucket,
-            region_name=self.ini.static.aws_region)
+            region_name=self.ini.static.aws_region,
+            bucket_name=self.ini.static.aws_bucket)
 
         assert downloaded
 
@@ -97,8 +98,8 @@ class S3Controller(Controller):
         removed = self.helper.web.aws.s3.remove(
             access_key_id=self.ini.static.aws_id,
             secret_access_key=self.ini.static.aws_secret,
-            bucket_name=self.ini.static.aws_bucket,
             region_name=self.ini.static.aws_region,
+            bucket_name=self.ini.static.aws_bucket,
             key=s3_key_copy)
 
         assert len(removed) == 1 and removed[0] == s3_key_copy
@@ -106,8 +107,8 @@ class S3Controller(Controller):
         removed = self.helper.web.aws.s3.remove(
             access_key_id=self.ini.static.aws_id,
             secret_access_key=self.ini.static.aws_secret,
-            bucket_name=self.ini.static.aws_bucket,
             region_name=self.ini.static.aws_region,
+            bucket_name=self.ini.static.aws_bucket,
             prefix='foo')
 
         assert len(removed) > 1 and len([True for e in removed if e in (s3_key_copy_2, s3_key)]) == 2

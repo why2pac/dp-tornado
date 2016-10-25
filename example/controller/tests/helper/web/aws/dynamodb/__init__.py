@@ -9,11 +9,11 @@ class DynamodbController(Controller):
         table_name = 'dp_test_%s' % self.ini.server.identifier
 
         index_columns = [
-            ('key1', self.helper.web.aws.dynamodb.column.number, self.helper.web.aws.dynamodb.indexing.partition),
-            ('key2', self.helper.web.aws.dynamodb.column.string)
+            ('key1', self.helper.web.aws.dynamodb.table.column.number, self.helper.web.aws.dynamodb.table.indexing.partition),
+            ('key2', self.helper.web.aws.dynamodb.table.column.string)
         ]
 
-        created = self.helper.web.aws.dynamodb.create_table(
+        created = self.helper.web.aws.dynamodb.table.create(
             access_key_id=self.ini.static.aws_id,
             secret_access_key=self.ini.static.aws_secret,
             region_name=self.ini.static.aws_region,
@@ -23,7 +23,7 @@ class DynamodbController(Controller):
 
         assert created
 
-        described = self.helper.web.aws.dynamodb.describe_table(
+        described = self.helper.web.aws.dynamodb.table.describe(
             access_key_id=self.ini.static.aws_id,
             secret_access_key=self.ini.static.aws_secret,
             region_name=self.ini.static.aws_region,
@@ -32,7 +32,7 @@ class DynamodbController(Controller):
 
         assert described
 
-        deleted = self.helper.web.aws.dynamodb.remove_table(
+        deleted = self.helper.web.aws.dynamodb.table.remove(
             access_key_id=self.ini.static.aws_id,
             secret_access_key=self.ini.static.aws_secret,
             region_name=self.ini.static.aws_region,

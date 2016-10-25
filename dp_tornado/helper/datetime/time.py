@@ -6,17 +6,17 @@ from dp_tornado.engine.helper import Helper as dpHelper
 
 
 class TimeHelper(dpHelper):
-    def hour(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        return self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).hour
+    def hour(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        return self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).hour
 
-    def minute(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        return self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).minute
+    def minute(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        return self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).minute
 
-    def second(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        return self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).second
+    def second(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        return self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).second
 
-    def tuple(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        datetime = self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def tuple(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         time_set = [datetime.hour, datetime.minute, datetime.second]
 
         if ms:
@@ -27,10 +27,27 @@ class TimeHelper(dpHelper):
 
         return time_set
 
-    def hhiiss(self, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
-        datetime = self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def hhiiss(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         return '%02d%s%02d%s%02d' % (datetime.hour, concat, datetime.minute, concat, datetime.second)
 
-    def hhii(self, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
-        datetime = self.helper.datetime.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def hhii(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         return '%02d%s%02d' % (datetime.hour, concat, datetime.minute)
+
+    def convert(self,
+                auto=None,
+                datetime=None,
+                timezone=None,
+                timestamp=None,
+                yyyymmdd=None,
+                yyyymmddhhiiss=None,
+                ms=False):
+        return self.helper.datetime.convert(
+            auto=auto,
+            datetime=datetime,
+            timezone=timezone,
+            timestamp=timestamp,
+            yyyymmdd=yyyymmdd,
+            yyyymmddhhiiss=yyyymmddhhiiss,
+            ms=ms)

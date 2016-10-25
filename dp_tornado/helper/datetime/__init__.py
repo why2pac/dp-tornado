@@ -35,7 +35,43 @@ class DatetimeHelper(dpHelper):
         else:
             return abs_datetime.datetime.fromtimestamp(timestamp, tz=timezone)
 
-    def convert(self, datetime=None, timezone=None, timestamp=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+    def transform(self, anonymous):
+        if isinstance(anonymous, abs_datetime.datetime):
+            return {'datetime': anonymous}
+
+        if self.helper.misc.type.check.string(anonymous):
+            anonymous_cast = self.helper.numeric.extract_numbers(anonymous)
+
+            if len(anonymous_cast) != len(anonymous):
+                raise Exception('The specified value is invalid.')
+
+            if len(anonymous) == 8:  # yyyymmdd
+                return {'yyyymmdd': anonymous}
+            elif len(anonymous) == 14:  # yyyymmddhhiiss
+                return {'yyyymmddhhiiss': anonymous}
+            else:
+                raise Exception('The specified value is invalid.')
+
+        elif self.helper.misc.type.check.numeric(anonymous):
+            if anonymous < 10000000000:  # timestamp
+                return {'timestamp': self.helper.numeric.cast.int(anonymous)}
+            else:  # timestamp with ms
+                return {'timestamp': self.helper.numeric.cast.long(anonymous), 'ms': True}
+
+        else:
+            raise Exception('The specified value is invalid.')
+
+    def convert(self,
+                auto=None,
+                datetime=None,
+                timezone=None,
+                timestamp=None,
+                yyyymmdd=None,
+                yyyymmddhhiiss=None,
+                ms=False):
+        if auto:
+            return self.convert(**self.transform(auto))
+
         if isinstance(datetime, abs_datetime.datetime):
             if timezone:
                 datetime = self.from_datetime(datetime=datetime, timezone=timezone)
@@ -76,8 +112,8 @@ class DatetimeHelper(dpHelper):
 
         return datetime
 
-    def tuple(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        datetime = self.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def tuple(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         time_set = [datetime.year, datetime.month, datetime.day, datetime.hour, datetime.minute, datetime.second]
 
         if ms:

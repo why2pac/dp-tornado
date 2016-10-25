@@ -30,26 +30,40 @@ class DateHelper(dpHelper):
         datetime = self.helper.datetime.from_timestamp(timestamp=timestamp, timezone=timezone, ms=ms)
         return self.from_datetime(datetime=datetime)
 
-    def convert(self, datetime=None, timezone=None, timestamp=None, yyyymmdd=None, ms=False):
+    def convert(
+            self,
+            auto=None,
+            datetime=None,
+            timezone=None,
+            timestamp=None,
+            yyyymmdd=None,
+            yyyymmddhhiiss=None,
+            ms=False):
         datetime = self.helper.datetime.convert(
-            datetime=datetime, timezone=timezone, timestamp=timestamp, yyyymmdd=yyyymmdd, ms=ms)
+            auto=auto,
+            datetime=datetime,
+            timezone=timezone,
+            timestamp=timestamp,
+            yyyymmdd=yyyymmdd,
+            yyyymmddhhiiss=yyyymmddhhiiss,
+            ms=ms)
         return self.from_datetime(datetime=datetime)
 
-    def year(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        return self.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).year
+    def year(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        return self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).year
 
-    def month(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        return self.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).month
+    def month(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        return self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).month
 
-    def day(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        return self.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).day
+    def day(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        return self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms).day
 
-    def weekday(self, datetime=None, timezone=None, timestamp=None, ms=False, isoweekday=True):
-        datetime = self.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def weekday(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False, isoweekday=True):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         return datetime.isoweekday() if isoweekday else datetime.weekday()
 
-    def tuple(self, datetime=None, timezone=None, timestamp=None, ms=False):
-        datetime = self.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def tuple(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         time_set = [datetime.year, datetime.month, datetime.day]
 
         if datetime.tzinfo:
@@ -57,10 +71,10 @@ class DateHelper(dpHelper):
 
         return time_set
 
-    def yyyymmdd(self, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
-        datetime = self.helper.datetime.date.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def yyyymmdd(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         return '%04d%s%02d%s%02d' % (datetime.year, concat, datetime.month, concat, datetime.day)
 
-    def mmdd(self, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
-        datetime = self.helper.datetime.date.convert(datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
+    def mmdd(self, auto=None, datetime=None, timezone=None, timestamp=None, ms=False, concat=''):
+        datetime = self.convert(auto=auto, datetime=datetime, timezone=timezone, timestamp=timestamp, ms=ms)
         return '%02d%s%02d' % (datetime.month, concat, datetime.day)

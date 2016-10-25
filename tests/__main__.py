@@ -33,6 +33,7 @@ def run(main):
     from . import test_helper
 
     test_helper.datetime()
+    test_helper.datetime_auto()
     test_helper.datetime_date()
     test_helper.datetime_time()
     test_helper.datetime_timestamp()

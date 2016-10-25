@@ -12,19 +12,37 @@ class TimestampHelper(dpHelper):
     def now(self, ms=False):
         return self.helper.numeric.cast.long(abs_time.time() if not ms else round(abs_time.time() * 1000))
 
-    def yesterday(self, timestamp=None, datetime=None, timezone=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+    def yesterday(
+            self,
+            auto=None,
+            timestamp=None,
+            datetime=None,
+            timezone=None,
+            yyyymmdd=None,
+            yyyymmddhhiiss=None,
+            ms=False):
         timestamp = self.convert(
+            auto=auto,
             timestamp=timestamp,
             datetime=datetime,
             timezone=timezone,
             yyyymmdd=yyyymmdd,
             yyyymmddhhiiss=yyyymmddhhiiss,
             ms=ms)
-        
+
         return timestamp - (3600*24*(1 if not ms else 1000))
 
-    def tommorow(self, timestamp=None, datetime=None, timezone=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+    def tommorow(
+            self,
+            auto=None,
+            timestamp=None,
+            datetime=None,
+            timezone=None,
+            yyyymmdd=None,
+            yyyymmddhhiiss=None,
+            ms=False):
         timestamp = self.convert(
+            auto=auto,
             timestamp=timestamp,
             datetime=datetime,
             timezone=timezone,
@@ -68,8 +86,17 @@ class TimestampHelper(dpHelper):
             microsecond=datetime.microsecond // 1000,
             ms=ms)
 
-    def convert(self, datetime=None, timezone=None, timestamp=None, yyyymmdd=None, yyyymmddhhiiss=None, ms=False):
+    def convert(
+            self,
+            auto=None,
+            datetime=None,
+            timezone=None,
+            timestamp=None,
+            yyyymmdd=None,
+            yyyymmddhhiiss=None,
+            ms=False):
         datetime = self.helper.datetime.convert(
+            auto=auto,
             datetime=datetime,
             timezone=timezone,
             timestamp=timestamp,

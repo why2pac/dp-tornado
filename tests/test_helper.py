@@ -8,6 +8,10 @@ def datetime():
     utils.expecting_text('get', '/helper/datetime', None, 200)
 
 
+def datetime_auto():
+    utils.expecting_text('get', '/helper/datetime/auto', None, 200)
+
+
 def datetime_date():
     utils.expecting_text('get', '/helper/datetime/date', None, 200)
 

@@ -59,6 +59,12 @@ class TimestampController(Controller):
         assert_tuple(self.helper.datetime.tuple(timestamp=yesterday_from_dt), [1989, 2, 2, 9, 20, 30])
         assert_tuple(self.helper.datetime.tuple(timestamp=tommorow_from_dt), [1989, 2, 4, 9, 20, 30])
 
+        yesterday_today = self.helper.datetime.timestamp.yesterday()
+        tommorow_today = self.helper.datetime.timestamp.tommorow()
+
+        assert self.helper.datetime.tuple(timestamp=yesterday_today)
+        assert self.helper.datetime.tuple(timestamp=tommorow_today)
+
         self.model.tests.helper_test.datetime.set_timezone(backup_zone)
 
         self.finish('done')

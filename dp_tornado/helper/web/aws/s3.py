@@ -74,8 +74,6 @@ class S3Helper(dpHelper):
              access_key_id,
              secret_access_key,
              copied_check=True):
-        import boto3
-
         s3 = boto3.client(
             service_name='s3',
             region_name=region_name,

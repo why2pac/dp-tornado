@@ -7,9 +7,9 @@ from Crypto.Cipher import AES
 
 
 class CryptoHelper(dpHelper):
-    def encrypt(self, plain, randomized=False, expire_in=0, key=None, raw=False, encode=True):
+    def encrypt(self, plain, randomized=False, expire_in=0, key=None, raw=False, encode=True, pad=True):
         if raw:
-            return self._encrypt(plain, key=key, encode=encode)
+            return self._encrypt(plain, key=key, encode=encode, pad=pad)
 
         payload = {
             'p': plain
@@ -24,8 +24,8 @@ class CryptoHelper(dpHelper):
         payload = self.helper.string.serialization.serialize(payload, method='json')
         return self._encrypt(payload, key=key)
 
-    def decrypt(self, encrypted, key=None, raw=False, encode=True):
-        decrypted = self._decrypt(encrypted, key=key, encode=encode)
+    def decrypt(self, encrypted, key=None, raw=False, encode=True, pad=True):
+        decrypted = self._decrypt(encrypted, key=key, encode=encode, pad=pad)
 
         if raw:
             return decrypted
@@ -60,15 +60,16 @@ class CryptoHelper(dpHelper):
         r_key = key * max(1, int(self.helper.numeric.math.ceil(32.0 / (len(key) * 1.0))))
         return r_key[0:16], r_key[16:32]
 
-    def _encrypt(self, plain, key=None, encode=True):
+    def _encrypt(self, plain, key=None, encode=True, pad=True):
         key, iv = self._key_and_iv(key)
-        encrypted = AES.new(key, AES.MODE_CBC, iv).encrypt(self._pad(plain))
+        encrypted = AES.new(key, AES.MODE_CBC, iv).encrypt(self._pad(plain) if pad else plain)
         return self.helper.security.crypto.encoding.base64_encode(encrypted, raw=True) if encode else encrypted
 
-    def _decrypt(self, encrypted, key=None, encode=True):
+    def _decrypt(self, encrypted, key=None, encode=True, pad=True):
         key, iv = self._key_and_iv(key)
         encrypted = self.helper.security.crypto.encoding.base64_decode(encrypted, raw=True) if encode else encrypted
-        decrypted = self._unpad(AES.new(key, AES.MODE_CBC, iv).decrypt(encrypted))
+        decrypted = AES.new(key, AES.MODE_CBC, iv).decrypt(encrypted)
+        decrypted = self._unpad(decrypted) if pad else decrypted
 
         if self.helper.misc.system.py_version >= 3:
             decrypted = decrypted.decode('utf8')

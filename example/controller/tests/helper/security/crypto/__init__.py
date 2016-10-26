@@ -54,4 +54,13 @@ class CryptoController(Controller):
 
         assert plain == decrypted
 
+        # without Encode and Pad
+
+        plain = 'HELLO PY. WORLD.'
+
+        encrypted = self.helper.security.crypto.encrypt(plain, key=key, raw=True, encode=True, pad=False)
+        decrypted = self.helper.security.crypto.decrypt(encrypted, key=key, raw=True, encode=True, pad=False)
+
+        assert plain == decrypted
+
         self.finish('done')

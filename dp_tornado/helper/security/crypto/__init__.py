@@ -41,7 +41,10 @@ class CryptoHelper(dpHelper):
         return payload['p']
 
     def _pad(self, s):
-        return s + (16 - len(s) % 16) * chr(16 - len(s) % 16)
+        if self.helper.misc.system.py_version >= 3:
+            return s + (16 - len(s) % 16) * chr(16 - len(s) % 16).encode('utf8')
+        else:
+            return s + (16 - len(s) % 16) * chr(16 - len(s) % 16)
 
     def _unpad(self, s):
         return s[:-ord(s[len(s)-1:])]
@@ -62,6 +65,10 @@ class CryptoHelper(dpHelper):
 
     def _encrypt(self, plain, key=None, encode=True, pad=True):
         key, iv = self._key_and_iv(key)
+
+        if self.helper.misc.system.py_version >= 3:
+            plain = plain.encode('utf8')
+
         encrypted = AES.new(key, AES.MODE_CBC, iv).encrypt(self._pad(plain) if pad else plain)
         return self.helper.security.crypto.encoding.base64_encode(encrypted, raw=True) if encode else encrypted
 

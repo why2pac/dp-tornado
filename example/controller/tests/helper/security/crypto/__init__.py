@@ -47,6 +47,19 @@ class CryptoController(Controller):
         assert enc == encrypted
         assert plain == decrypted
 
+        # RAW (Unicode)
+
+        plain = '안녕하세요.'
+        enc = 'D00uYTgwZBSq1c1wubOY1xMzyJVKHT4X1tj9lHqXu5Y='
+
+        key = ('01234567890123456789012345678901', '\0' * 16)
+
+        encrypted = self.helper.security.crypto.encrypt(plain, key=key, raw=True)
+        decrypted = self.helper.security.crypto.decrypt(encrypted, key=key, raw=True)
+
+        assert enc == encrypted
+        assert plain == decrypted
+
         # without Encode
 
         encrypted = self.helper.security.crypto.encrypt(plain, key=key, raw=True, encode=False)

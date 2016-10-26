@@ -126,8 +126,10 @@ class Bootstrap(object):
         engine.ini.scheduler.get('mode', default='web')
 
         exception_delegate = engine.ini.logging.get('exception_delegate', default='') or None
-        access_logging = engine.ini.logging.get('access', default=1)
-        sql_logging = engine.ini.logging.get('sql', default=0)
+        access_logging = engine.ini.logging.get('access', default=False)
+        sql_logging = engine.ini.logging.get('sql', default=False)
+        aws_logging = engine.ini.logging.get('aws', default=False)
+        http_logging = engine.ini.logging.get('http', default=False)
 
         if exception_delegate:
             try:
@@ -146,6 +148,20 @@ class Bootstrap(object):
         # SQLAlchemy logging level
         if sql_logging:
             logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+        # AWS logging level (boto
+        if not aws_logging:
+            logging.getLogger('boto3').setLevel(logging.WARNING)
+            logging.getLogger('botocore').setLevel(logging.WARNING)
+            logging.getLogger('nose').setLevel(logging.WARNING)
+            logging.getLogger('s3transfer').setLevel(logging.WARNING)
+
+        # Requests logging level
+        if not http_logging:
+            logging.getLogger('requests').setLevel(logging.WARNING)
+
+        # Disable Pillow log
+        logging.getLogger('PIL.PngImagePlugin').setLevel(logging.WARNING)
 
         return {
             'template_path': os.path.join(application_path, 'view'),

@@ -33,3 +33,25 @@ class CryptoController(Controller):
         time.sleep(1.6)
 
         assert(self.helper.security.crypto.decrypt(encrypted, key=key) is False)
+
+        # RAW
+
+        plain = 'HELLO.'
+        enc = 'wOlChy1LGjQemn6UBpJrwA=='
+
+        key = ('01234567890123456789012345678901', '\0' * 16)
+
+        encrypted = self.helper.security.crypto.encrypt(plain, key=key, raw=True)
+        decrypted = self.helper.security.crypto.decrypt(encrypted, key=key, raw=True)
+
+        assert enc == encrypted
+        assert plain == decrypted
+
+        # without Encode
+
+        encrypted = self.helper.security.crypto.encrypt(plain, key=key, raw=True, encode=False)
+        decrypted = self.helper.security.crypto.decrypt(encrypted, key=key, raw=True, encode=False)
+
+        assert plain == decrypted
+
+        self.finish('done')

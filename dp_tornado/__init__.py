@@ -31,6 +31,7 @@ from dp_tornado.engine.plugin.static import Compressor
 from dp_tornado.engine.plugin.static import StaticURL
 from dp_tornado.engine.plugin.pagination import Pagination
 from dp_tornado.engine.plugin import ui_methods
+from dp_tornado.version import __version_info__
 
 
 engine = dpEngineSingleton()
@@ -68,7 +69,7 @@ class Bootstrap(object):
         settings = EngineBootstrap.init_ini(application_path=application_path, ini_file=custom_config_file)
 
         logging.info('---------------------------------')
-        logging.info('dp for Tornado has been started..')
+        logging.info('dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
         logging.info('---------------------------------')
 
         services_raw = [

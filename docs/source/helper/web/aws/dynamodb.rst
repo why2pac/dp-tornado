@@ -12,3 +12,4 @@
 .. toctree::
 
    dynamodb/table
+   dynamodb/item

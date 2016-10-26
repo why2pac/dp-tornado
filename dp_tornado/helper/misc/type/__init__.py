@@ -37,3 +37,11 @@ class TypeHelper(dpHelper):
             return basestring,
         else:
             return str,
+
+    @property
+    def array(self):
+        return list, tuple
+
+    @property
+    def dict(self):
+        return dict,

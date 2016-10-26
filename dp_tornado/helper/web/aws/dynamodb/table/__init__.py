@@ -2,12 +2,34 @@
 
 
 import time
-import boto3
 
 from dp_tornado.engine.helper import Helper as dpHelper
 
 
 class TableHelper(dpHelper):
+    def get(
+            self,
+            access_key_id,
+            secret_access_key,
+            region_name,
+            table_name,
+            wait_until_exists=False):
+        dynamodb = self.helper.web.aws.dynamodb.resource(
+            access_key_id=access_key_id, secret_access_key=secret_access_key, region_name=region_name)
+
+        table = dynamodb.Table(table_name)
+
+        if wait_until_exists:
+            if not self.wait_until(
+                    access_key_id=access_key_id,
+                    secret_access_key=secret_access_key,
+                    region_name=region_name,
+                    table_name=table_name,
+                    exists=True):
+                return False
+
+        return table
+
     def create(
             self,
             access_key_id,
@@ -20,11 +42,8 @@ class TableHelper(dpHelper):
             wait_until_exists=True,
             **kwargs):
         try:
-            dynamodb = boto3.client(
-                service_name='dynamodb',
-                aws_access_key_id=access_key_id,
-                aws_secret_access_key=secret_access_key,
-                region_name=region_name)
+            dynamodb = self.helper.web.aws.dynamodb.client(
+                access_key_id=access_key_id, secret_access_key=secret_access_key, region_name=region_name)
 
             def_at = self.helper.web.aws.dynamodb.table.indexing.sort
 
@@ -53,6 +72,13 @@ class TableHelper(dpHelper):
             return True
 
         except Exception as e:
+            if self.status(
+                    access_key_id=access_key_id,
+                    secret_access_key=secret_access_key,
+                    region_name=region_name,
+                    table_name=table_name) == 'ACTIVE':
+                return True
+
             self.logging.exception(e)
 
             return False
@@ -68,20 +94,19 @@ class TableHelper(dpHelper):
             repeated=0,
             before_status=None):
         try:
-            described = self.describe(
+            status = self.status(
                 access_key_id=access_key_id,
                 secret_access_key=secret_access_key,
                 region_name=region_name,
-                table_name=table_name,
-                wait_until_exists=False)
+                table_name=table_name)
 
-            if not described:
+            if not status:
                 if not exists and before_status in ('ACTIVE', 'DELETING'):
                     return True
 
                 return False
 
-            if exists and described['Table']['TableStatus'] == 'ACTIVE':
+            if exists and status == 'ACTIVE':
                 return True
 
             if repeat > repeated:
@@ -95,7 +120,7 @@ class TableHelper(dpHelper):
                     exists=exists,
                     repeat=repeat,
                     repeated=repeated+1,
-                    before_status=described['Table']['TableStatus'])
+                    before_status=status)
 
             return True
 
@@ -103,6 +128,24 @@ class TableHelper(dpHelper):
             self.logging.error(e)
 
             return False
+
+    def status(
+            self,
+            access_key_id,
+            secret_access_key,
+            region_name,
+            table_name):
+        described = self.describe(
+            access_key_id=access_key_id,
+            secret_access_key=secret_access_key,
+            region_name=region_name,
+            table_name=table_name,
+            wait_until_exists=False)
+
+        if not described or 'Table' not in described or 'TableStatus' not in described['Table']:
+            return False
+
+        return described['Table']['TableStatus']
 
     def describe(
             self,
@@ -121,18 +164,16 @@ class TableHelper(dpHelper):
                         exists=True):
                     return False
 
-            dynamodb = boto3.client(
-                service_name='dynamodb',
-                aws_access_key_id=access_key_id,
-                aws_secret_access_key=secret_access_key,
-                region_name=region_name)
+            dynamodb = self.helper.web.aws.dynamodb.client(
+                access_key_id=access_key_id, secret_access_key=secret_access_key, region_name=region_name)
 
             describe = dynamodb.describe_table(TableName=table_name)
 
             return describe
 
         except Exception as e:
-            self.logging.error(e)
+            if wait_until_exists:
+                self.logging.error(e)
 
             return False
 
@@ -144,11 +185,8 @@ class TableHelper(dpHelper):
             table_name,
             wait_until_not_exists=True):
         try:
-            dynamodb = boto3.client(
-                service_name='dynamodb',
-                aws_access_key_id=access_key_id,
-                aws_secret_access_key=secret_access_key,
-                region_name=region_name)
+            dynamodb = self.helper.web.aws.dynamodb.client(
+                access_key_id=access_key_id, secret_access_key=secret_access_key, region_name=region_name)
 
             deleted = dynamodb.delete_table(TableName=table_name)
 

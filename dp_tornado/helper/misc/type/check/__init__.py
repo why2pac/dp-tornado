@@ -10,3 +10,9 @@ class CheckHelper(dpHelper):
 
     def string(self, val):
         return True if isinstance(val, self.helper.misc.type.string) else False
+
+    def array(self, val):
+        return True if isinstance(val, self.helper.misc.type.array) else False
+
+    def dict(self, val):
+        return True if isinstance(val, self.helper.misc.type.dict) else False

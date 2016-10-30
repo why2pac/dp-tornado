@@ -24,6 +24,7 @@ class Bootstrap(object):
 
         if not valid:
             logging.warning('Default directory structure initialzation skipped. Directory not empty.')
+            return False
 
         else:
             import shutil
@@ -45,7 +46,12 @@ class Bootstrap(object):
                     dest = os.path.join(app_path, file)
 
                     if not os.path.isfile(dest):
+                        if src.endswith('.pyc'):
+                            continue
+
                         shutil.copy(src, dest)
+
+            return True
 
     @staticmethod
     def init_args():

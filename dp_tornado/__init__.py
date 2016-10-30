@@ -50,9 +50,6 @@ class RestfulApplication(tornado.web.Application):
 
 class Bootstrap(object):
     def run(self, **kwargs):
-        # Initialize Logging
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
-
         custom_scheduler = kwargs['scheduler'] if 'scheduler' in kwargs else None
         custom_service = kwargs['service'] if 'service' in kwargs else None
         custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
@@ -68,9 +65,9 @@ class Bootstrap(object):
 
         settings = EngineBootstrap.init_ini(application_path=application_path, ini_file=custom_config_file)
 
-        logging.info('---------------------------------')
-        logging.info('dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
-        logging.info('---------------------------------')
+        engine.logger.log(100, '---------------------------------')
+        engine.logger.log(100, 'dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
+        engine.logger.log(100, '---------------------------------')
 
         services_raw = [
             (r"/dp/scheduler/(.*)", 'dp_tornado.engine.scheduler_handler.SchedulerHandler'),
@@ -111,12 +108,12 @@ class Bootstrap(object):
         num_processed = engine.ini.server.num_processes if engine.ini.server.num_processes \
             else multiprocessing.cpu_count()
 
-        logging.info('Server Mode : %s' % ('Production' if not engine.ini.server.debug else 'Debugging'))
-        logging.info('Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
-        logging.info('Server Port : %s' % engine.ini.server.port)
-        logging.info('Processors  : %s' % num_processed)
-        logging.info('CPU Count   : %d' % multiprocessing.cpu_count())
-        logging.info('---------------------------------')
+        engine.logger.log(100, 'Server Mode : %s' % ('Production' if not engine.ini.server.debug else 'Debugging'))
+        engine.logger.log(100, 'Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
+        engine.logger.log(100, 'Server Port : %s' % engine.ini.server.port)
+        engine.logger.log(100, 'Processors  : %s' % num_processed)
+        engine.logger.log(100, 'CPU Count   : %d' % multiprocessing.cpu_count())
+        engine.logger.log(100, '---------------------------------')
 
         if custom_scheduler:
             scheduler = Scheduler(custom_scheduler)

@@ -39,12 +39,16 @@ class IniSection(object):
     def set(self, key, val):
         self.__setattr__(key, val)
 
+
 class IniParser(object):
     def __init__(self, parser):
         self._parser = parser
 
     def get(self, section, key, default=None):
         try:
+            if not self._parser:
+                return False
+
             got = self._parser.get(section, key)
 
             if default is True or default is False:
@@ -76,8 +80,12 @@ class Initialization(dpSingleton):
         application_path = os.getenv('DP_APPLICATION_PATH')
         ini_file = os.getenv('DP_APPLICATION_INI')
 
-        parser = configparser.RawConfigParser()
-        parser.read(os.path.join(application_path, ini_file))
+        if not application_path or not ini_file:
+            parser = None
+
+        else:
+            parser = configparser.RawConfigParser()
+            parser.read(os.path.join(application_path, ini_file))
 
         ini_parser = IniParser(parser)
         self.__dict__['_parser'] = ini_parser

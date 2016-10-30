@@ -47,9 +47,9 @@ class IniParser(object):
     def get(self, section, key, default=None):
         try:
             if not self._parser:
-                return False
-
-            got = self._parser.get(section, key)
+                got = False
+            else:
+                got = self._parser.get(section, key)
 
             if default is True or default is False:
                 return True if got == '1' else False

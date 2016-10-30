@@ -16,6 +16,8 @@ except ImportError:
 
 class Logger(dpSingleton):
     def __init__(self, engine=None):
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
+
         self.engine = engine
         self.delegate_handler = self.engine.ini.logging.exception_delegate
 

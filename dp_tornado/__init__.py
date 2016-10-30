@@ -54,14 +54,10 @@ class Bootstrap(object):
         custom_service = kwargs['service'] if 'service' in kwargs else None
         custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
 
-        engine_path = os.path.join(os.path.dirname(os.path.realpath(__file__)))
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
 
         os.environ['DP_APPLICATION_PATH'] = application_path
         os.environ['DP_APPLICATION_INI'] = custom_config_file
-
-        if 'initialize' in kwargs and kwargs['initialize']:
-            EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path)
 
         settings = EngineBootstrap.init_ini(application_path=application_path, ini_file=custom_config_file)
 

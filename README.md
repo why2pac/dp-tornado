@@ -12,39 +12,10 @@ To install the package run:
     pip install dp-tornado
     
     
-## Bootstrap Code
-
-    # -*- coding: utf-8 -*-
-    # __init__.py
-    
-    
-    import os
-    
-    from dp_tornado import Bootstrap
-    
-    kwargs = {
-        'initialize': True,  # If this value specified True, create default directories and files.
-        'application_path': os.path.join(os.path.dirname(os.path.realpath(__file__))),
-        'scheduler': [
-            ('* * * * *', 'scheduler.foo')
-        ]
-    }
-    
-    bootstrap = Bootstrap()
-    bootstrap.run(**kwargs)
-    
-    
 ## Run
 
-    $ pip install virtualenv  # if required.
+    $ pip install virtualenv
     $ virtualenv ./venv
     $ . ./venv/bin/activate
     $ pip install dp-tornado
-    $ python __init__.py
-
-
-## Requisites
-
-- [Python 3.x](https://www.python.org)
-- [Python 2.7](https://www.python.org)
-- [Minifier](https://www.npmjs.com/package/minifier) Minify CSS, Javascript
+    $ dp4p init --path app

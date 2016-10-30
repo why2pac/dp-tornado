@@ -49,6 +49,9 @@ class Logger(dpSingleton):
     def debug(self, msg, *args, **kwargs):
         logging.debug(self.strip(msg), *args, **kwargs)
 
+    def log(self, level, msg, *args, **kwargs):
+        logging.log(level, self.strip(msg), *args, **kwargs)
+
     def delegate_interrupt(self):
         if self.delegate_handler:
             self.delegate_queue.put(False)

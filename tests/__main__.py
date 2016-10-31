@@ -30,6 +30,12 @@ def run(main):
 
     test_controller.prefix()
 
+    from . import test_handler
+
+    test_handler.exception_before()
+    test_handler.exception_raise()
+    test_handler.exception_after()
+
     from . import test_helper
 
     test_helper.datetime()

@@ -80,6 +80,28 @@ class CliHandler(dpEngine):
 
             self.logging.info('Result : Succeed')
 
+        elif self.args.action == 'start':
+            init_path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
+            init_py = init_path
+            executable = True
+
+            if self.helper.io.path.is_dir(init_py):
+                init_py = '%s/__init__.py' % init_py
+
+            self.logging.info('Path   : %s' % init_py)
+
+            if not self.helper.io.path.is_file(init_py):
+                executable = False
+
+            self.logging.info('Status : %s' % ('Executable' if executable else 'Not Executable'))
+
+            self.logging.info('---------------------------------')
+
+            # TODO
+
+            self.logging.info('---------------------------------')
+            self.logging.info('Result : Not implemented action')
+
         else:
             self.logging.info('Result : Not implemented action')
 

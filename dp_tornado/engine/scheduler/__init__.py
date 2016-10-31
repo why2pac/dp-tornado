@@ -131,6 +131,10 @@ class Scheduler(threading.Thread, dpEngine):
 
     def request(self, payload):
         def handle_response(o):
+            if o.reason != 'OK':
+                payload['ref'] -= 1
+                payload['enabled'] = True
+
             payload['busy'] = False
 
         url = '%s/%s' % (self.request_host, payload['command'])

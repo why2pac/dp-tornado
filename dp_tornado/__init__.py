@@ -55,6 +55,8 @@ class Bootstrap(object):
         custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
 
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
+        engine_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'engine')
+        engine_static_path = os.path.join(engine_path, 'static')
 
         os.environ['DP_APPLICATION_PATH'] = application_path
         os.environ['DP_APPLICATION_INI'] = custom_config_file
@@ -67,6 +69,7 @@ class Bootstrap(object):
 
         services_raw = [
             (r"/dp/scheduler/(.*)", 'dp_tornado.engine.scheduler_handler.SchedulerHandler'),
+            (r"/dp/(.*)", 'dp_tornado.engine.static_handler.StaticHandler', {'path': engine_static_path}),
             (r"/", None),
             (r"/(.*)", None),
         ]
@@ -97,7 +100,7 @@ class Bootstrap(object):
                 module_path = 'controller'
                 handler = default_handler
 
-            services.append((service[0], handler, dict(prefix=module_path)))
+            services.append((service[0], handler, dict(prefix=module_path) if len(service) < 3 else service[2]))
 
         # Clear combined files
         Compressor.clear(settings['combined_static_path'])

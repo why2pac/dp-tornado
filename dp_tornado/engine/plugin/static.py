@@ -56,8 +56,10 @@ class Compressor(dpEngine):
 
         return True
 
-    def compress(self, path, files, ext, tempname):
+    def compress(self, path, files, ext, tempname, dp_static=False):
         try:
+            path = path if not dp_static else self.handler.vars.static.path_dp
+
             if ext == 'js':
                 commands = self._commands(path, files, ext, tempname)
                 subprocess.check_output(commands)
@@ -120,6 +122,12 @@ class StaticURL(tornado.web.UIModule):
             self.handler.vars.static.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
             self.handler.vars.static.cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
 
+            path_dp = self.handler.helper.io.path.dirname(__file__)  # engine/plugin
+            path_dp = self.handler.helper.io.path.dirname(path_dp)  # engine
+            path_dp = self.handler.helper.io.path.join(path_dp, 'static')  # engine/static
+
+            self.handler.vars.static.path_dp = path_dp
+
             self.handler.vars.static.aws_id = self.handler.ini.static.aws_id
             self.handler.vars.static.aws_secret = self.handler.ini.static.aws_secret
             self.handler.vars.static.aws_bucket = self.handler.ini.static.aws_bucket
@@ -131,6 +139,8 @@ class StaticURL(tornado.web.UIModule):
                                                                self.handler.vars.static.aws_bucket and
                                                                self.handler.vars.static.aws_region and
                                                                self.handler.vars.static.aws_endpoint) else False
+
+        dp_static = True if 'dp' in options and options['dp'] else False
 
         explicit = None
         explicit = 'debug' if 'debug' in options and options['debug'] else explicit
@@ -149,10 +159,11 @@ class StaticURL(tornado.web.UIModule):
         # for Debugging Mode, do not minify css or js.
         if explicit == 'debug' or (not explicit and self.handler.settings.get('debug')):
             mtime = self.handler.vars.compressor.helper.datetime.timestamp.now(ms=True)
-            return '\n'.join([self._template('%s?%s' % (t, mtime)) for t in statics])
+            return '\n'.join([self._template('%s?%s' % (t, mtime), dp_static=dp_static) for t in statics])
 
         elif explicit == 'skip' or (not explicit and (not self.handler.vars.static.minify or explicit_proxy)):
-            return '\n'.join([self._template('%s?%s' % (t, self.handler.application.startup_at)) for t in statics])
+            return '\n'.join([self._template(
+                '%s?%s' % (t, self.handler.application.startup_at), dp_static=dp_static) for t in statics])
 
         cache_key = 'key_%s_%s' % (explicit, self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))
         prepared = (self.handler.vars.static.prepared.__getattr__(cache_key) or
@@ -181,7 +192,7 @@ class StaticURL(tornado.web.UIModule):
             else:
                 statics = list(extensions.values())[0]
 
-        template = self._template(statics[0], replaced=False)
+        template = self._template(statics[0], replaced=False, dp_static=dp_static)
         ext = statics[0].split('.')[-1].lower()
 
         if not template:
@@ -212,7 +223,8 @@ class StaticURL(tornado.web.UIModule):
             tempname = output.name
             output.close()
 
-        compressed = self.handler.vars.compressor.compress(self.handler.vars.static.path, statics, ext, tempname)
+        compressed = self.handler.vars.compressor.compress(
+            self.handler.vars.static.path, statics, ext, tempname, dp_static=dp_static)
 
         # If failed compression.
         if not compressed:
@@ -260,10 +272,14 @@ class StaticURL(tornado.web.UIModule):
 
         return prepared
 
-    def _template(self, path, replaced=True):
+    def _template(self, path, replaced=True, dp_static=False):
         if replaced:
+            prefix = self.handler.vars.static.prefix if not dp_static else '/dp/'
+            prefix = prefix if prefix.endswith('/') else '%s/' % prefix
+
             path = path[1:] if path.startswith('/') else path
-            url = self.handler.vars.compressor.helper.web.url.join(self.handler.vars.static.prefix, path)
+            url = self.handler.vars.compressor.helper.web.url.join(prefix, path)
+
             return self._template(path, replaced=False) % {'url': url}
 
         extension = path.split('?')[0].split('.')[-1].lower()

@@ -20,6 +20,7 @@ class Logger(dpSingleton):
 
         self.engine = engine
 
+        self.delegate_queue = None
         self.delegate_handler = None
 
     def set_delegate_handler(self, handler=None):
@@ -46,7 +47,7 @@ class Logger(dpSingleton):
         msg = self.strip(str(exception), True)
         tb = traceback.format_exc()
 
-        if self.delegate_handler:
+        if self.delegate_handler and self.delegate_queue:
             self.delegate_queue.put((logging.ERROR, msg, tb))
 
         logging.exception(msg, *args, **kwargs)

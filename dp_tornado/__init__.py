@@ -16,9 +16,6 @@ import tornado.web
 import tornado.ioloop
 import tornado.httpserver
 
-import logging
-import logging.handlers
-
 import time
 import os
 import multiprocessing

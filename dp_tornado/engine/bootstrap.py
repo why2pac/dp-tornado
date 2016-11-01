@@ -140,6 +140,7 @@ class Bootstrap(object):
         if exception_delegate:
             try:
                 exception_delegate = eval('engine.%s' % exception_delegate)
+                engine.logger.set_delegate_handler(exception_delegate)
             except AttributeError:
                 logging.error('The specified exception delegate is invalid.')
                 exception_delegate = None

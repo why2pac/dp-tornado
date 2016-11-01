@@ -70,8 +70,12 @@ class Bootstrap(object):
         return parser.parse_args()
 
     @staticmethod
-    def init_ini(application_path, ini_file):
+    def init_ini(application_path, ini_file, as_cli=False):
         args = Bootstrap.init_args()
+
+        if as_cli:
+            engine.ini.server.set('num_processes', 0)
+            engine.ini.server.set('debug', False)
 
         combined_path = engine.ini.static.get('path', default='combined')
         static_prefix = engine.ini.static.get('prefix', default='/s/')

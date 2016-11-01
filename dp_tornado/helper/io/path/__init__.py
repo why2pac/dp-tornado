@@ -10,6 +10,9 @@ class PathHelper(dpHelper):
     def join(self, path, *paths):
         return os.path.join(path, *paths)
 
+    def split(self, path):
+        return os.path.split(path)
+
     def mkdir(self, path, mode=None):
         if self.is_file(path):
             path = self.dirname(path)
@@ -40,6 +43,9 @@ class PathHelper(dpHelper):
 
     def dirname(self, path):
         return os.path.dirname(path)
+
+    def cwd(self):
+        return os.getcwd()
 
     def ext(self, path, dot='.'):
         ext = os.path.splitext(path)[-1]

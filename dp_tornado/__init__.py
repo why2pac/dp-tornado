@@ -50,6 +50,8 @@ class RestfulApplication(tornado.web.Application):
 
 class Bootstrap(object):
     def run(self, **kwargs):
+        as_cli = True if 'as_cli' in kwargs and kwargs['as_cli'] else False
+
         custom_scheduler = kwargs['scheduler'] if 'scheduler' in kwargs else None
         custom_service = kwargs['service'] if 'service' in kwargs else None
         custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
@@ -61,7 +63,8 @@ class Bootstrap(object):
         os.environ['DP_APPLICATION_PATH'] = application_path
         os.environ['DP_APPLICATION_INI'] = custom_config_file
 
-        settings = EngineBootstrap.init_ini(application_path=application_path, ini_file=custom_config_file)
+        settings = EngineBootstrap.init_ini(
+            application_path=application_path, ini_file=custom_config_file, as_cli=as_cli)
 
         engine.logger.log(100, '---------------------------------')
         engine.logger.log(100, 'dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))

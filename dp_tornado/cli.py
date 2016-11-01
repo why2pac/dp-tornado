@@ -12,7 +12,7 @@ class CliHandler(dpEngine):
 
         parser = argparse.ArgumentParser()
 
-        actions = ['init', 'start', 'stop', 'restart']
+        actions = ['init', 'run']
 
         sub_parser = parser.add_subparsers(dest='action')
 
@@ -27,61 +27,121 @@ class CliHandler(dpEngine):
 
         self.parser = parser
         self.args = parser.parse_args()
-
-        import os
-
-        self.cwd = os.getcwd()
+        self.cwd = self.helper.io.path.cwd()
 
     def main(self):
-        self.logging.info('---------------------------------')
-        self.logging.info('dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
-        self.logging.info('---------------------------------')
-        self.logging.info('Mode   : %s' % self.args.action)
+        self.logging.info('------------------------')
+        self.logging.info('* dp for Python v%s' % '.'.join([str(e) for e in __version_info__]))
+        self.logging.info('------------------------')
 
         if self.args.action == 'init':
-            init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
-            installable = True
+            self.command_init()
 
-            self.logging.info('Path   : %s' % init_dir)
+        elif self.args.action == 'run':
+            self.command_run()
 
-            if self.helper.io.path.is_dir(init_dir):
-                if len(self.helper.io.path.browse(init_dir)) > 0:
-                    status = 'Not Empty'
-                    installable = False
-                else:
-                    status = 'Empty'
+    def command_init(self):
+        init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
+        installable = True
 
-            elif self.helper.io.path.is_file(init_dir):
-                status = 'File'
+        if init_dir.endswith('__init__.py'):
+            init_dir = self.helper.io.path.dirname(init_dir)
+
+        self.logging.info('* Initializing app .. %s' % init_dir)
+
+        if self.helper.io.path.is_dir(init_dir):
+            if len(self.helper.io.path.browse(init_dir)) > 0:
+                status = 'Not Empty'
                 installable = False
-
             else:
-                self.helper.io.path.mkdir(init_dir)
+                status = 'Empty'
 
-                if not self.helper.io.path.is_dir(init_dir):
-                    status = 'Permission Denied'
-                    installable = False
-                else:
-                    status = 'Empty'
-
-            self.logging.info('Status : %s' % status)
-
-            if not installable:
-                self.logging.info('Result : Failed')
-                return
-
-            engine_path = self.helper.io.path.dirname(__file__)
-            application_path = init_dir
-
-            # template initialization.
-            if not EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path):
-                self.logging.info('Result : Failed')
-                return
-
-            self.logging.info('Result : Succeed')
+        elif self.helper.io.path.is_file(init_dir):
+            status = 'File'
+            installable = False
 
         else:
-            self.logging.info('Result : Not implemented action')
+            self.helper.io.path.mkdir(init_dir)
+
+            if not self.helper.io.path.is_dir(init_dir):
+                status = 'Permission Denied'
+                installable = False
+            else:
+                status = 'Empty'
+
+        if not installable:
+            self.logging.info('* Initialization failed, %s' % status)
+            return
+
+        engine_path = self.helper.io.path.dirname(__file__)
+        application_path = init_dir
+
+        # template initialization.
+        if not EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path):
+            self.logging.info('* Initialization failed.')
+            return
+
+        self.logging.info('* Initialization succeed.')
+
+    def command_run(self):
+        init_path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
+        init_path = init_path[:-1] if init_path.endswith('/') else init_path
+        init_py = init_path
+        executable = True
+
+        if self.helper.io.path.is_dir(init_py):
+            init_py = '%s/__init__.py' % init_py
+
+        self.logging.info('* Running app .. %s' % init_py)
+
+        if not self.helper.io.path.is_file(init_py):
+            executable = False
+
+        if not executable:
+            self.logging.info('* Running failed, Not executable path.')
+            return
+
+        modules = []
+        dirpath = init_path
+
+        while True:
+            dirpath, module = self.helper.io.path.split(dirpath)
+            modules.append(module)
+
+            if not self.helper.io.path.is_file(self.helper.io.path.join(dirpath, '__init__.py')):
+                break
+
+        app_module = '.'.join(modules[::-1])
+
+        self.helper.io.path.sys.insert(0, dirpath)
+        self.helper.io.path.sys.insert(1, init_path)
+
+        import sys
+
+        __import__(app_module)
+        app = sys.modules[app_module] if app_module in sys.modules else None
+        app_run = getattr(app, 'run', None) if app else None
+
+        if not app_run:
+            self.logging.info('* Running failed, Invalid app.')
+            return
+
+        sys.argv.pop(1)
+
+        argv_path = sys.argv.index('--path') if '--path' in sys.argv else -1
+
+        if argv_path >= 0:
+            sys.argv.pop(argv_path)
+            sys.argv.pop(argv_path)
+
+        try:
+            app_run(True)
+
+        except KeyboardInterrupt:
+            pass
+
+        except Exception as e:
+            self.logging.exception(e)
 
 
 cli = CliHandler()

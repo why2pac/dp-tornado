@@ -19,9 +19,12 @@ class Logger(dpSingleton):
         logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
 
         self.engine = engine
-        self.delegate_handler = self.engine.ini.logging.exception_delegate
+        self.delegate_handler = None
 
-        if self.delegate_handler:
+    def set_delegate_handler(self, handler=None):
+        self.delegate_handler = handler or self.engine.ini.logging.exception_delegate
+
+        if self.delegate_handler and not getattr(self, 'delegate', None):
             self.delegate_queue = queue.Queue()
             self.delegate = LoggerDelegate(self)
             self.delegate.start()

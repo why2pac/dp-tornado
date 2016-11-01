@@ -25,6 +25,7 @@ class Logger(dpSingleton):
     def set_delegate_handler(self, handler=None):
         self.delegate_handler = handler or self.engine.ini.logging.exception_delegate
 
+    def start_handler(self):
         if self.delegate_handler and not getattr(self, 'delegate', None):
             self.delegate_queue = queue.Queue()
             self.delegate = LoggerDelegate(self)
@@ -36,8 +37,7 @@ class Logger(dpSingleton):
         if not delegate:
             return
 
-        delegate.interrupted = True
-        self.delegate_queue.put(False)
+        self.delegate_interrupt()
 
     def strip(self, msg, strip=False):
         return msg.strip() if strip else msg
@@ -69,6 +69,7 @@ class Logger(dpSingleton):
 
     def delegate_interrupt(self):
         if self.delegate_handler:
+            self.delegate.interrupted = True
             self.delegate_queue.put(False)
 
     def set_level(self, logger_name, level):

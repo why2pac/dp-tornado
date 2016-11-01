@@ -132,13 +132,17 @@ class Bootstrap(object):
         import random
         application.identifier = random.randint(100000, 999999)
 
+        engine.logger.start_handler()
+
         try:
             instance = tornado.ioloop.IOLoop.instance()
             instance.__setattr__('startup_at', getattr(application, 'startup_at'))
             instance.start()
 
         except KeyboardInterrupt:
-            if scheduler:
-                scheduler.interrupt()
+            pass
 
-            engine.logger.interrupt()
+        if scheduler:
+            scheduler.interrupt()
+
+        engine.logger.interrupt()

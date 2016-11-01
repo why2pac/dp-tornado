@@ -30,10 +30,9 @@ class CliHandler(dpEngine):
         self.cwd = self.helper.io.path.cwd()
 
     def main(self):
-        self.logging.info('---------------------------------')
-        self.logging.info('dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
-        self.logging.info('---------------------------------')
-        self.logging.info('Mode   : %s' % self.args.action)
+        self.logging.info('------------------------')
+        self.logging.info('* dp for Python v%s' % '.'.join([str(e) for e in __version_info__]))
+        self.logging.info('------------------------')
 
         if self.args.action == 'init':
             self.command_init()
@@ -41,16 +40,14 @@ class CliHandler(dpEngine):
         elif self.args.action == 'run':
             self.command_run()
 
-        else:
-            self.logging.info('Result : Not implemented action')
-
-        self.logging.info('---------------------------------')
-
     def command_init(self):
         init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
         installable = True
 
-        self.logging.info('Path   : %s' % init_dir)
+        if init_dir.endswith('__init__.py'):
+            init_dir = self.helper.io.path.dirname(init_dir)
+
+        self.logging.info('* Initializing app .. %s' % init_dir)
 
         if self.helper.io.path.is_dir(init_dir):
             if len(self.helper.io.path.browse(init_dir)) > 0:
@@ -72,10 +69,8 @@ class CliHandler(dpEngine):
             else:
                 status = 'Empty'
 
-        self.logging.info('Status : %s' % status)
-
         if not installable:
-            self.logging.info('Result : Failed')
+            self.logging.info('* Initialization failed, %s' % status)
             return
 
         engine_path = self.helper.io.path.dirname(__file__)
@@ -83,10 +78,10 @@ class CliHandler(dpEngine):
 
         # template initialization.
         if not EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path):
-            self.logging.info('Result : Failed')
+            self.logging.info('* Initialization failed.')
             return
 
-        self.logging.info('Result : Succeed')
+        self.logging.info('* Initialization succeed.')
 
     def command_run(self):
         init_path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
@@ -97,15 +92,13 @@ class CliHandler(dpEngine):
         if self.helper.io.path.is_dir(init_py):
             init_py = '%s/__init__.py' % init_py
 
-        self.logging.info('Path   : %s' % init_py)
+        self.logging.info('* Running app .. %s' % init_py)
 
         if not self.helper.io.path.is_file(init_py):
             executable = False
 
-        self.logging.info('Status : %s' % ('Executable' if executable else 'Not Executable'))
-
         if not executable:
-            self.logging.info('Result : Not executable path')
+            self.logging.info('* Running failed, Not executable path.')
             return
 
         modules = []
@@ -130,7 +123,7 @@ class CliHandler(dpEngine):
         app_run = getattr(app, 'run', None) if app else None
 
         if not app_run:
-            self.logging.info('Result : Invalid execution path')
+            self.logging.info('* Running failed, Invalid app.')
             return
 
         sys.argv.pop(1)

@@ -119,7 +119,7 @@ setup(
         'pytz==2016.7',
         'pycrypto==2.6.1',
         'boto3==1.4.1',
-        'SQLAlchemy==1.1.2',
+        'SQLAlchemy==1.1.3',
         'futures==3.0.5',
         'Pillow==3.4.2',
         'validate_email==1.3',

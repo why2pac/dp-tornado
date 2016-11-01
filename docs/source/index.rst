@@ -5,11 +5,11 @@ dp-tornado
 
 MVC Web Application Framework with Tornado, Python 2 and 3
 
-To install the package run:
+To install the package run::
 
     $ pip install dp-tornado
 
-##Run
+Run::
 
     $ pip install virtualenv
     $ virtualenv ./venv

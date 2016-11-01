@@ -19,6 +19,7 @@ class Logger(dpSingleton):
         logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
 
         self.engine = engine
+
         self.delegate_handler = None
 
     def set_delegate_handler(self, handler=None):
@@ -28,6 +29,15 @@ class Logger(dpSingleton):
             self.delegate_queue = queue.Queue()
             self.delegate = LoggerDelegate(self)
             self.delegate.start()
+
+    def interrupt(self):
+        delegate = getattr(self, 'delegate', None)
+
+        if not delegate:
+            return
+
+        delegate.interrupted = True
+        self.delegate_queue.put(False)
 
     def strip(self, msg, strip=False):
         return msg.strip() if strip else msg
@@ -87,11 +97,13 @@ class Logger(dpSingleton):
 
 class LoggerDelegate(threading.Thread):
     def __init__(self, logger):
-        threading.Thread.__init__(self)
+        self.interrupted = False
         self.logger = logger
 
+        threading.Thread.__init__(self)
+
     def run(self):
-        while True:
+        while not self.interrupted:
             payload = self.logger.delegate_queue.get()
 
             if not payload:

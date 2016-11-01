@@ -70,6 +70,9 @@ class Scheduler(threading.Thread, dpEngine):
 
         threading.Thread.__init__(self)
 
+    def interrupt(self):
+        self.interrupted = True
+
     def run(self):
         if not self.schedules:
             return

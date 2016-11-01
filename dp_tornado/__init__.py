@@ -139,4 +139,6 @@ class Bootstrap(object):
 
         except KeyboardInterrupt:
             if scheduler:
-                scheduler.interrupted = True
+                scheduler.interrupt()
+
+            engine.logger.interrupt()

@@ -29,8 +29,10 @@ class CliHandler(dpEngine):
 
         for e in self.args.options:
             if not self.args.path:
-                if self.helper.io.path.is_dir(self.helper.io.path.join(self.cwd, e)) or \
-                        self.helper.io.path.is_file(self.helper.io.path.join(self.cwd, e)):
+                path = self.helper.io.path.join(self.cwd, e)
+                
+                if self.helper.io.path.is_file(path) or \
+                        (self.helper.io.path.mkdir(path) and self.helper.io.path.is_dir(path)):
                     self.args.path = e
 
         if self.args.action and self.args.action[0] == 'init':

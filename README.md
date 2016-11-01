@@ -18,4 +18,11 @@ To install the package run:
     $ virtualenv ./venv
     $ . ./venv/bin/activate
     $ pip install dp-tornado
-    $ dp4p init --path app
+    
+    $ dp4p init app_dir
+    $ dp4p run app_dir
+    
+    or
+    
+    $ dp4p init --path app_dir
+    $ dp4p run --path app_dir

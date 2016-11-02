@@ -13,17 +13,34 @@ To install the package run:
     pip install dp-tornado
     
     
-## Run
+## Environment Setup
+
+Virtualenv:
 
     $ pip install virtualenv
     $ virtualenv ./venv
     $ . ./venv/bin/activate
+    
+Install dp-tornado:
+
     $ pip install dp-tornado
+
+
+## Run
+    
+Startup:
     
     $ dp4p init app_dir
     $ dp4p run app_dir
     
-    or
+or:
     
     $ dp4p init --path app_dir
     $ dp4p run --path app_dir
+    
+or:
+    
+    $ mkdir app_dir
+    $ cd app_dir
+    $ dp4p init
+    $ dp4p run

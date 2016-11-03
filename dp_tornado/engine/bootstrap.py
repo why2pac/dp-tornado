@@ -14,7 +14,7 @@ engine = dpEngineSingleton()
 
 class Bootstrap(object):
     @staticmethod
-    def init_template(engine_path, application_path):
+    def init_template(engine_path, application_path, template_name):
         valid = True
 
         for e in ('config', 'controller', 'model', 'helper'):
@@ -29,7 +29,10 @@ class Bootstrap(object):
         else:
             import shutil
 
-            template_path = os.path.join(engine_path, 'engine', 'template')
+            template_path = os.path.join(engine_path, 'engine', 'template', template_name)
+
+            if not os.path.isdir(template_path):
+                return False
 
             for root, dirs, files in os.walk(template_path):
                 path = root[len(template_path)+1:]

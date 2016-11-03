@@ -8,3 +8,7 @@
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. toctree::
+
+   path/sys

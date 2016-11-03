@@ -16,9 +16,6 @@ import tornado.web
 import tornado.ioloop
 import tornado.httpserver
 
-import logging
-import logging.handlers
-
 import time
 import os
 import multiprocessing
@@ -135,11 +132,17 @@ class Bootstrap(object):
         import random
         application.identifier = random.randint(100000, 999999)
 
+        engine.logger.start_handler()
+
         try:
             instance = tornado.ioloop.IOLoop.instance()
             instance.__setattr__('startup_at', getattr(application, 'startup_at'))
             instance.start()
 
         except KeyboardInterrupt:
-            if scheduler:
-                scheduler.interrupted = True
+            pass
+
+        if scheduler:
+            scheduler.interrupt()
+
+        engine.logger.interrupt()

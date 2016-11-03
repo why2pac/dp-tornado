@@ -12,18 +12,11 @@ class CliHandler(dpEngine):
 
         parser = argparse.ArgumentParser()
 
-        actions = ['init', 'run']
-
-        sub_parser = parser.add_subparsers(dest='action')
-
-        for action in actions:
-            sub_parser.add_parser(action)
-
-            sub_action_parser = sub_parser.add_parser(action)
-
-            sub_action_parser.add_argument('--identifier', help='Identifier')
-            sub_action_parser.add_argument('--path', help='App Path')
-            sub_action_parser.add_argument('--port', type=int, help='Binding port')
+        parser.add_argument('action', nargs=1)
+        parser.add_argument('options', nargs='*')
+        parser.add_argument('--identifier', help='Identifier')
+        parser.add_argument('--path', help='App Path')
+        parser.add_argument('--port', type=int, help='Binding port')
 
         self.parser = parser
         self.args = parser.parse_args()
@@ -34,11 +27,22 @@ class CliHandler(dpEngine):
         self.logging.info('* dp for Python v%s' % '.'.join([str(e) for e in __version_info__]))
         self.logging.info('------------------------')
 
-        if self.args.action == 'init':
+        for e in self.args.options:
+            if not self.args.path:
+                path = self.helper.io.path.join(self.cwd, e)
+                
+                if self.helper.io.path.is_file(path) or \
+                        (self.helper.io.path.mkdir(path) and self.helper.io.path.is_dir(path)):
+                    self.args.path = e
+
+        if self.args.action and self.args.action[0] == 'init':
             self.command_init()
 
-        elif self.args.action == 'run':
+        elif self.args.action and self.args.action[0] == 'run':
             self.command_run()
+
+        else:
+            self.logging.info('* dp4p finished, unrecognized action.')
 
     def command_init(self):
         init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
@@ -50,7 +54,10 @@ class CliHandler(dpEngine):
         self.logging.info('* Initializing app .. %s' % init_dir)
 
         if self.helper.io.path.is_dir(init_dir):
-            if len(self.helper.io.path.browse(init_dir)) > 0:
+            browse = self.helper.io.path.browse(init_dir)
+            browse = [e for e in browse if not self.helper.io.path.split(e)[1].startswith('.')]
+
+            if len(browse) > 0:
                 status = 'Not Empty'
                 installable = False
             else:
@@ -86,6 +93,10 @@ class CliHandler(dpEngine):
     def command_run(self):
         init_path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
         init_path = init_path[:-1] if init_path.endswith('/') else init_path
+
+        if init_path.endswith('__init__.py'):
+            init_path = self.helper.io.path.dirname(init_path)
+
         init_py = init_path
         executable = True
 
@@ -126,7 +137,8 @@ class CliHandler(dpEngine):
             self.logging.info('* Running failed, Invalid app.')
             return
 
-        sys.argv.pop(1)
+        for i in range(len(self.args.options) + 1):
+            sys.argv.pop(1)
 
         argv_path = sys.argv.index('--path') if '--path' in sys.argv else -1
 

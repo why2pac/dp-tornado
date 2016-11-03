@@ -70,6 +70,9 @@ class Scheduler(threading.Thread, dpEngine):
 
         threading.Thread.__init__(self)
 
+    def interrupt(self):
+        self.interrupted = True
+
     def run(self):
         if not self.schedules:
             return
@@ -135,8 +138,8 @@ class Scheduler(threading.Thread, dpEngine):
                 payload['ref'] -= 1
                 payload['enabled'] = True
 
-            payload['busy'] = False
-
         url = '%s/%s' % (self.request_host, payload['command'])
         http_client = tornado.httpclient.AsyncHTTPClient()
         http_client.fetch(url, handle_response)
+
+        payload['busy'] = False

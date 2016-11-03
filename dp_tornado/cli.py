@@ -54,7 +54,10 @@ class CliHandler(dpEngine):
         self.logging.info('* Initializing app .. %s' % init_dir)
 
         if self.helper.io.path.is_dir(init_dir):
-            if len(self.helper.io.path.browse(init_dir)) > 0:
+            browse = self.helper.io.path.browse(init_dir)
+            browse = [e for e in browse if not self.helper.io.path.split(e)[1].startswith('.')]
+
+            if len(browse) > 0:
                 status = 'Not Empty'
                 installable = False
             else:

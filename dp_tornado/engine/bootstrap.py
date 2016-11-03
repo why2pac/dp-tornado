@@ -7,6 +7,7 @@ import logging
 
 from dp_tornado.engine.static_handler import StaticHandler
 from dp_tornado.engine.engine import EngineSingleton as dpEngineSingleton
+from dp_tornado.version import __version__
 
 
 engine = dpEngineSingleton()
@@ -53,6 +54,10 @@ class Bootstrap(object):
                             continue
 
                         shutil.copy(src, dest)
+
+            # default requirements.txt file.
+            with open(os.path.join(application_path, 'requirements.txt'), 'w') as fp:
+                fp.write('dp-tornado==%s' % __version__)
 
             return True
 

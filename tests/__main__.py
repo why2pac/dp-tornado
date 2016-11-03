@@ -105,6 +105,7 @@ def run(main):
     from . import test_view_static
 
     test_view_static.dp()
+    test_view_static.dp_test()
 
     from . import test_scheduler
 

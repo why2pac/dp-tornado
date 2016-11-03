@@ -4,6 +4,6 @@
 from dp_tornado.engine.controller import Controller
 
 
-class TestController(Controller):
+class JsLibController(Controller):
     def get(self):
-        self.render('tests/view/static/dp_test.html')
+        self.render('tests/view/static/js_lib/test.html')

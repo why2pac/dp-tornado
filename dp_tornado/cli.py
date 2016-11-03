@@ -15,6 +15,7 @@ class CliHandler(dpEngine):
         parser.add_argument('action', nargs=1)
         parser.add_argument('options', nargs='*')
         parser.add_argument('--identifier', help='Identifier')
+        parser.add_argument('--template', help='Template Name', default='helloworld')
         parser.add_argument('--path', help='App Path')
         parser.add_argument('--port', type=int, help='Binding port')
 
@@ -84,7 +85,8 @@ class CliHandler(dpEngine):
         application_path = init_dir
 
         # template initialization.
-        if not EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path):
+        if not EngineBootstrap.init_template(
+                engine_path=engine_path, application_path=application_path, template_name=self.args.template):
             self.logging.info('* Initialization failed.')
             return
 
@@ -140,11 +142,12 @@ class CliHandler(dpEngine):
         for i in range(len(self.args.options) + 1):
             sys.argv.pop(1)
 
-        argv_path = sys.argv.index('--path') if '--path' in sys.argv else -1
+        for k in ('--path', '--template'):
+            argv_path = sys.argv.index(k) if k in sys.argv else -1
 
-        if argv_path >= 0:
-            sys.argv.pop(argv_path)
-            sys.argv.pop(argv_path)
+            if argv_path >= 0:
+                sys.argv.pop(argv_path)
+                sys.argv.pop(argv_path)
 
         try:
             app_run(True)

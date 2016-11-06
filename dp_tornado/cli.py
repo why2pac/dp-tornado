@@ -12,14 +12,21 @@ class CliHandler(dpEngine):
 
         parser = argparse.ArgumentParser()
 
-        parser.add_argument('action', nargs=1)
-        parser.add_argument('options', nargs='*')
-        parser.add_argument('--identifier', help='Identifier')
-        parser.add_argument('--path', help='App Path')
-        parser.add_argument('--port', type=int, help='Binding port')
+        args = [
+            ['action', {'nargs': 1}],
+            ['options', {'nargs': '*'}],
+            ['--identifier', {'help': 'Identifier'}],
+            ['--dryrun', {'help': 'Dryrun'}],
+            ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
+            ['--path', {'help': 'App Path'}],
+            ['--port', {'help': 'Binding port', 'type': int}]
+        ]
+
+        for e in args:
+            parser.add_argument(e[0], **e[1])
 
         self.parser = parser
-        self.args = parser.parse_args()
+        self.args, self.args_unknown = parser.parse_known_args()
         self.cwd = self.helper.io.path.cwd()
 
     def main(self):
@@ -30,7 +37,7 @@ class CliHandler(dpEngine):
         for e in self.args.options:
             if not self.args.path:
                 path = self.helper.io.path.join(self.cwd, e)
-                
+
                 if self.helper.io.path.is_file(path) or \
                         (self.helper.io.path.mkdir(path) and self.helper.io.path.is_dir(path)):
                     self.args.path = e
@@ -43,6 +50,13 @@ class CliHandler(dpEngine):
 
         else:
             self.logging.info('* dp4p finished, unrecognized action.')
+
+            import sys
+            self.logging.info('%s' % sys.argv)
+
+            return exit(1)
+
+        return exit(0)
 
     def command_init(self):
         init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
@@ -78,15 +92,16 @@ class CliHandler(dpEngine):
 
         if not installable:
             self.logging.info('* Initialization failed, %s' % status)
-            return
+            return exit(1)
 
         engine_path = self.helper.io.path.dirname(__file__)
         application_path = init_dir
 
         # template initialization.
-        if not EngineBootstrap.init_template(engine_path=engine_path, application_path=application_path):
+        if not EngineBootstrap.init_template(
+                engine_path=engine_path, application_path=application_path, template_name=self.args.template):
             self.logging.info('* Initialization failed.')
-            return
+            return exit(1)
 
         self.logging.info('* Initialization succeed.')
 
@@ -110,7 +125,7 @@ class CliHandler(dpEngine):
 
         if not executable:
             self.logging.info('* Running failed, Not executable path.')
-            return
+            return exit(1)
 
         modules = []
         dirpath = init_path
@@ -135,19 +150,13 @@ class CliHandler(dpEngine):
 
         if not app_run:
             self.logging.info('* Running failed, Invalid app.')
-            return
+            return exit(1)
 
         for i in range(len(self.args.options) + 1):
             sys.argv.pop(1)
 
-        argv_path = sys.argv.index('--path') if '--path' in sys.argv else -1
-
-        if argv_path >= 0:
-            sys.argv.pop(argv_path)
-            sys.argv.pop(argv_path)
-
         try:
-            app_run(True)
+            app_run(self)
 
         except KeyboardInterrupt:
             pass

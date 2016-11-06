@@ -47,7 +47,8 @@ class RestfulApplication(tornado.web.Application):
 
 class Bootstrap(object):
     def run(self, **kwargs):
-        as_cli = True if 'as_cli' in kwargs and kwargs['as_cli'] else False
+        as_cli = kwargs['as_cli'] if 'as_cli' in kwargs and kwargs['as_cli'] else False
+        dryrun = True if as_cli and as_cli.args.dryrun == 'yes' else False
 
         custom_scheduler = kwargs['scheduler'] if 'scheduler' in kwargs else None
         custom_service = kwargs['service'] if 'service' in kwargs else None
@@ -137,7 +138,9 @@ class Bootstrap(object):
         try:
             instance = tornado.ioloop.IOLoop.instance()
             instance.__setattr__('startup_at', getattr(application, 'startup_at'))
-            instance.start()
+
+            if not dryrun:
+                instance.start()
 
         except KeyboardInterrupt:
             pass

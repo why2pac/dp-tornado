@@ -3,9 +3,20 @@
 
 import tempfile
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageOps
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+
+try:
+    from PIL import ImageDraw
+except ImportError:
+    ImageDraw = None
+
+try:
+    from PIL import ImageOps
+except ImportError:
+    ImageOps = None
 
 from dp_tornado.engine.helper import Helper as dpHelper
 

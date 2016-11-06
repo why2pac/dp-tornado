@@ -7,6 +7,7 @@ import logging
 
 from dp_tornado.engine.static_handler import StaticHandler
 from dp_tornado.engine.engine import EngineSingleton as dpEngineSingleton
+from dp_tornado.version import __version__
 
 
 engine = dpEngineSingleton()
@@ -14,7 +15,7 @@ engine = dpEngineSingleton()
 
 class Bootstrap(object):
     @staticmethod
-    def init_template(engine_path, application_path):
+    def init_template(engine_path, application_path, template_name):
         valid = True
 
         for e in ('config', 'controller', 'model', 'helper'):
@@ -29,7 +30,10 @@ class Bootstrap(object):
         else:
             import shutil
 
-            template_path = os.path.join(engine_path, 'engine', 'template')
+            template_path = os.path.join(engine_path, 'engine', 'template', template_name)
+
+            if not os.path.isdir(template_path):
+                return False
 
             for root, dirs, files in os.walk(template_path):
                 path = root[len(template_path)+1:]
@@ -51,6 +55,10 @@ class Bootstrap(object):
 
                         shutil.copy(src, dest)
 
+            # default requirements.txt file.
+            with open(os.path.join(application_path, 'requirements.txt'), 'w') as fp:
+                fp.write('dp-tornado==%s' % __version__)
+
             return True
 
     @staticmethod
@@ -60,20 +68,31 @@ class Bootstrap(object):
         parser = argparse.ArgumentParser()
 
         parser.add_argument('--app-path', help='App Path')
-
-        parser.add_argument('--scheduler-path', help='Scheduler Path')
-        parser.add_argument('--scheduler-timeout', type=int, help='Scheduler Timeout')
+        parser.add_argument('--mode', help='Mode')
 
         parser.add_argument('-i', '--identifier', help='Identifier')
         parser.add_argument('-p', '--port', type=int, help='Binding port')
 
-        return parser.parse_args()
+        return parser.parse_known_args()
 
     @staticmethod
     def init_ini(application_path, ini_file, as_cli=False):
-        args = Bootstrap.init_args()
+        args, args_unkonwn = Bootstrap.init_args()
 
-        if as_cli:
+        # App Options
+
+        if args.mode:
+            engine.ini.app.set('mode', args.mode)
+
+        engine.ini.app.get('mode', default='debug')
+
+        # Specify Sandbox Mode
+        if (engine.ini.app.mode or '').lower() in ('debug', 'sandbox', 'test', 'dev', 'development', 'develop'):
+            engine.ini.server.set('num_processes', 1)
+            engine.ini.server.set('debug', True)
+
+        # Specify Production Mode
+        elif (engine.ini.app.mode or '').lower() in ('prod', 'production', 'real', 'service'):
             engine.ini.server.set('num_processes', 0)
             engine.ini.server.set('debug', False)
 

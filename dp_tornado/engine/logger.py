@@ -51,7 +51,6 @@ class Logger(dpSingleton):
             self.delegate_queue.put((logging.ERROR, msg, tb))
 
         logging.exception(msg, *args, **kwargs)
-        logging.exception(tb)
 
     def error(self, msg, *args, **kwargs):
         logging.error(self.strip(str(msg), True), *args, **kwargs)

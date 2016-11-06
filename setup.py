@@ -19,6 +19,7 @@ Run
 """
 
 
+import sys
 import logging
 
 
@@ -58,9 +59,8 @@ dp_maintainer_email = dp_author_email
 
 dp_description = 'MVC Web Application Framework with Tornado.'
 
-dp_requires_additional = []
-
-CyMySQL = 'CyMySQL==0.8.9'
+dp_requires_CyMySQL = 'CyMySQL==0.8.9'
+dp_requires_futres = 'futures==3.0.5'
 
 
 class CustomInstallCommand(install):
@@ -78,18 +78,16 @@ class CustomInstallCommand(install):
     def finalize_options(self):
         install.finalize_options(self)
 
-        if self.dp_without_mysql:
-            dp_requires_additional.remove(CyMySQL)
-
         dist = getattr(core, '_setup_distribution', None) if core else None
 
         if not dist:
             logging.warning('Aditional requires cannot installed.')
         else:
-            if dist.install_requires:
-                dist.install_requires += dp_requires_additional
-            else:
-                dist.install_requires = dp_requires_additional
+            if self.dp_without_mysql:
+                dist.install_requires.remove(dp_requires_CyMySQL)
+
+            if sys.version_info[0] >= 3:
+                dist.install_requires.remove(dp_requires_futres)
 
     def run(self):
         install.run(self)
@@ -111,7 +109,6 @@ setup(
     include_package_data=True,
     cmdclass={'install': CustomInstallCommand},
     install_requires=[
-        'argparse',
         'tornado==4.4.2',
         'redis==2.10.5',
         'requests==2.11.1',
@@ -120,14 +117,14 @@ setup(
         'pycrypto==2.6.1',
         'boto3==1.4.1',
         'SQLAlchemy==1.1.3',
-        'futures==3.0.5',
         'Pillow==3.4.2',
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
         'lxml==3.6.4',
         'httpagentparser==1.7.8',
         'validators==0.11.0',
-        CyMySQL
+        dp_requires_CyMySQL,
+        dp_requires_futres
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

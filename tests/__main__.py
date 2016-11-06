@@ -2,10 +2,28 @@
 
 
 def run(main):
+    from . import test_cli
+
+    test_cli.clear()
+
+    test_cli.init()
+    test_cli.init_with_path_option()
+    test_cli.init_not_empty()
+
+    test_cli.run_with_port()
+    test_cli.run_debug()
+    test_cli.run_production()
+
+    test_cli.clear()
+
     from . import server
 
     server.run_server(main)
     server.wait_server()
+
+    from . import test_config
+
+    test_config.config()
 
     from . import test_controller
 

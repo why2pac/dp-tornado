@@ -3,6 +3,21 @@
 
 def run(main):
     from . import server
+    from . import test_cli
+
+    server.stop_server()
+
+    test_cli.clear()
+
+    test_cli.init()
+    test_cli.init_with_path_option()
+    test_cli.init_not_empty()
+
+    test_cli.run_with_port()
+    test_cli.run_debug()
+    test_cli.run_production()
+
+    test_cli.clear()
 
     server.run_server(main)
     server.wait_server()

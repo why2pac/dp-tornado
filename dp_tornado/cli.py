@@ -37,7 +37,7 @@ class CliHandler(dpEngine):
         for e in self.args.options:
             if not self.args.path:
                 path = self.helper.io.path.join(self.cwd, e)
-                
+
                 if self.helper.io.path.is_file(path) or \
                         (self.helper.io.path.mkdir(path) and self.helper.io.path.is_dir(path)):
                     self.args.path = e
@@ -50,6 +50,13 @@ class CliHandler(dpEngine):
 
         else:
             self.logging.info('* dp4p finished, unrecognized action.')
+
+            import sys
+            self.logging.info('%s' % sys.argv)
+
+            return exit(1)
+
+        return exit(0)
 
     def command_init(self):
         init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
@@ -85,7 +92,7 @@ class CliHandler(dpEngine):
 
         if not installable:
             self.logging.info('* Initialization failed, %s' % status)
-            return
+            return exit(1)
 
         engine_path = self.helper.io.path.dirname(__file__)
         application_path = init_dir
@@ -94,7 +101,7 @@ class CliHandler(dpEngine):
         if not EngineBootstrap.init_template(
                 engine_path=engine_path, application_path=application_path, template_name=self.args.template):
             self.logging.info('* Initialization failed.')
-            return
+            return exit(1)
 
         self.logging.info('* Initialization succeed.')
 
@@ -118,7 +125,7 @@ class CliHandler(dpEngine):
 
         if not executable:
             self.logging.info('* Running failed, Not executable path.')
-            return
+            return exit(1)
 
         modules = []
         dirpath = init_path
@@ -143,13 +150,17 @@ class CliHandler(dpEngine):
 
         if not app_run:
             self.logging.info('* Running failed, Invalid app.')
-            return
+            return exit(1)
 
         for i in range(len(self.args.options) + 1):
             sys.argv.pop(1)
 
         if self.args.suicide == 'yes':
-            self.suicide_after_deply()
+            if self.args.identifier:
+                self.suicide_after_deply()
+            else:
+                self.logging.info('* Running failed, must use suicide option with identifier option.')
+                return exit(1)
 
         try:
             app_run(True)
@@ -163,6 +174,8 @@ class CliHandler(dpEngine):
     def suicide_after_deply(self):
         import threading
         import time
+        import subprocess
+        import sys
 
         class Suicider(threading.Thread):
             def __init__(self, that):
@@ -170,19 +183,33 @@ class CliHandler(dpEngine):
                 threading.Thread.__init__(self)
 
             def run(self):
-                while True:
+                executed = False
+
+                for _ in range(5):
                     time.sleep(0.5)
 
                     dest = 'http://127.0.0.1:%s/dp/scheduler/ping' % self.that.ini.server.port
                     code, res = self.that.helper.web.http.get.text(dest)
 
                     if res == 'pong':
+                        executed = True
                         break
 
                 import os
                 import signal
 
-                os.kill(os.getpid(), signal.SIGINT)
+                def server_pids():
+                    pids = subprocess.Popen(['pgrep', '-f', self.that.args.identifier], stdout=subprocess.PIPE)
+                    pids = pids.stdout.readlines()
+
+                    return [(e.decode('utf8') if sys.version_info[0] >= 3 else e).replace('\n', '') for e in
+                            (pids if pids else [])]
+
+                for _ in range(100):
+                    os.kill(os.getpid(), signal.SIGINT)
+
+                    for pid in server_pids():
+                        subprocess.Popen(['kill', '-9', pid])
 
         suicider = Suicider(self)
         suicider.start()

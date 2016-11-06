@@ -76,15 +76,15 @@ def init_with_path_option():
 
 
 def run_with_port():
-    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--suicide', 'yes'], 'Port : %s' % consts.dp_testing_port)
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port)
 
 
 def run_debug():
-    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'debug', '--suicide', 'yes'], 'Server Mode : Debugging')
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'debug', '--dryrun', 'yes'], 'Server Mode : Debugging')
 
 
 def run_production():
-    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'production', '--suicide', 'yes'], 'Server Mode : Production')
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'production', '--dryrun', 'yes'], 'Server Mode : Production')
 
 
 if __name__ == '__main__':

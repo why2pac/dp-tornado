@@ -2,10 +2,7 @@
 
 
 def run(main):
-    from . import server
     from . import test_cli
-
-    server.stop_server()
 
     test_cli.clear()
 
@@ -18,6 +15,8 @@ def run(main):
     test_cli.run_production()
 
     test_cli.clear()
+
+    from . import server
 
     server.run_server(main)
     server.wait_server()

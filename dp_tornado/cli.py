@@ -16,7 +16,7 @@ class CliHandler(dpEngine):
             ['action', {'nargs': 1}],
             ['options', {'nargs': '*'}],
             ['--identifier', {'help': 'Identifier'}],
-            ['--suicide', {'help': 'Suicide after deploy'}],
+            ['--dryrun', {'help': 'Dryrun'}],
             ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
             ['--path', {'help': 'App Path'}],
             ['--port', {'help': 'Binding port', 'type': int}]
@@ -155,64 +155,14 @@ class CliHandler(dpEngine):
         for i in range(len(self.args.options) + 1):
             sys.argv.pop(1)
 
-        if self.args.suicide == 'yes':
-            if self.args.identifier:
-                self.suicide_after_deply()
-            else:
-                self.logging.info('* Running failed, must use suicide option with identifier option.')
-                return exit(1)
-
         try:
-            app_run(True)
+            app_run(self)
 
         except KeyboardInterrupt:
             pass
 
         except Exception as e:
             self.logging.exception(e)
-
-    def suicide_after_deply(self):
-        import threading
-        import time
-        import subprocess
-        import sys
-
-        class Suicider(threading.Thread):
-            def __init__(self, that):
-                self.that = that
-                threading.Thread.__init__(self)
-
-            def run(self):
-                executed = False
-
-                for _ in range(5):
-                    time.sleep(0.5)
-
-                    dest = 'http://127.0.0.1:%s/dp/scheduler/ping' % self.that.ini.server.port
-                    code, res = self.that.helper.web.http.get.text(dest)
-
-                    if res == 'pong':
-                        executed = True
-                        break
-
-                import os
-                import signal
-
-                def server_pids():
-                    pids = subprocess.Popen(['pgrep', '-f', self.that.args.identifier], stdout=subprocess.PIPE)
-                    pids = pids.stdout.readlines()
-
-                    return [(e.decode('utf8') if sys.version_info[0] >= 3 else e).replace('\n', '') for e in
-                            (pids if pids else [])]
-
-                for _ in range(100):
-                    os.kill(os.getpid(), signal.SIGINT)
-
-                    for pid in server_pids():
-                        subprocess.Popen(['kill', '-9', pid])
-
-        suicider = Suicider(self)
-        suicider.start()
 
 
 cli = CliHandler()

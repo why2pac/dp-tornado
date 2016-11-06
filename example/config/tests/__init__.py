@@ -6,4 +6,5 @@ from dp_tornado.engine.config import Config
 
 class TestsConfig(Config):
     def index(self):
-        pass
+        self.production = True if self.ini.app.mode == 'production' else False
+        self.debug = True if self.ini.app.mode == 'debug' else False

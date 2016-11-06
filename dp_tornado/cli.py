@@ -16,6 +16,7 @@ class CliHandler(dpEngine):
             'action': {'nargs': 1},
             'options': {'nargs': '*'},
             '--identifier': {'help': 'Identifier'},
+            '--suicide': {'help': 'Suicide after deploy'},
             '--template': {'help': 'Template Name', 'default': 'helloworld'},
             '--path': {'help': 'App Path'},
             '--port': {'help': 'Binding port', 'type': int}
@@ -147,6 +148,9 @@ class CliHandler(dpEngine):
         for i in range(len(self.args.options) + 1):
             sys.argv.pop(1)
 
+        if self.args.suicide == 'yes':
+            self.suicide_after_deply()
+
         try:
             app_run(True)
 
@@ -155,6 +159,33 @@ class CliHandler(dpEngine):
 
         except Exception as e:
             self.logging.exception(e)
+
+    def suicide_after_deply(self):
+        import threading
+        import time
+
+        class Suicider(threading.Thread):
+            def __init__(self, that):
+                self.that = that
+                threading.Thread.__init__(self)
+
+            def run(self):
+                while True:
+                    time.sleep(0.5)
+
+                    dest = 'http://127.0.0.1:%s/dp/scheduler/ping' % self.that.ini.server.port
+                    code, res = self.that.helper.web.http.get.text(dest)
+
+                    if res == 'pong':
+                        break
+
+                import os
+                import signal
+
+                os.kill(os.getpid(), signal.SIGINT)
+
+        suicider = Suicider(self)
+        suicider.start()
 
 
 cli = CliHandler()

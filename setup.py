@@ -112,7 +112,7 @@ setup(
         'tornado==4.4.2',
         'redis==2.10.5',
         'requests==2.11.1',
-        'croniter==0.3.12',
+        'croniter==0.3.13',
         'pytz==2016.7',
         'pycrypto==2.6.1',
         'boto3==1.4.1',

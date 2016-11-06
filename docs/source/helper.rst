@@ -12,6 +12,7 @@ Helper
    helper/misc
    helper/numeric
    helper/security
+   helper/serialization
    helper/string
    helper/validator
    helper/web

@@ -68,20 +68,31 @@ class Bootstrap(object):
         parser = argparse.ArgumentParser()
 
         parser.add_argument('--app-path', help='App Path')
-
-        parser.add_argument('--scheduler-path', help='Scheduler Path')
-        parser.add_argument('--scheduler-timeout', type=int, help='Scheduler Timeout')
+        parser.add_argument('--mode', help='Mode')
 
         parser.add_argument('-i', '--identifier', help='Identifier')
         parser.add_argument('-p', '--port', type=int, help='Binding port')
 
-        return parser.parse_args()
+        return parser.parse_known_args()
 
     @staticmethod
     def init_ini(application_path, ini_file, as_cli=False):
-        args = Bootstrap.init_args()
+        args, args_unkonwn = Bootstrap.init_args()
 
-        if as_cli:
+        # App Options
+
+        if args.mode:
+            engine.ini.app.set('mode', args.mode)
+
+        engine.ini.app.get('mode', default='debug')
+
+        # Specify Sandbox Mode
+        if (engine.ini.app.mode or '').lower() in ('debug', 'sandbox', 'test', 'dev', 'development', 'develop'):
+            engine.ini.server.set('num_processes', 1)
+            engine.ini.server.set('debug', True)
+
+        # Specify Production Mode
+        elif (engine.ini.app.mode or '').lower() in ('prod', 'production', 'real', 'service'):
             engine.ini.server.set('num_processes', 0)
             engine.ini.server.set('debug', False)
 

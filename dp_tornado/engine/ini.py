@@ -28,7 +28,7 @@ class IniSection(object):
         self.__dict__['_options'][key] = value
 
     def get(self, key, default=None):
-        if key in self._options:
+        if key in self.__dict__['_options']:
             return self.__dict__['_options'][key]
 
         got = self.__dict__['_parser'].get(section=self._section, key=key, default=default)

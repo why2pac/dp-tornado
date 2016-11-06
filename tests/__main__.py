@@ -7,6 +7,10 @@ def run(main):
     server.run_server(main)
     server.wait_server()
 
+    from . import test_config
+
+    test_config.config()
+
     from . import test_controller
 
     test_controller.get()

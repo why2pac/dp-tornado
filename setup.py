@@ -104,7 +104,6 @@ setup(
     include_package_data=True,
     cmdclass={'install': CustomInstallCommand},
     install_requires=[
-        'argparse',
         'tornado==4.4.2',
         'redis==2.10.5',
         'requests==2.11.1',

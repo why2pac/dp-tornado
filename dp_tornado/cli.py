@@ -12,18 +12,18 @@ class CliHandler(dpEngine):
 
         parser = argparse.ArgumentParser()
 
-        args = {
-            'action': {'nargs': 1},
-            'options': {'nargs': '*'},
-            '--identifier': {'help': 'Identifier'},
-            '--suicide': {'help': 'Suicide after deploy'},
-            '--template': {'help': 'Template Name', 'default': 'helloworld'},
-            '--path': {'help': 'App Path'},
-            '--port': {'help': 'Binding port', 'type': int}
-        }
+        args = [
+            ['action', {'nargs': 1}],
+            ['options', {'nargs': '*'}],
+            ['--identifier', {'help': 'Identifier'}],
+            ['--suicide', {'help': 'Suicide after deploy'}],
+            ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
+            ['--path', {'help': 'App Path'}],
+            ['--port', {'help': 'Binding port', 'type': int}]
+        ]
 
-        for k, v in args.items():
-            parser.add_argument(k, **v)
+        for e in args:
+            parser.add_argument(e[0], **e[1])
 
         self.parser = parser
         self.args, self.args_unknown = parser.parse_known_args()

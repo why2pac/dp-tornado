@@ -19,6 +19,7 @@ Run
 """
 
 
+import sys
 import logging
 
 
@@ -59,6 +60,7 @@ dp_maintainer_email = dp_author_email
 dp_description = 'MVC Web Application Framework with Tornado.'
 
 dp_requires_CyMySQL = 'CyMySQL==0.8.9'
+dp_requires_futres = 'futures==3.0.5'
 
 
 class CustomInstallCommand(install):
@@ -83,6 +85,9 @@ class CustomInstallCommand(install):
         else:
             if self.dp_without_mysql:
                 dist.install_requires.remove(dp_requires_CyMySQL)
+
+            if sys.version_info[0] >= 3:
+                dist.install_requires.remove(dp_requires_futres)
 
     def run(self):
         install.run(self)
@@ -112,14 +117,14 @@ setup(
         'pycrypto==2.6.1',
         'boto3==1.4.1',
         'SQLAlchemy==1.1.3',
-        'futures==3.0.5',
         'Pillow==3.4.2',
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
         'lxml==3.6.4',
         'httpagentparser==1.7.8',
         'validators==0.11.0',
-        dp_requires_CyMySQL
+        dp_requires_CyMySQL,
+        dp_requires_futres
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

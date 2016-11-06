@@ -58,9 +58,7 @@ dp_maintainer_email = dp_author_email
 
 dp_description = 'MVC Web Application Framework with Tornado.'
 
-dp_requires_additional = []
-
-CyMySQL = 'CyMySQL==0.8.9'
+dp_requires_CyMySQL = 'CyMySQL==0.8.9'
 
 
 class CustomInstallCommand(install):
@@ -78,18 +76,13 @@ class CustomInstallCommand(install):
     def finalize_options(self):
         install.finalize_options(self)
 
-        if self.dp_without_mysql:
-            dp_requires_additional.remove(CyMySQL)
-
         dist = getattr(core, '_setup_distribution', None) if core else None
 
         if not dist:
             logging.warning('Aditional requires cannot installed.')
         else:
-            if dist.install_requires:
-                dist.install_requires += dp_requires_additional
-            else:
-                dist.install_requires = dp_requires_additional
+            if self.dp_without_mysql:
+                dist.install_requires.remove(dp_requires_CyMySQL)
 
     def run(self):
         install.run(self)
@@ -127,7 +120,7 @@ setup(
         'lxml==3.6.4',
         'httpagentparser==1.7.8',
         'validators==0.11.0',
-        CyMySQL
+        dp_requires_CyMySQL
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

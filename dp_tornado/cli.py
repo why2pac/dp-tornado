@@ -16,7 +16,7 @@ class CliHandler(dpEngine):
             ['action', {'nargs': 1}],
             ['options', {'nargs': '*'}],
             ['--identifier', {'help': 'Identifier'}],
-            ['--dryrun', {'help': 'Dryrun'}],
+            ['--dryrun', {'help': 'Dryrun, If this value specified `yes` then enabled.'}],
             ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
             ['--path', {'help': 'App Path'}],
             ['--port', {'help': 'Binding port', 'type': int}]

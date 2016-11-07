@@ -4,17 +4,7 @@
 def run(main):
     from . import test_cli
 
-    test_cli.clear()
-
-    test_cli.init()
-    test_cli.init_with_path_option()
-    test_cli.init_not_empty()
-
-    test_cli.run_with_port()
-    test_cli.run_debug()
-    test_cli.run_production()
-
-    test_cli.clear()
+    test_cli.run_test()
 
     from . import server
 

@@ -158,6 +158,12 @@ class Testing(dpEngine):
                 '* Method test failed, %s -> (%s) -> %s%s -> %s' % (path, req, '' if p[2] else '! ', got, exp))
             return False
 
+        got = str(got)
+        req = str(req)
+
+        got = '%s..' % got[0:7] if len(got) > 7 else got
+        req = '%s..' % req[0:7] if len(req) > 7 else req
+
         self.logging.info(
             '* Method test passed, %s -> (%s) -> %s%s' % (path, req, '' if p[2] else '! ', got))
 

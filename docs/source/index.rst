@@ -56,6 +56,7 @@ Documentation
    m17n
    vars
    logging
+   testing
 
 * :ref:`genindex`
 * :ref:`modindex`

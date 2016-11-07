@@ -4,6 +4,11 @@ var dp = {
             dp.ui.init();
         }
     },
+    vars: {
+        cached: {
+
+        }
+    },
     req: function(o) {
         if (!dp.helper) {
             alert('dp.helper library is required.');
@@ -51,3 +56,10 @@ else {
         dp.init();
     });
 }
+
+var _el = function(selector, no_cache) {
+    if (!no_cache && dp.vars.cached[selector] != undefined) return dp.vars.cached[selector];
+
+    dp.vars.cached[selector] = dp_jqlib(selector);
+    return dp.vars.cached[selector];
+};

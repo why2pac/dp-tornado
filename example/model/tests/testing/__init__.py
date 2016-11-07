@@ -36,3 +36,15 @@ class TestingModel(dpModel):
                 !expect(bool=False, args=(1, 9))
         """
         return a - b
+
+    def unicode(self, a):
+        """
+            .. test::
+                expect(str='한글', args=('한글', ))
+                expect(
+                    int='한글',
+                    kwargs={
+                        'a': '한글'
+                    })
+        """
+        return a

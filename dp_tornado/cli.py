@@ -124,20 +124,7 @@ class CliHandler(dpEngine):
             self.logging.info('* Running failed, Not executable path.')
             return exit(1)
 
-        modules = []
-        dirpath = init_path
-
-        while True:
-            dirpath, module = self.helper.io.path.split(dirpath)
-            modules.append(module)
-
-            if not self.helper.io.path.is_file(self.helper.io.path.join(dirpath, '__init__.py')):
-                break
-
-        app_module = '.'.join(modules[::-1])
-
-        self.helper.io.path.sys.insert(0, dirpath)
-        self.helper.io.path.sys.insert(1, init_path)
+        app_module = self._append_sys_path(init_path)
 
         import sys
 
@@ -170,6 +157,24 @@ class CliHandler(dpEngine):
             return exit(1)
 
         self.logging.info('* Testing succeed, done.')
+
+    def _append_sys_path(self, init_path):
+        dirpath = init_path
+        modules = []
+
+        while True:
+            dirpath, module = self.helper.io.path.split(dirpath)
+            modules.append(module)
+
+            if not self.helper.io.path.is_file(self.helper.io.path.join(dirpath, '__init__.py')):
+                break
+
+        app_module = '.'.join(modules[::-1])
+
+        self.helper.io.path.sys.insert(0, dirpath)
+        self.helper.io.path.sys.insert(1, init_path)
+
+        return app_module
 
     def _pathified(self):
         path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd

@@ -67,6 +67,7 @@ def run(main):
     test_helper.string_serialization_json()
     test_helper.string_random()
 
+    test_helper.io_path()
     test_helper.io_file()
     test_helper.io_file_zip()
 

@@ -87,7 +87,7 @@ def run_production():
     assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'production', '--dryrun', 'yes'], 'Server Mode : Production')
 
 
-if __name__ == '__main__':
+def run_test():
     clear()
 
     init()
@@ -99,3 +99,6 @@ if __name__ == '__main__':
     run_production()
 
     clear()
+
+if __name__ == '__main__':
+    run_test()

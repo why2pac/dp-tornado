@@ -36,6 +36,7 @@ class Testing(dpEngine):
                 docstring = attr.__doc__
 
                 if docstring and docstring.find('.. test::') != -1:
+                    # noinspection PyUnusedLocal
                     def expect(alt, **kwargs):
                         self.tests[module].append((cls, m, alt, path, kwargs, module))
 
@@ -54,6 +55,7 @@ class Testing(dpEngine):
                         stmt = stmt.replace('expect(', 'expect(True, ')
                         stmt = stmt.replace('!expect(True,', 'expect(False,')
 
+                        # noinspection PyBroadException
                         try:
                             eval(stmt)
                         except:
@@ -74,6 +76,7 @@ class Testing(dpEngine):
         cls_name = ''.join([e.capitalize() for e in (path[-1] if path else 'starter').split('_')] + [mod.capitalize()])
         module = '.'.join([self.app_module, mod] + path)
 
+        # noinspection PyBroadException
         try:
             __import__(module)
             app = sys.modules[module] if module in sys.modules else None
@@ -134,6 +137,7 @@ class Testing(dpEngine):
         path = '%s.%s.%s' % (p[5], '.'.join(p[3]), p[1])
         req = None
 
+        # noinspection PyBroadException
         try:
             if 'kwargs' in p[4] and p[4]['kwargs']:
                 req = p[4]['kwargs']

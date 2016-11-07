@@ -18,4 +18,7 @@ class JsonModel(dpModel):
                 !expect(str='10', args=(1, 9))
                 !expect(bool=False, args=(1, 9))
         """
-        return a + b
+        return {
+            'a': a,
+            'b': b
+        }

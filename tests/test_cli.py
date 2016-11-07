@@ -17,12 +17,18 @@ except ImportError:
     TimeoutExpired = NotImplementedError
 
 
-def assert_output(c, f):
+def assert_output(c, f, shell=False, cwd=None):
     try:
         kwargs = {
             'timeout': 5,
             'stderr': subprocess.STDOUT
         }
+
+        if shell:
+            kwargs['shell'] = shell
+
+        if cwd:
+            kwargs['cwd'] = cwd
 
         if sys.version_info[0] < 3:
             del kwargs['timeout']
@@ -87,6 +93,32 @@ def run_production():
     assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'production', '--dryrun', 'yes'], 'Server Mode : Production')
 
 
+def init_variety_methods():
+    # current directory
+    assert_output(['mkdir', '-p', '__cli_test__/app_dir3'], None)
+    assert_output(['dp4p', 'init'], '* Initialization succeed.', cwd='__cli_test__/app_dir3')
+
+    # specific path with py file
+    assert_output(['dp4p', 'init', '--path', '__cli_test__/app_dir4/__init__.py'], '* Initialization succeed.')
+
+
+def run_variety_methods():
+    # path with py file
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir/__init__.py', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port)
+
+    # current directory
+    assert_output(['dp4p', 'run', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port, cwd='__cli_test__/app_dir')
+
+    # current directory with py file
+    assert_output(['dp4p', 'run', '--path', '__init__.py', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port, cwd='__cli_test__/app_dir')
+
+    # child directory
+    assert_output(['dp4p', 'run', '--path', 'app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port, cwd='__cli_test__')
+
+    # child directory with py file
+    assert_output(['dp4p', 'run', '--path', 'app_dir/__init__.py', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port, cwd='__cli_test__')
+
+
 def run_test():
     clear()
 
@@ -97,6 +129,9 @@ def run_test():
     run_with_port()
     run_debug()
     run_production()
+
+    init_variety_methods()
+    run_variety_methods()
 
     clear()
 

@@ -1,5 +1,32 @@
 var dp = {
     init: function() {
+        if (dp.ui) {
+            dp.ui.init();
+        }
+    },
+    req: function(o) {
+        if (!dp.helper) {
+            alert('dp.helper library is required.');
+            return false;
+        }
+
+        return dp.helper.req(o);
+    },
+    alert: function(a, b, c, d, e, f, g) {
+        if (!dp.ui) {
+            alert('dp.helper library is required.');
+            return false;
+        }
+
+        return dp.ui.util.alert(a, b, c, d, e, f, g);
+    },
+    noti: function(a, b, c, d) {
+        if (!dp.ui) {
+            alert('dp.helper library is required.');
+            return false;
+        }
+
+        return dp.ui.util.noti(a, b, c, d);
     }
 };
 

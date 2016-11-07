@@ -1,6 +1,9 @@
 if (!dp) var dp = {};
 
 dp.helper = {
+    req: function(o) {
+        alert('not implemented yet.');
+    },
     string: {
         _uniqid_seed: 0,
         uniqid: function(prefix, more_entropy, more_entropy_separator) {

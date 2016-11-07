@@ -119,6 +119,10 @@ def run_variety_methods():
     assert_output(['dp4p', 'run', '--path', 'app_dir/__init__.py', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--dryrun', 'yes'], 'Port : %s' % consts.dp_testing_port, cwd='__cli_test__')
 
 
+def test_example():
+    assert_output(['dp4p', 'test'], '* Testing succeed', cwd='../example')
+
+
 def run_test():
     clear()
 
@@ -132,6 +136,8 @@ def run_test():
 
     init_variety_methods()
     run_variety_methods()
+
+    test_example()
 
     clear()
 

@@ -37,7 +37,7 @@ class Testing(dpEngine):
 
                 if docstring and docstring.find('.. test::') != -1:
                     def expect(alt, **kwargs):
-                        self.tests[module].append((cls, m, alt, path, kwargs))
+                        self.tests[module].append((cls, m, alt, path, kwargs, module))
 
                     docstring = docstring[docstring.find('.. test::')+len('.. test::'):]
                     docstring = '\n'.join([e for e in docstring.split('\n') if e.strip()]).strip()
@@ -54,7 +54,11 @@ class Testing(dpEngine):
                         stmt = stmt.replace('expect(', 'expect(True, ')
                         stmt = stmt.replace('!expect(True,', 'expect(False,')
 
-                        eval(stmt)
+                        try:
+                            eval(stmt)
+                        except:
+                            self.logging.info('* Test case parsing error, %s' % stmt)
+                            return False
 
         return True
 
@@ -95,16 +99,87 @@ class Testing(dpEngine):
         self.logging.info('*')
 
         for e in self.tests['model']:
-            self.logging.info(e)
+            if not self._test_value(e):
+                return False
 
         self.logging.info('*')
 
         for e in self.tests['helper']:
-            self.logging.info(e)
+            if not self._test_value(e):
+                return False
 
         self.logging.info('*')
 
-        return False
+        return True
+
+    def _test_value(self, p):
+        cls = self._class(p[0])
+        method = getattr(cls, p[1])
+        path = '%s.%s.%s' % (p[5], '.'.join(p[3]), p[1])
+        req = None
+
+        try:
+            if 'kwargs' in p[4] and p[4]['kwargs']:
+                req = p[4]['kwargs']
+                got = method(**req)
+            elif 'args' in p[4] and p[4]['args']:
+                req = p[4]['args']
+                got = method(*req)
+            else:
+                got = method()
+        except:
+            self.logging.info('* Method execution error, %s.%s' % (p[0], p[1]))
+            return False
+
+        res, exp = self._assertion_expect(p, got)
+
+        if not res:
+            self.logging.info(
+                '* Method test failed, %s -> (%s) -> %s%s -> %s' % (path, req, '' if p[2] else '! ', got, exp))
+            return False
+
+        self.logging.info(
+            '* Method test passed, %s -> (%s) -> %s%s' % (path, req, '' if p[2] else '! ', got))
+
+        return True
+
+    def _expected(self, payload):
+        expected = {}
+
+        for k in ('int', 'long', 'bool', 'str', 'json'):
+            if k in payload:
+                expected[k] = payload[k]
+
+        return expected
+
+    def _assertion_expect(self, payload, result):
+        expected = self._expected(payload[4])
+
+        for k, v in expected.items():
+            vo = v
+
+            if k == 'json':
+                vo = self.helper.serialization.json.stringify(vo)
+                vo = self.helper.serialization.json.parse(vo)
+
+                result = self.helper.serialization.json.stringify(result)
+                result = self.helper.serialization.json.parse(result)
+
+            if payload[2]:
+                if vo != result:
+                    return False, v
+            else:
+                if vo == result:
+                    return False, v
+
+        return True, None
+
+    def _class(self, cls):
+        if str(cls) in self.modules:
+            return self.modules[str(cls)]
+
+        self.modules[str(cls)] = cls()
+        return self.modules[str(cls)]
 
 
 '''

@@ -124,7 +124,7 @@ class Testing(dpEngine):
             req = p[4]['params']
 
         self.logging.info(
-            '* Method test skipped, %s -> (%s) -> %s' % (path, req or '-', '' if p[2] else '! '))
+            '* Method test, %s -> (%s) -> %s [SKIP]' % (path, req or '-', '' if p[2] else '! '))
 
         return True
 
@@ -155,7 +155,7 @@ class Testing(dpEngine):
 
         if not res:
             self.logging.info(
-                '* Method test failed, %s -> (%s) -> %s%s -> %s' % (path, req, '' if p[2] else '! ', got, exp))
+                '* Method test, %s -> (%s) -> %s%s -> %s [FAIL]' % (path, req, '' if p[2] else '! ', got, exp))
             return False
 
         got = str(got)
@@ -165,7 +165,7 @@ class Testing(dpEngine):
         req = '%s..' % req[0:7] if len(req) > 7 else req
 
         self.logging.info(
-            '* Method test passed, %s -> (%s) -> %s%s' % (path, req, '' if p[2] else '! ', got))
+            '* Method test, %s -> (%s) -> %s%s [OK]' % (path, req, '' if p[2] else '! ', got))
 
         return True
 

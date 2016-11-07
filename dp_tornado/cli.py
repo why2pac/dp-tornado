@@ -155,11 +155,17 @@ class CliHandler(dpEngine):
             self.logging.info('* Testing failed.')
             return exit(1)
 
-        if not tester.run():
-            self.logging.info('* Testing failed.')
-            return exit(1)
+        tester.server_start()
+        tested = tester.run()
+        tester.server_stop()
 
-        self.logging.info('* Testing succeed.')
+        if not tested:
+            self.logging.info('* Testing failed.')
+        else:
+            self.logging.info('* Testing succeed.')
+
+        if not tested:
+            return exit(1)
 
     def _append_sys_path(self, init_path=None):
         dirpath = init_path or self._pathified()

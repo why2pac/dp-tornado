@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
+import os
 import sys
+import subprocess
 
 from .engine import Engine as dpEngine
 
@@ -9,6 +11,7 @@ from .engine import Engine as dpEngine
 class Testing(dpEngine):
     def __init__(self, app_module, path):
         self.app_module = app_module
+        self.app_identifier = 'dp-tornado-testing-9x48923'
         self.path = path
 
         self.tests = {}
@@ -16,6 +19,29 @@ class Testing(dpEngine):
 
         for e in ('controller', 'model', 'helper'):
             self.tests[e] = []
+
+    @property
+    def dev_null(self):
+        return open(os.devnull, 'w')
+
+    def server_start(self):
+        self.server_stop()
+
+        subprocess.Popen(
+            ['dp4p', 'run', '--path', self.path, '--port', '48923', '--identifier', self.app_identifier],
+            stdout=self.dev_null,
+            stderr=subprocess.STDOUT)
+
+    def server_stop(self):
+        pids = subprocess.Popen(['pgrep', '-f', self.app_identifier], stdout=subprocess.PIPE)
+        pids = pids.stdout.readlines()
+        pids = [(e.decode('utf8') if sys.version_info[0] >= 3 else e).replace('\n', '') for e in (pids if pids else [])]
+
+        for pid in pids:
+            subprocess.Popen(
+                ['kill', '-9', pid],
+                stdout=self.dev_null,
+                stderr=subprocess.STDOUT)
 
     def traverse(self):
         for module in ('controller', 'model', 'helper'):

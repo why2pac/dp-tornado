@@ -94,7 +94,8 @@ class Testing(dpEngine):
         self.logging.info('*')
 
         for e in self.tests['controller']:
-            self.logging.info(e)
+            if not self._test_request(e):
+                return False
 
         self.logging.info('*')
 
@@ -111,6 +112,21 @@ class Testing(dpEngine):
         self.logging.info('*')
 
         return True
+
+    def _test_request(self, p):
+        path = '%s.%s.%s' % (p[5], '.'.join(p[3]), p[1])
+        req = None
+
+        if 'params' in p[4] and p[4]['params']:
+            req = p[4]['params']
+
+        self.logging.info(
+            '* Method test skipped, %s -> (%s) -> %s' % (path, req or '-', '' if p[2] else '! '))
+
+        return True
+
+    def _test_request_assertion(self, payload, result):
+        pass
 
     def _test_value(self, p):
         cls = self._class(p[0])
@@ -131,7 +147,7 @@ class Testing(dpEngine):
             self.logging.info('* Method execution error, %s.%s' % (p[0], p[1]))
             return False
 
-        res, exp = self._assertion_expect(p, got)
+        res, exp = self._test_value_assertion(p, got)
 
         if not res:
             self.logging.info(
@@ -143,17 +159,12 @@ class Testing(dpEngine):
 
         return True
 
-    def _expected(self, payload):
+    def _test_value_assertion(self, payload, result):
         expected = {}
 
         for k in ('int', 'long', 'bool', 'str', 'json'):
             if k in payload:
                 expected[k] = payload[k]
-
-        return expected
-
-    def _assertion_expect(self, payload, result):
-        expected = self._expected(payload[4])
 
         for k, v in expected.items():
             vo = v

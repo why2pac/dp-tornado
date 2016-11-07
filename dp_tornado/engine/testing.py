@@ -1,12 +1,34 @@
 # -*- coding: utf-8 -*-
 
 
-from .singleton import Singleton as dpSingleton
 from .engine import Engine as dpEngine
 
 
-class Testing(dpEngine, dpSingleton):
-    pass
+class Testing(dpEngine):
+    def __init__(self, path):
+        self.path = path
+
+        self.tests_controller = []
+        self.tests_helper = []
+        self.tests_model = []
+
+        self.traverse()
+
+    def traverse(self):
+        self._traverse(self.helper.io.path.join(self.path, 'controller'))
+
+    def _traverse(self, path):
+        for e in self.helper.io.path.browse(path):
+            if self.helper.io.path.is_dir(e):
+                self._traverse(e)
+            else:
+                self.import_class(e)
+
+    def import_class(self, file):
+        pass
+
+    def run(self):
+        return False
 
 
 """

@@ -3,6 +3,7 @@
 
 from dp_tornado.engine.engine import Engine as dpEngine
 from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
+from dp_tornado.engine.testing import Testing as dpTesting
 from dp_tornado.version import __version_info__
 
 
@@ -161,7 +162,14 @@ class CliHandler(dpEngine):
             self.logging.exception(e)
 
     def command_test(self):
-        pass
+        tester = dpTesting(self._pathified())
+        tested = tester.run()
+
+        if not tested:
+            self.logging.info('* Testing failed, finished.')
+            return exit(1)
+
+        self.logging.info('* Testing succeed, done.')
 
     def _pathified(self):
         path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd

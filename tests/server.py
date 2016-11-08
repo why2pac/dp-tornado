@@ -4,6 +4,7 @@
 import sys
 import time
 import subprocess
+import time as abs_time
 
 from . import consts
 from . import utils
@@ -14,7 +15,7 @@ def run_server(main=False):
     subprocess.Popen([
         'python',
         '%sexample/__init__.py' % ('../' if not main else ''),
-        '--identifier', consts.dp_testing_identifier,
+        '--identifier', '%s-%s' % (consts.dp_testing_identifier, int(abs_time.time())),
         '--port', consts.dp_testing_port])
 
 

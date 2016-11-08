@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 from dp_tornado.engine.helper import Helper as dpHelper
 
-import datetime as abs_datetime
 import time as abs_time
 
 

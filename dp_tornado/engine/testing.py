@@ -210,6 +210,16 @@ class Testing(dpEngine):
 
             asserted_text = True if p[4]['text'] == res else False
 
+        # Assertion, json
+        if 'json' in p[4]:
+            res_a = res if self.helper.misc.type.check.string(res) else self.helper.serialization.json.stringify(res)
+            res_a = self.helper.serialization.json.parse(res_a)
+
+            res_b = self.helper.serialization.json.stringify(p[4]['json'])
+            res_b = self.helper.serialization.json.parse(res_b)
+
+            asserted_json = True if res_a == res_b else False
+
         asserted = asserted_code is False or asserted_text is False or asserted_json is False
 
         if p[2]:
@@ -222,6 +232,16 @@ class Testing(dpEngine):
                 desc.append('[CODE %s / %s]' % (p[4]['code'], code))
             if asserted_text is not None:
                 desc.append('[TEXT "%s" / "%s"]' % (p[4]['text'], res))
+            if asserted_json is not None:
+                # noinspection PyUnboundLocalVariable
+                res_a = self.helper.serialization.json.stringify(res_a)
+                # noinspection PyUnboundLocalVariable
+                res_b = self.helper.serialization.json.stringify(res_b)
+
+                res_a = '%s..' % res_a[0:7] if len(res_a) > 7 else res_a
+                res_b = '%s..' % res_b[0:7] if len(res_b) > 7 else res_b
+
+                desc.append('[JSON %s / %s]' % (res_a, res_b))
 
             desc = ' & '.join(desc)
 
@@ -230,8 +250,17 @@ class Testing(dpEngine):
 
             return False
 
+        desc = []
+
+        if asserted_code is not None:
+            desc.append('CODE')
+        if asserted_text is not None:
+            desc.append('TEXT')
+        if asserted_json is not None:
+            desc.append('JSON')
+
         self.logging.info(
-            '* Request test, [%s] %s [OK]' % (method.upper(), url_path))
+            '* Request test, [%s] %s -> %s [OK]' % (method.upper(), url_path, ' & '.join(desc)))
 
         return True
 

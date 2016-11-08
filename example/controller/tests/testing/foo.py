@@ -33,3 +33,18 @@ class FooController(Controller):
         b = int(b)
 
         self.finish(str(a + b))
+
+    def put(self, a, b):
+        """
+            .. test::
+                expect(code=200, args=(10, 20))
+                expect(json={'a': 10, 'b': 20}, args=(10, 20))
+        """
+
+        a = int(a)
+        b = int(b)
+
+        self.finish({
+            'a': a,
+            'b': b
+        })

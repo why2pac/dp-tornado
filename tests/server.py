@@ -15,7 +15,7 @@ def run_server(main=False):
     subprocess.Popen([
         'python',
         '%sexample/__init__.py' % ('../' if not main else ''),
-        '--identifier', '%s-%s' % (consts.dp_testing_identifier, round(abs_time.time() * 1000)),
+        '--identifier', '%s-%s' % (consts.dp_testing_identifier, int(abs_time.time())),
         '--port', consts.dp_testing_port])
 
 

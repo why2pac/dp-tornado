@@ -12,10 +12,11 @@ class TestingController(Controller):
                 expect(
                     code=200,
                     text='done')
-                !expect(code=200, text='foo==bar', params={'foo': 'baz'})
+                expect(code=200, text='done', params={'foo': 'baz'})
+                !expect(code=200, text='done!', params={'foo': 'baz'})
         """
 
         if self.get_argument('foo') == 'bar':
-            self.finish('foo==bar')
+            return self.finish('foo==bar')
 
         self.finish('done')

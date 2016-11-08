@@ -13,12 +13,23 @@ class FooController(Controller):
                 expect(
                     code=200,
                     text='done')
-                !expect(code=200, text='foo==bar', params={'foo': 'baz'})
+                !expect(code=400, text='foo==bar', params={'foo': 'baz'})
         """
 
         if self.get_argument('foo') == 'bar':
-            self.finish('foo==bar')
+            return self.finish('foo==bar')
         elif self.get_argument('foo') == 'foo':
             return self.finish_with_error(400)
 
         self.finish('done')
+
+    def get(self, a, b):
+        """
+            .. test::
+                expect(text='30', args=(10, 20), params={'foo': 'bar'})
+        """
+
+        a = int(a)
+        b = int(b)
+
+        self.finish(str(a + b))

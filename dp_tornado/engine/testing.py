@@ -3,6 +3,7 @@
 
 import os
 import sys
+import time
 import subprocess
 
 from .engine import Engine as dpEngine
@@ -12,6 +13,8 @@ class Testing(dpEngine):
     def __init__(self, app_module, path):
         self.app_module = app_module
         self.app_identifier = 'dp-tornado-testing-9x48923'
+        self.app_port = 48923
+
         self.path = path
 
         self.tests = {}
@@ -28,7 +31,7 @@ class Testing(dpEngine):
         self.server_stop()
 
         subprocess.Popen(
-            ['dp4p', 'run', '--path', self.path, '--port', '48923', '--identifier', self.app_identifier],
+            ['dp4p', 'run', '--path', self.path, '--port', str(self.app_port), '--identifier', self.app_identifier],
             stdout=self.dev_null,
             stderr=subprocess.STDOUT)
 
@@ -120,6 +123,28 @@ class Testing(dpEngine):
             return path, False
 
     def run(self):
+        self.logging.set_level('requests', self.logging.level.CRITICAL)
+
+        server_executed = False
+
+        for i in range(2*10):
+            time.sleep(0.2)
+
+            code, res = self.helper.web.http.get.text('http://127.0.0.1:%s/dp/identifier' % self.app_port)
+
+            if res == self.app_identifier:
+                server_executed = True
+                break
+
+            if i >= 5:
+                self.logging.info('* Waiting server ..')
+
+            time.sleep(0.3)
+
+        if not server_executed:
+            self.logging.info('* Server execution failed.')
+            return exit(1)
+
         self.logging.info('*')
 
         for e in self.tests['controller']:
@@ -143,14 +168,70 @@ class Testing(dpEngine):
         return True
 
     def _test_request(self, p):
+        url_path = '/'.join(p[3])
         path = '%s.%s.%s' % (p[5], '.'.join(p[3]), p[1])
-        req = None
+        method = p[1]
+        req = {}
+        res_type = None
+
+        if 'args' in p[4] and p[4]['args']:
+            url_path = '%s/%s' % (url_path, '/'.join(str(e) for e in p[4]['args']))
+
+        url = 'http://127.0.0.1:%s/%s' % (self.app_port, url_path)
 
         if 'params' in p[4] and p[4]['params']:
-            req = p[4]['params']
+            req['data'] = p[4]['params']
+
+        if 'code' in p[4]:
+            res_type = 'raw'
+        if 'text' in p[4]:
+            res_type = 'text'
+        elif 'json' in p[4]:
+            res_type = 'json'
+
+        if method not in ('get', 'post', 'delete', 'patch', 'put', 'head') or not res_type:
+            self.logging.info('* Method test, %s -> (%s) [INVALID]' % (path, req or '-'))
+            return False
+
+        code, res = self.helper.web.http.request(req_type=method, res_type=res_type, url=url, **req)
+
+        asserted_code = None
+        asserted_text = None
+        asserted_json = None
+
+        # Assertion, code
+        if 'code' in p[4]:
+            asserted_code = True if p[4]['code'] == code else False
+
+        # Assertion, text
+        if 'text' in p[4]:
+            if res_type != 'text':
+                res = str(res)
+
+            asserted_text = True if p[4]['text'] == res else False
+
+        asserted = asserted_code is False or asserted_text is False or asserted_json is False
+
+        if p[2]:
+            asserted = not asserted
+
+        if not asserted:
+            desc = []
+
+            if asserted_code is not None:
+                desc.append('[CODE %s / %s]' % (p[4]['code'], code))
+            if asserted_text is not None:
+                desc.append('[TEXT "%s" / "%s"]' % (p[4]['text'], res))
+
+            desc = ' & '.join(desc)
+
+            self.logging.info(
+                '* Request test, [%s] %s => %s %s [FAIL]' % (method.upper(), url_path, '' if p[2] else '!', desc))
+
+            return False
 
         self.logging.info(
-            '* Method test, %s -> (%s) -> %s [SKIP]' % (path, req or '-', '' if p[2] else '! '))
+            '* Request test, [%s] %s [OK]' % (method.upper(), url_path))
 
         return True
 
@@ -233,7 +314,7 @@ class Testing(dpEngine):
 
     Controller:
         expect / !exepct : code, text, json
-        args : args, kwargs, params
+        args : args, params
 
     Model, Helper:
         expect / !exepct : int, long, bool, json

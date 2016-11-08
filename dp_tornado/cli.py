@@ -3,6 +3,7 @@
 
 from dp_tornado.engine.engine import Engine as dpEngine
 from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
+from dp_tornado.engine.testing import Testing as dpTesting
 from dp_tornado.version import __version_info__
 
 
@@ -16,7 +17,7 @@ class CliHandler(dpEngine):
             ['action', {'nargs': 1}],
             ['options', {'nargs': '*'}],
             ['--identifier', {'help': 'Identifier'}],
-            ['--dryrun', {'help': 'Dryrun'}],
+            ['--dryrun', {'help': 'Dryrun, If this value specified `yes` then enabled.'}],
             ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
             ['--path', {'help': 'App Path'}],
             ['--port', {'help': 'Binding port', 'type': int}]
@@ -48,6 +49,9 @@ class CliHandler(dpEngine):
         elif self.args.action and self.args.action[0] == 'run':
             self.command_run()
 
+        elif self.args.action and self.args.action[0] == 'test':
+            self.command_test()
+
         else:
             self.logging.info('* dp4p finished, unrecognized action.')
 
@@ -59,16 +63,13 @@ class CliHandler(dpEngine):
         return exit(0)
 
     def command_init(self):
-        init_dir = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
         installable = True
+        init_path = self._pathified()
 
-        if init_dir.endswith('__init__.py'):
-            init_dir = self.helper.io.path.dirname(init_dir)
+        self.logging.info('* Initializing app .. %s' % init_path)
 
-        self.logging.info('* Initializing app .. %s' % init_dir)
-
-        if self.helper.io.path.is_dir(init_dir):
-            browse = self.helper.io.path.browse(init_dir)
+        if self.helper.io.path.is_dir(init_path):
+            browse = self.helper.io.path.browse(init_path)
             browse = [e for e in browse if not self.helper.io.path.split(e)[1].startswith('.')]
 
             if len(browse) > 0:
@@ -77,14 +78,14 @@ class CliHandler(dpEngine):
             else:
                 status = 'Empty'
 
-        elif self.helper.io.path.is_file(init_dir):
+        elif self.helper.io.path.is_file(init_path):
             status = 'File'
             installable = False
 
         else:
-            self.helper.io.path.mkdir(init_dir)
+            self.helper.io.path.mkdir(init_path)
 
-            if not self.helper.io.path.is_dir(init_dir):
+            if not self.helper.io.path.is_dir(init_path):
                 status = 'Permission Denied'
                 installable = False
             else:
@@ -95,7 +96,7 @@ class CliHandler(dpEngine):
             return exit(1)
 
         engine_path = self.helper.io.path.dirname(__file__)
-        application_path = init_dir
+        application_path = init_path
 
         # template initialization.
         if not EngineBootstrap.init_template(
@@ -106,11 +107,7 @@ class CliHandler(dpEngine):
         self.logging.info('* Initialization succeed.')
 
     def command_run(self):
-        init_path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
-        init_path = init_path[:-1] if init_path.endswith('/') else init_path
-
-        if init_path.endswith('__init__.py'):
-            init_path = self.helper.io.path.dirname(init_path)
+        init_path = self._pathified()
 
         init_py = init_path
         executable = True
@@ -127,20 +124,7 @@ class CliHandler(dpEngine):
             self.logging.info('* Running failed, Not executable path.')
             return exit(1)
 
-        modules = []
-        dirpath = init_path
-
-        while True:
-            dirpath, module = self.helper.io.path.split(dirpath)
-            modules.append(module)
-
-            if not self.helper.io.path.is_file(self.helper.io.path.join(dirpath, '__init__.py')):
-                break
-
-        app_module = '.'.join(modules[::-1])
-
-        self.helper.io.path.sys.insert(0, dirpath)
-        self.helper.io.path.sys.insert(1, init_path)
+        app_module = self._append_sys_path(init_path)
 
         import sys
 
@@ -164,6 +148,51 @@ class CliHandler(dpEngine):
         except Exception as e:
             self.logging.exception(e)
 
+    def command_test(self):
+        tester = dpTesting(self._append_sys_path(), self._pathified())
+
+        if not tester.traverse():
+            self.logging.info('* Testing failed.')
+            return exit(1)
+
+        tester.server_start()
+        tested = tester.run()
+        tester.server_stop()
+
+        if not tested:
+            self.logging.info('* Testing failed.')
+        else:
+            self.logging.info('* Testing succeed.')
+
+        if not tested:
+            return exit(1)
+
+    def _append_sys_path(self, init_path=None):
+        dirpath = init_path or self._pathified()
+        modules = []
+
+        while True:
+            dirpath, module = self.helper.io.path.split(dirpath)
+            modules.append(module)
+
+            if not self.helper.io.path.is_file(self.helper.io.path.join(dirpath, '__init__.py')):
+                break
+
+        app_module = '.'.join(modules[::-1])
+
+        self.helper.io.path.sys.insert(0, dirpath)
+        self.helper.io.path.sys.insert(1, init_path)
+
+        return app_module
+
+    def _pathified(self):
+        path = self.helper.io.path.join(self.cwd, self.args.path) if self.args.path else self.cwd
+        path = path[:-1] if path.endswith('/') else path
+
+        if path.endswith('__init__.py'):
+            path = self.helper.io.path.dirname(path)
+
+        return path
 
 cli = CliHandler()
 

@@ -70,6 +70,7 @@ class Bootstrap(object):
 
         services_raw = [
             (r"/dp/scheduler/(.*)", 'dp_tornado.engine.scheduler_handler.SchedulerHandler'),
+            (r"/dp/identifier", 'dp_tornado.engine.dp_identifier_handler.DpIdentifierHandler'),
             (r"/dp/(.*)", 'dp_tornado.engine.static_handler.StaticHandler', {'path': engine_static_path}),
             (r"/", None),
             (r"/(.*)", None),

@@ -124,7 +124,10 @@ class Bootstrap(object):
             engine.ini.server.set('port', args.port)
 
         # Identifier
-        engine.ini.server.set('identifier', engine.helper.misc.uuid.v1())
+        if args.identifier:
+            engine.ini.server.set('identifier', args.identifier)
+        else:
+            engine.ini.server.set('identifier', engine.helper.misc.uuid.v1())
 
         # Setup Options
         engine.ini.server.get('max_worker', default=1)

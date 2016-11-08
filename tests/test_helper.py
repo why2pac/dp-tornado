@@ -104,6 +104,10 @@ def io_file():
     utils.expecting_text('get', '/helper/io/file', None, 200)
 
 
+def io_path():
+    utils.expecting_text('get', '/helper/io/path', None, 200)
+
+
 def io_file_zip():
     utils.expecting_text('get', '/helper/io/file/zip', None, 200)
 

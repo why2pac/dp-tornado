@@ -51,6 +51,8 @@ class Testing(dpEngine):
             if not self._traverse(module, self.helper.io.path.join(self.path, module)):
                 return False
 
+            self.tests[module].sort(key=lambda e: e[6])
+
         return True
 
     def _traverse(self, module, path):
@@ -60,14 +62,20 @@ class Testing(dpEngine):
             if cls is False:
                 return False
 
+            priority = 1000000
+
             for m in dir(cls):
                 attr = getattr(cls, m)
                 docstring = attr.__doc__
 
                 if docstring and docstring.find('.. test::') != -1:
                     # noinspection PyUnusedLocal
-                    def expect(alt, **kwargs):
-                        self.tests[module].append((cls, m, alt, path, kwargs, module))
+                    def expect(alt, prio, *args, **kwargs):
+                        # Priority
+                        if args and len(args) == 1:
+                            prio = args[0]
+
+                        self.tests[module].append((cls, m, alt, path, kwargs, module, prio))
 
                     docstring = docstring[docstring.find('.. test::')+len('.. test::'):]
                     docstring = '\n'.join([e for e in docstring.split('\n') if e.strip()]).strip()
@@ -81,7 +89,9 @@ class Testing(dpEngine):
                         stmt = docstring[:next_stmt].strip() if next_stmt != -1 else docstring
                         docstring = docstring[len(stmt):].strip()
 
-                        stmt = stmt.replace('expect(', 'expect(True, ')
+                        priority += 1
+
+                        stmt = stmt.replace('expect(', 'expect(True, %s, ' % priority)
                         stmt = stmt.replace('!expect(True,', 'expect(False,')
 
                         # noinspection PyBroadException
@@ -346,6 +356,18 @@ class Testing(dpEngine):
 
 '''
 
+    Syntax:
+        expect(criteria)
+        expect(priority, criteria)
+        !expect(criteria)
+        !expect(priority, criteria)
+
+        criteria:
+            controller:
+                code, text, json, args(arguments separated by /), params (query string, form values)
+            model,helper:
+                int, long, bool, str, json, args (arguments by list), kwargs (arguments by dict)
+
     Controller:
         expect / !exepct : code, text, json
         args : args, params
@@ -363,6 +385,7 @@ class Testing(dpEngine):
             """
                 .. test::
                     expect(
+                        1,
                         code=200,
                         text='foo==bar',
                         params={'foo': 'bar'})

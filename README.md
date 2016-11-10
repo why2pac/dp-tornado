@@ -44,3 +44,8 @@ or:
     $ cd app_dir
     $ dp4p init
     $ dp4p run
+
+
+### Special Contributors
+
+[David](https://github.com/youngyoon), [Matthew](https://github.com/Matthew-Kwon) and [Max](https://github.com/leadermin)

@@ -147,8 +147,12 @@ class Testing(dpEngine):
 
         self.logging.info('*')
 
+        session = True
+
         for e in self.tests['controller']:
-            if not self._test_request(e):
+            session, asserted = self._test_request(e, session)
+
+            if not asserted:
                 return False
 
         self.logging.info('*')
@@ -167,7 +171,7 @@ class Testing(dpEngine):
 
         return True
 
-    def _test_request(self, p):
+    def _test_request(self, p, session):
         url_path = '/'.join(p[3])
         path = '%s.%s.%s' % (p[5], '.'.join(p[3]), p[1])
         method = p[1]
@@ -191,9 +195,10 @@ class Testing(dpEngine):
 
         if method not in ('get', 'post', 'delete', 'patch', 'put', 'head') or not res_type:
             self.logging.info('* Method test, %s -> (%s) [INVALID]' % (path, req or '-'))
-            return False
+            return session, False
 
-        code, res = self.helper.web.http.request(req_type=method, res_type=res_type, url=url, **req)
+        session, code, res = self.helper.web.http.request(
+            req_type=method, res_type=res_type, url=url, session=session or True, **req)
 
         asserted_code = None
         asserted_text = None
@@ -248,7 +253,7 @@ class Testing(dpEngine):
             self.logging.info(
                 '* Request test, [%s] %s => %s %s [FAIL]' % (method.upper(), url_path, '' if p[2] else '!', desc))
 
-            return False
+            return session, False
 
         desc = []
 
@@ -262,7 +267,7 @@ class Testing(dpEngine):
         self.logging.info(
             '* Request test, [%s] %s -> %s [OK]' % (method.upper(), url_path, ' & '.join(desc)))
 
-        return True
+        return session, True
 
     def _test_request_assertion(self, payload, result):
         pass

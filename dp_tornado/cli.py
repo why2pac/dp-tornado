@@ -19,6 +19,7 @@ class CliHandler(dpEngine):
             ['--identifier', {'help': 'Identifier'}],
             ['--dryrun', {'help': 'Dryrun, If this value specified `yes` then enabled.'}],
             ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
+            ['--logging', {'help': 'Logging'}],
             ['--path', {'help': 'App Path'}],
             ['--port', {'help': 'Binding port', 'type': int}]
         ]
@@ -155,7 +156,12 @@ class CliHandler(dpEngine):
             self.logging.info('* Testing failed.')
             return exit(1)
 
-        tester.server_start()
+        disable_logging = True
+
+        if self.args.logging in ('enable', 'true', '1', 'yes', 'on'):
+            disable_logging = False
+
+        tester.server_start(disable_logging=disable_logging)
         tested = tester.run()
         tester.server_stop()
 

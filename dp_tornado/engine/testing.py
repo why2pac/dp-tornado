@@ -27,13 +27,20 @@ class Testing(dpEngine):
     def dev_null(self):
         return open(os.devnull, 'w')
 
-    def server_start(self):
+    def server_start(self, disable_logging=True):
         self.server_stop()
+
+        kwargs = {}
+
+        if disable_logging:
+            kwargs = {
+                'stdout': self.dev_null,
+                'stderr': subprocess.STDOUT
+            }
 
         subprocess.Popen(
             ['dp4p', 'run', '--path', self.path, '--port', str(self.app_port), '--identifier', self.app_identifier],
-            stdout=self.dev_null,
-            stderr=subprocess.STDOUT)
+            **kwargs)
 
     def server_stop(self):
         pids = subprocess.Popen(['pgrep', '-f', self.app_identifier], stdout=subprocess.PIPE)
@@ -51,6 +58,8 @@ class Testing(dpEngine):
             if not self._traverse(module, self.helper.io.path.join(self.path, module)):
                 return False
 
+            self.tests[module].sort(key=lambda e: e[6])
+
         return True
 
     def _traverse(self, module, path):
@@ -60,14 +69,20 @@ class Testing(dpEngine):
             if cls is False:
                 return False
 
+            priority = 1000000
+
             for m in dir(cls):
                 attr = getattr(cls, m)
                 docstring = attr.__doc__
 
                 if docstring and docstring.find('.. test::') != -1:
                     # noinspection PyUnusedLocal
-                    def expect(alt, **kwargs):
-                        self.tests[module].append((cls, m, alt, path, kwargs, module))
+                    def expect(alt, prio, *args, **kwargs):
+                        # Priority
+                        if args and len(args) == 1:
+                            prio = args[0]
+
+                        self.tests[module].append((cls, m, alt, path, kwargs, module, prio))
 
                     docstring = docstring[docstring.find('.. test::')+len('.. test::'):]
                     docstring = '\n'.join([e for e in docstring.split('\n') if e.strip()]).strip()
@@ -81,13 +96,15 @@ class Testing(dpEngine):
                         stmt = docstring[:next_stmt].strip() if next_stmt != -1 else docstring
                         docstring = docstring[len(stmt):].strip()
 
-                        stmt = stmt.replace('expect(', 'expect(True, ')
+                        priority += 1
+
+                        stmt = stmt.replace('expect(', 'expect(True, %s, ' % priority)
                         stmt = stmt.replace('!expect(True,', 'expect(False,')
 
                         # noinspection PyBroadException
                         try:
                             eval(stmt)
-                        except:
+                        except Exception:
                             self.logging.info('* Test case parsing error, %s' % stmt)
                             return False
 
@@ -147,8 +164,12 @@ class Testing(dpEngine):
 
         self.logging.info('*')
 
+        session = True
+
         for e in self.tests['controller']:
-            if not self._test_request(e):
+            session, asserted = self._test_request(e, session)
+
+            if not asserted:
                 return False
 
         self.logging.info('*')
@@ -167,7 +188,7 @@ class Testing(dpEngine):
 
         return True
 
-    def _test_request(self, p):
+    def _test_request(self, p, session):
         url_path = '/'.join(p[3])
         path = '%s.%s.%s' % (p[5], '.'.join(p[3]), p[1])
         method = p[1]
@@ -191,9 +212,10 @@ class Testing(dpEngine):
 
         if method not in ('get', 'post', 'delete', 'patch', 'put', 'head') or not res_type:
             self.logging.info('* Method test, %s -> (%s) [INVALID]' % (path, req or '-'))
-            return False
+            return session, False
 
-        code, res = self.helper.web.http.request(req_type=method, res_type=res_type, url=url, **req)
+        session, code, res = self.helper.web.http.request(
+            req_type=method, res_type=res_type, url=url, session=session or True, **req)
 
         asserted_code = None
         asserted_text = None
@@ -210,6 +232,16 @@ class Testing(dpEngine):
 
             asserted_text = True if p[4]['text'] == res else False
 
+        # Assertion, json
+        if 'json' in p[4]:
+            res_a = res if self.helper.misc.type.check.string(res) else self.helper.serialization.json.stringify(res)
+            res_a = self.helper.serialization.json.parse(res_a)
+
+            res_b = self.helper.serialization.json.stringify(p[4]['json'])
+            res_b = self.helper.serialization.json.parse(res_b)
+
+            asserted_json = True if res_a == res_b else False
+
         asserted = asserted_code is False or asserted_text is False or asserted_json is False
 
         if p[2]:
@@ -222,18 +254,37 @@ class Testing(dpEngine):
                 desc.append('[CODE %s / %s]' % (p[4]['code'], code))
             if asserted_text is not None:
                 desc.append('[TEXT "%s" / "%s"]' % (p[4]['text'], res))
+            if asserted_json is not None:
+                # noinspection PyUnboundLocalVariable
+                res_a = self.helper.serialization.json.stringify(res_a)
+                # noinspection PyUnboundLocalVariable
+                res_b = self.helper.serialization.json.stringify(res_b)
+
+                res_a = '%s..' % res_a[0:7] if len(res_a) > 7 else res_a
+                res_b = '%s..' % res_b[0:7] if len(res_b) > 7 else res_b
+
+                desc.append('[JSON %s / %s]' % (res_a, res_b))
 
             desc = ' & '.join(desc)
 
             self.logging.info(
                 '* Request test, [%s] %s => %s %s [FAIL]' % (method.upper(), url_path, '' if p[2] else '!', desc))
 
-            return False
+            return session, False
+
+        desc = []
+
+        if asserted_code is not None:
+            desc.append('CODE')
+        if asserted_text is not None:
+            desc.append('TEXT')
+        if asserted_json is not None:
+            desc.append('JSON')
 
         self.logging.info(
-            '* Request test, [%s] %s [OK]' % (method.upper(), url_path))
+            '* Request test, [%s] %s -> %s [OK]' % (method.upper(), url_path, ' & '.join(desc)))
 
-        return True
+        return session, True
 
     def _test_request_assertion(self, payload, result):
         pass
@@ -312,6 +363,18 @@ class Testing(dpEngine):
 
 '''
 
+    Syntax:
+        expect(criteria)
+        expect(priority, criteria)
+        !expect(criteria)
+        !expect(priority, criteria)
+
+        criteria:
+            controller:
+                code, text, json, args(arguments separated by /), params (query string, form values)
+            model,helper:
+                int, long, bool, str, json, args (arguments by list), kwargs (arguments by dict)
+
     Controller:
         expect / !exepct : code, text, json
         args : args, params
@@ -329,6 +392,7 @@ class Testing(dpEngine):
             """
                 .. test::
                     expect(
+                        1,
                         code=200,
                         text='foo==bar',
                         params={'foo': 'bar'})

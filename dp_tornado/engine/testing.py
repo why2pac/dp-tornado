@@ -27,13 +27,20 @@ class Testing(dpEngine):
     def dev_null(self):
         return open(os.devnull, 'w')
 
-    def server_start(self):
+    def server_start(self, disable_logging=True):
         self.server_stop()
+
+        kwargs = {}
+
+        if disable_logging:
+            kwargs = {
+                'stdout': self.dev_null,
+                'stderr': subprocess.STDOUT
+            }
 
         subprocess.Popen(
             ['dp4p', 'run', '--path', self.path, '--port', str(self.app_port), '--identifier', self.app_identifier],
-            stdout=self.dev_null,
-            stderr=subprocess.STDOUT)
+            **kwargs)
 
     def server_stop(self):
         pids = subprocess.Popen(['pgrep', '-f', self.app_identifier], stdout=subprocess.PIPE)
@@ -97,7 +104,7 @@ class Testing(dpEngine):
                         # noinspection PyBroadException
                         try:
                             eval(stmt)
-                        except:
+                        except Exception:
                             self.logging.info('* Test case parsing error, %s' % stmt)
                             return False
 

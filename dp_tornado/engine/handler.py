@@ -448,7 +448,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             return self.set_session_value(name, value, expire_in=expire_in)
 
         else:
-            return self.get_session_value(name)
+            return self.get_session_value(name, expire_in=expire_in)
 
     def redirect(self, url, permanent=False, status=None):
         try:

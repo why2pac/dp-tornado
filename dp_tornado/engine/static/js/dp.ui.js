@@ -112,8 +112,6 @@ dp.ui = {
                 });
             };
 
-            console.log(_buttons);
-
             dp_jqlib(_buttons).each(function(k, e) {
                 var btn = dp_jqlib('<button />');
                 btn.addClass('_i-' + k);

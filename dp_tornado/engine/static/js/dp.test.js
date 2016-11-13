@@ -14,6 +14,8 @@ dp.test = {
         dp_assert(dp.helper.string.uniqid('prefix_', true), 'test-uniqid-with-entropy');
         dp_assert(dp.helper.string.uniqid('prefix_', true, '-'), 'test-uniqid-with-entropy-separator');
 
+        dp_assert(dp.helper.string.replaceAll('abcd', 'a', '-') === '-bcd', 'text-helper-string-replaceAll');
+
         dp_assert(
             function() {
                 return dp.test.ui.element.input.delegate.on_focus_called;

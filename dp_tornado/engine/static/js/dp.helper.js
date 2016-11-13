@@ -1,6 +1,24 @@
 if (!dp) var dp = {};
 
 dp.helper = {
+    prefixize: function(path, prefix) {
+        prefix = prefix || dp_prefix;
+
+        if (prefix) {
+            if (dp.helper.string.endsWith(prefix, '/')) {
+                prefix = prefix.substr(0, prefix.length -1);
+            }
+        }
+        else {
+            prefix = '';
+        }
+
+        if (dp.helper.string.startsWith(path, prefix)) {
+            path = path.substr(prefix.length) || '/';
+        }
+
+        return path;
+    },
     req: function(o) {
         alert('not implemented yet.');
     },
@@ -56,6 +74,12 @@ dp.helper = {
         },
         replaceAll: function(text, find, replace) {
             return text.split(find).join(replace);
+        },
+        startsWith: function(str, prefix) {
+            return str ? str.indexOf(prefix, 0) !== -1 : false;
+        },
+        endsWith: function(str, suffix) {
+            return str ? str.indexOf(suffix, str.length - suffix.length) !== -1 : false;
         }
     }
 };

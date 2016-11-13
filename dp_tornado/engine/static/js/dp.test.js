@@ -14,7 +14,21 @@ dp.test = {
         dp_assert(dp.helper.string.uniqid('prefix_', true), 'test-uniqid-with-entropy');
         dp_assert(dp.helper.string.uniqid('prefix_', true, '-'), 'test-uniqid-with-entropy-separator');
 
-        dp_assert(dp.helper.string.replaceAll('abcd', 'a', '-') === '-bcd', 'text-helper-string-replaceAll');
+        dp_prefix = '/front';
+
+        dp_assert(dp.helper.prefixize('/front') === '/', 'helper-prefixize-global-prefix');
+        dp_assert(dp.helper.prefixize('/front/') === '/', 'helper-prefixize-global-prefix');
+        dp_assert(dp.helper.prefixize('/front/foo/bar') === '/foo/bar', 'helper-prefixize-global-prefix');
+
+        dp_prefix = undefined;
+
+        dp_assert(dp.helper.prefixize('/front/foo/bar') === '/front/foo/bar', 'helper-prefixize-no-prefix');
+        dp_assert(dp.helper.prefixize('/front/foo/bar', '/front') === '/foo/bar', 'helper-prefixize-with-prefix');
+        dp_assert(dp.helper.prefixize('/front/foo/bar', '/front/') === '/foo/bar', 'helper-prefixize-with-prefix-slash');
+        dp_assert(dp.helper.prefixize('/front', '/front') === '/', 'helper-prefixize-with-prefix');
+        dp_assert(dp.helper.prefixize('/front', '/front/') === '/', 'helper-prefixize-with-prefix-slash');
+
+        dp_assert(dp.helper.string.replaceAll('abcd', 'a', '-') === '-bcd', 'helper-string-replaceAll');
 
         dp_assert(
             function() {

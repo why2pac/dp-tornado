@@ -35,6 +35,7 @@ var dp = {
     }
 };
 
+var dp_prefix = undefined;
 var dp_jqlib = false;
 var dp_init = function(fn) {
     if (!dp_jqlib) return;

@@ -50,6 +50,13 @@ dp.ui = {
             }
             else if (typeof(a) == 'string' && !b && !c && !d && !e) {
                 _msg = a;
+
+                if (b === null) {
+
+                }
+                else {
+                    _buttons.push(['OK', undefined]);
+                }
             }
             else if (typeof(a) == 'string' && typeof(b) == 'string' && !c && !d && !e) {
                 _msg = a;

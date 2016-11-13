@@ -28,6 +28,15 @@ dp.test = {
         dp_assert(dp.helper.prefixize('/front', '/front') === '/', 'helper-prefixize-with-prefix');
         dp_assert(dp.helper.prefixize('/front', '/front/') === '/', 'helper-prefixize-with-prefix-slash');
 
+        dp_assert(dp.helper.validator.email('email@valid.com'), 'helper-validator-email');
+        dp_assert(dp.helper.validator.email('email@.invalid.com') == false, 'helper-validator-email');
+
+        dp_assert(dp.helper.validator.url('http://www.google.com'), 'helper-validator-url');
+        dp_assert(dp.helper.validator.url('http://www.google'), 'helper-validator-url');
+        dp_assert(dp.helper.validator.url('http://123.123.123.123'), 'helper-validator-url');
+        dp_assert(dp.helper.validator.url('http://123.123.123.256') == false, 'helper-validator-url');
+        dp_assert(dp.helper.validator.url('https://www.google.') == false, 'helper-validator-url');
+
         dp_assert(dp.helper.string.replaceAll('abcd', 'a', '-') === '-bcd', 'helper-string-replaceAll');
 
         dp_assert(

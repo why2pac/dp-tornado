@@ -2,3 +2,15 @@
 .dp4css div,
 .dp4css input,
 .dp4css p { padding: 0; margin: 0; }
+
+.dp4css-alert { display: block; position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 2147483647; }
+.dp4css-alert ._bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)"; filter: alpha(opacity=75); opacity: 0.75; }
+.dp4css-alert ._box { display: block; position: absolute; width: 280px; margin-left: -155px; left: 50%; top: 50%; border: 1px solid #e0e0e0; padding: 15px; background-color: #fff; border-radius: 8px; }
+.dp4css-alert ._msg { background-color: #fff; padding: 60px 15px 40px 15px; color: #555; font-size: 13px; text-align: center; line-height: 200%; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; }
+.dp4css-alert ._ico { position: absolute; width: 80px; height: 80px; background: #24B5F2; top: 0; left: 50%; margin-left: -40px; margin-top: -40px; color: #fff; line-height: 80px; text-align: center; font-family: Impact; font-size: 40px; font-weight: 900; -webkit-border-radius: 40px; -moz-border-radius: 40px; border-radius: 40px; }
+.dp4css-alert ._btn { display: block; }
+.dp4css-alert ._btn button { display: block; width: 100%; height: 40px; line-height: 40px; text-align: center; outline: none; border: 1px solid #dcdcdc; background: #fff; color: #333; border-top-width: 0; font-family: "lucida grande", tahoma, verdana, arial, sans-serif; font-size: 12px; cursor: pointer; }
+.dp4css-alert ._btn button:hover { text-decoration: underline; }
+.dp4css-alert ._btn button {  }
+.dp4css-alert ._btn button._i-0 { border-top-width: 1px; background: #f9f9f9; border-color: #ccc; font-weight: bold; }
+.dp4css-alert ._btn button._i-1 {  }

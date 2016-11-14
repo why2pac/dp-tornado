@@ -14,19 +14,23 @@ dp.test = {
         dp_assert(dp.helper.string.uniqid('prefix_', true), 'test-uniqid-with-entropy');
         dp_assert(dp.helper.string.uniqid('prefix_', true, '-'), 'test-uniqid-with-entropy-separator');
 
-        dp_prefix = '/front';
+        var temp_prefix = dp.vars.prefix;
+
+        dp.vars.prefix = '/front';
 
         dp_assert(dp.helper.prefixize('/front') === '/', 'helper-prefixize-global-prefix');
         dp_assert(dp.helper.prefixize('/front/') === '/', 'helper-prefixize-global-prefix');
         dp_assert(dp.helper.prefixize('/front/foo/bar') === '/foo/bar', 'helper-prefixize-global-prefix');
 
-        dp_prefix = undefined;
+        dp.vars.prefix = undefined;
 
         dp_assert(dp.helper.prefixize('/front/foo/bar') === '/front/foo/bar', 'helper-prefixize-no-prefix');
         dp_assert(dp.helper.prefixize('/front/foo/bar', '/front') === '/foo/bar', 'helper-prefixize-with-prefix');
         dp_assert(dp.helper.prefixize('/front/foo/bar', '/front/') === '/foo/bar', 'helper-prefixize-with-prefix-slash');
         dp_assert(dp.helper.prefixize('/front', '/front') === '/', 'helper-prefixize-with-prefix');
         dp_assert(dp.helper.prefixize('/front', '/front/') === '/', 'helper-prefixize-with-prefix-slash');
+
+        dp.vars.prefix = temp_prefix;
 
         dp_assert(dp.helper.validator.email('email@valid.com'), 'helper-validator-email');
         dp_assert(dp.helper.validator.email('email@.invalid.com') == false, 'helper-validator-email');
@@ -262,7 +266,10 @@ dp.test = {
 
         setTimeout(function() {
             dp_assert(!dp.test.failed, 'all-test-cases');
-            dp_jqlib('<h3 />').attr('id', 'result-message').text('succeed').appendTo('body');
+
+            if (!dp.test.failed) {
+                dp_jqlib('<h3 />').attr('id', 'result-message').text('succeed').appendTo('body');
+            }
         }, wait * 500);
     },
     ui: {

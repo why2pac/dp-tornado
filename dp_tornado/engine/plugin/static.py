@@ -146,6 +146,8 @@ class StaticURL(tornado.web.UIModule):
         if dp_init:
             if self.handler.request.headers and 'X-Proxy-Prefix' in self.handler.request.headers:
                 dp_init = ["<script>var dp_prefix='%s';</script>" % self.handler.request.headers['X-Proxy-Prefix']]
+            else:
+                dp_init = []
         else:
             dp_init = []
 

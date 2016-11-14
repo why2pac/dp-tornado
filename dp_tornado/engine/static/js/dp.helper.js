@@ -2,7 +2,7 @@ if (!dp) var dp = {};
 
 dp.helper = {
     prefixize: function(path, prefix) {
-        prefix = prefix || dp_prefix;
+        prefix = prefix || dp.vars.prefix;
 
         if (prefix) {
             if (dp.helper.string.endsWith(prefix, '/')) {
@@ -74,7 +74,7 @@ dp.helper = {
         var dataType = obj.dataType || 'json';
         var fade = obj.fade != undefined ? obj.fade : true;
         var prefixize = obj.prefixize != undefined ? obj.prefixize : true;
-        var prefix = obj.prefix != undefined ? obj.prefix : dp_prefix;
+        var prefix = obj.prefix != undefined ? obj.prefix : dp.vars.prefix;
         var identifier = obj.identifier || undefined;
         var opacity_origin = btn ? btn.css('opacity') : 1.0;
 

@@ -39,7 +39,7 @@ dp.test = {
 
         dp_assert(dp.helper.string.replaceAll('abcd', 'a', '-') === '-bcd', 'helper-string-replaceAll');
 
-        var a_wait = wait * 60;
+        var a_wait = 280;
         var a_done = 550;
 
         setTimeout(function() {

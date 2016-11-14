@@ -32,6 +32,7 @@ for py_ver in 2.7 3.4; do
   then
     python setup.py install > /dev/null 2>&1
     pip install nose > /dev/null 2>&1
+    pip install selenium > /dev/null 2>&1
   fi
 
   ./nodeps/$py_ver/bin/nosetests -w ./tests --cover-erase

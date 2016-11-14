@@ -5,7 +5,10 @@ import time
 import requests
 import logging
 
-from . import consts
+try:
+    from . import consts
+except (ValueError, SystemError):
+    import consts
 
 
 def req(session, method, url, params=None, retry=3, retry_delay=1, host=None):

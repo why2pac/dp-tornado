@@ -42,6 +42,111 @@ dp.test = {
         var a_wait = 280;
         var a_done = 550;
 
+        // dp.req
+
+        var r1 = dp.req(_el('#req-test-case-1'), {
+            'before': function() {
+                return false;
+            }
+        });
+
+        dp_assert(r1 == false, 'helper-req-before-false');
+
+        //
+
+        _el('#req-test-case-1 input[name="email"]').val('');
+
+        var r2 = dp.req(_el('#req-test-case-1'));
+
+        setTimeout(function() {
+            dp_assert(r2.find('._msg').text() == _el('#req-test-case-1 input[name="email"]').attr('dp-req-missing'), 'helper-req-field-missing');
+            dp_jqlib(r2.find('button').get(0)).trigger('click');
+        }, a_done);
+
+        //
+
+        _el('#req-test-case-1 input[name="email"]').val('invalid@email@address.com');
+
+        var r3 = dp.req(_el('#req-test-case-1'));
+
+        setTimeout(function() {
+            dp_assert(r3.find('._msg').text() == _el('#req-test-case-1 input[name="email"]').attr('dp-req-invalid'), 'helper-req-field-invalid');
+            dp_jqlib(r3.find('button').get(0)).trigger('click');
+        }, a_done);
+
+        //
+
+        _el('#req-test-case-1 input[name="email"]').val('john@email.com');
+
+        var r4 = dp.req(_el('#req-test-case-1'), {
+            success: function(data) {
+                dp_assert(data.result, 'helper-req-field-confirm-response-success');
+            },
+            error: function() {
+                dp_assert(false, 'helper-req-field-confirm-response-error');
+            }
+        });
+
+        setTimeout(function() {
+            dp_assert(r4.find('._msg').text() == _el('#req-test-case-1 button').attr('dp-req-confirm'), 'helper-req-field-confirm');
+            dp_jqlib(r4.find('button').get(0)).trigger('click');
+        }, a_done);
+
+        //
+
+        var r5 = dp.req(_el('#req-test-case-1'));
+
+        dp_assert(r5 == false, 'helper-req-no-multiple');
+
+        //
+
+        _el('#req-test-case-1 button').attr('dp-req-multiple', 'yes');
+
+        var r6 = dp.req(_el('#req-test-case-1'));
+        var r7 = dp.req(_el('#req-test-case-1'));
+
+        setTimeout(function() {
+            dp_assert(r6.find('._msg').text() == _el('#req-test-case-1 button').attr('dp-req-confirm'), 'helper-req-multiple-first');
+            dp_jqlib(r6.find('button').get(1)).trigger('click');
+        }, a_done);
+
+        setTimeout(function() {
+            dp_assert(r7.find('._msg').text() == _el('#req-test-case-1 button').attr('dp-req-confirm'), 'helper-req-multiple-second');
+            dp_jqlib(r7.find('button').get(1)).trigger('click');
+        }, a_done);
+
+        //
+
+        var r8_id = dp.helper.string.uniqid();
+        _el('#req-test-case-1').clone().attr('id', r8_id).appendTo(_el('body'));
+        _el('#' + r8_id + ' input[name="name"]').val('short');
+
+        var r8 = dp.req(_el('#' + r8_id));
+
+        setTimeout(function() {
+            dp_assert(r8.find('._msg').text() == _el('#' + r8_id + ' input[name="name"]').attr('dp-req-invalid'), 'helper-req-field-too-short');
+            dp_jqlib(r8.find('button').get(0)).trigger('click');
+
+            _el('#' + r8_id).remove();
+        }, a_done);
+
+        //
+
+        var r9_id = dp.helper.string.uniqid();
+        _el('#req-test-case-1').clone().attr('id', r9_id).appendTo(_el('body'));
+        _el('#' + r9_id + ' input[name="name"]').val('too loooooooooooooooooong');
+
+        var r9 = dp.req(_el('#' + r8_id));
+
+        setTimeout(function() {
+            dp_assert(r9.find('._msg').text() == _el('#' + r9_id + ' input[name="name"]').attr('dp-req-invalid'), 'helper-req-field-too-long');
+            dp_jqlib(r9.find('button').get(0)).trigger('click');
+
+            _el('#' + r9_id).remove();
+        }, a_done);
+
+        // dp.alert
+
         setTimeout(function() {
             var a1 = dp.alert('text message', 'Okay');
 

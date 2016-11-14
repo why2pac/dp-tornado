@@ -9,13 +9,13 @@ var dp = {
 
         }
     },
-    req: function(o) {
+    req: function(o, oa) {
         if (!dp.helper) {
             alert('dp.helper library is required.');
             return false;
         }
 
-        return dp.helper.req(o);
+        return dp.helper.req(o, oa);
     },
     alert: function(a, b, c, d, e, f, g) {
         if (!dp.ui) {

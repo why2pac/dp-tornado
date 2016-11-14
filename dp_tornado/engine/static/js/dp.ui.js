@@ -9,6 +9,7 @@ dp.ui = {
     },
     util: {
         _alert_template: undefined,
+        alert_focus: undefined,
         alert: function(a, b, c, d, e) {
             if (dp.ui.util._alert_template == undefined) {
                 dp.ui.util._alert_template = dp_jqlib('<div />').addClass('dp4css-alert');
@@ -108,6 +109,11 @@ dp.ui = {
 
                     template.fadeTo(300, 0, function() {
                         template.remove();
+
+                        if (dp.ui.util.alert_focus) {
+                            dp.ui.util.alert_focus.focus();
+                            dp.ui.util.alert_focus = undefined;
+                        }
                     });
                 });
             };

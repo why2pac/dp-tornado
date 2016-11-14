@@ -10,5 +10,14 @@
 </head>
 <body>
     <input type="text" dp-on-return="dp.test.ui.element.input.delegate.on_return();" dp-on-focus="dp.test.ui.element.input.delegate.on_focus();" id="input-test" />
+
+    <form id="req-test-case-1" method="post" action="{{ prefixize('/tests/view/static/js_lib') }}" dp-req-res-type="json" dp-req-prefixize="yes">
+        <input type="hidden" name="email" value="john@email.com" dp-req-type="email" dp-req-required="yes" dp-req-focus="true" dp-req-missing="The `email` field is required." dp-req-invalid="The specified `email` field is invalid." />
+        <input type="hidden" name="name" value="john mayer" dp-req-type="text" dp-req-required="yes" dp-req-length="7,12" dp-req-missing="The `name` field is required." dp-req-invalid="The specified `name` field is invalid." />
+        <input type="hidden" name="homepage" value="http://www.google.com" dp-req-type="text" dp-req-required="no" dp-req-missing="The `homepage` field is required." dp-req-invalid="The specified `homepage` field is invalid." />
+        <input type="hidden" name="password" value="password" dp-req-type="text" dp-req-required="yes" dp-req-missing="The `password` field is required." dp-req-invalid="The specified `password` field is invalid." />
+        <input type="hidden" name="bio" value="" dp-req-type="text" dp-req-required="no" dp-req-missing="The `email` field is required." dp-req-invalid="The specified `email` field is invalid." />
+        <button type="button" dp-req-type="button" dp-req-fade="yes" dp-req-multiple="no" dp-req-identifier="req-test-case-1" dp-req-confirm="Are you sure?" onclick="dp.req(_el('#req-test-case-1'));">Submit [CASE 1]</button>
+    </form>
 </body>
 </html>

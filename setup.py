@@ -125,6 +125,7 @@ setup(
         'validators==0.11.0',
         dp_requires_CyMySQL,
         dp_requires_futres
+        # , 'selenium'
     ],
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

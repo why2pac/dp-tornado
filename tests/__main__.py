@@ -113,7 +113,8 @@ def run(main):
 
     from . import test_view_static
 
-    test_view_static.dp()
+    test_view_static.js_lib_include()
+    test_view_static.js_lib()
 
     from . import test_scheduler
 

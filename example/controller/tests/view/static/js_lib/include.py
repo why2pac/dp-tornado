@@ -2,12 +2,13 @@
 
 
 from dp_tornado.engine.controller import Controller
-from bs4 import BeautifulSoup
 
 
-class DpController(Controller):
+class IncludeController(Controller):
     def get(self):
-        o = self.render_string('tests/view/static/dp.html')
+        from bs4 import BeautifulSoup
+
+        o = self.render_string('tests/view/static/js_lib/include.html')
         o = BeautifulSoup(o, 'lxml')
 
         min_local = False

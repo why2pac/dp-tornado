@@ -116,6 +116,19 @@ class Bootstrap(object):
         engine.logger.log(100, 'CPU Count   : %d' % multiprocessing.cpu_count())
         engine.logger.log(100, '---------------------------------')
 
+        application = RestfulApplication(services, settings)
+        service = tornado.httpserver.HTTPServer(
+            application,
+            xheaders=True,
+            max_body_size=engine.ini.server.max_body_size)
+
+        try:
+            service.bind(engine.ini.server.port, '')
+        except Exception as e:
+            engine.logger.error('Failed to service binding. (port %s)' % engine.ini.server.port)
+            engine.logger.error(e)
+            return False
+
         if custom_scheduler:
             scheduler = Scheduler(custom_scheduler)
             scheduler.start()
@@ -123,12 +136,6 @@ class Bootstrap(object):
         else:
             scheduler = None
 
-        application = RestfulApplication(services, settings)
-        service = tornado.httpserver.HTTPServer(
-            application,
-            xheaders=True,
-            max_body_size=engine.ini.server.max_body_size)
-        service.bind(engine.ini.server.port, '')
         service.start(engine.ini.server.num_processes)
 
         import random

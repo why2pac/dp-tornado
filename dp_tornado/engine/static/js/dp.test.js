@@ -262,7 +262,10 @@ dp.test = {
 
         setTimeout(function() {
             dp_assert(!dp.test.failed, 'all-test-cases');
-            dp_jqlib('<h3 />').attr('id', 'result-message').text('succeed').appendTo('body');
+
+            if (!dp.test.failed) {
+                dp_jqlib('<h3 />').attr('id', 'result-message').text('succeed').appendTo('body');
+            }
         }, wait * 500);
     },
     ui: {

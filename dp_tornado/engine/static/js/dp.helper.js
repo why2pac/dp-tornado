@@ -215,8 +215,6 @@ dp.helper = {
                 error: error
             };
 
-            console.log(payload);
-
             dp_jqlib.ajax(payload);
         };
 

@@ -115,6 +115,7 @@ def run(main):
 
     test_view_static.js_lib_include()
     test_view_static.js_lib()
+    test_view_static.js_lib_virtual()
 
     from . import test_scheduler
 

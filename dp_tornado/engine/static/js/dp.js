@@ -44,7 +44,7 @@ var dp_init = function(fn) {
 
 try {
     // Required jQuery >= 3.0 library.
-    if (jQuery && jQuery.fn.jquery && parseFloat(jQuery.fn.jquery.split(' ')[0]) >= 3.0) {
+    if (jQuery && jQuery.fn.jquery && (parseFloat(jQuery.fn.jquery.split(' ')[0]) >= 3.0 || parseFloat(jQuery.fn.jquery.split(' ')[0]) <= 1.99)) {
         dp_jqlib = jQuery;
     }
 } catch (e) { }

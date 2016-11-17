@@ -46,6 +46,6 @@ or:
     $ dp4p run
 
 
-### Special Contributors
+### Inspired by
 
 [David](https://github.com/youngyoon), [Matthew](https://github.com/Matthew-Kwon) and [Max](https://github.com/leadermin)

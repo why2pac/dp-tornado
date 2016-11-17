@@ -9,7 +9,7 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class ToysSchema(dpTable):
     __table_name__ = 'toys'
 
-    __engine__ = 'MyISAM'
+    __engine__ = 'InnoDB'
     __charset__ = 'euckr'
 
     toy_id = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Toy ID')
@@ -21,8 +21,6 @@ class ToysSchema(dpTable):
     primary_key = dpAttribute.index(dpAttribute.IndexType.PRIMARY, 'toy_id')
 
     idx_toys_toy_name = dpAttribute.index(dpAttribute.IndexType.INDEX, 'toy_name')
-    idx_toys_toy_summary = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'toy_summary')
-    idx_toys_toy_description = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'toy_description')
 
     __dummy_data__ = [
         {'toy_id': 1, 'toy_code': 1000, 'toy_name': 'Lego', 'toy_summary': 'Lego Limited Edition', 'toy_description': 'Lego Limited Edition.'},

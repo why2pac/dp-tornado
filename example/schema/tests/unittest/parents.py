@@ -9,7 +9,7 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class ParentsSchema(dpTable):
     __table_name__ = 'parents'
 
-    __engine__ = 'MyISAM'
+    __engine__ = 'InnoDB'
     __charset__ = 'utf8'
 
     parent_id = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=1, nn=True, un=True, comment='Parent ID')

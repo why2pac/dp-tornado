@@ -9,6 +9,8 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class ChildToysSchema(dpTable):
     __table_name__ = 'child_toys'
 
+    __engine__ = 'InnoDB'
+
     child_id = dpAttribute.field(dpAttribute.DataType.BIGINT, pk=1, nn=True, un=True, comment='Child ID')
     toy_id = dpAttribute.field(dpAttribute.DataType.BIGINT, pk=2, nn=True, un=True, uq=True, comment='Toy ID')
 

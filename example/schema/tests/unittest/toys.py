@@ -9,6 +9,9 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class ToysSchema(dpTable):
     __table_name__ = 'toys'
 
+    __engine__ = 'InnoDB'
+    __charset__ = 'euckr'
+
     toy_id = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Toy ID')
     toy_cd = dpAttribute.field(dpAttribute.DataType.BIGINT(20), uq=True, nn=True, zf=True, un=True, name='toy_code', comment='Toy Code')
     toy_name = dpAttribute.field(dpAttribute.DataType.VARCHAR(128), nn=True, comment='Toy Name')

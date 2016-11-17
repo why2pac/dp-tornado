@@ -9,6 +9,8 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class FieldsSchema(dpTable):
     __table_name__ = 'fields'
 
+    __engine__ = 'MyISAM'
+
     PK = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Primary Key')
 
     INT = dpAttribute.field(dpAttribute.DataType.INT)

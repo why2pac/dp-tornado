@@ -9,7 +9,7 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class ToysSchema(dpTable):
     __table_name__ = 'toys'
 
-    __engine__ = 'InnoDB'
+    __engine__ = 'MyISAM'
     __charset__ = 'euckr'
 
     toy_id = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Toy ID')

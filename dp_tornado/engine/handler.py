@@ -422,13 +422,13 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         sessionid = self.get_sessionid() if not sessionid else sessionid
         key = '%s:%s' % (sessionid, name)
 
-        return self.cache.get(key, self._sessiondb, expire_in=expire_in)
+        return self.cache.get(key, dsn_or_conn=self._sessiondb, expire_in=expire_in)
 
     def get_session_value_ttl(self, name):
         sessionid = self.get_sessionid()
         key = '%s:%s' % (sessionid, name)
 
-        return self.cache.ttl(key, self._sessiondb)
+        return self.cache.ttl(key, dsn_or_conn=self._sessiondb)
 
     @property
     def session_default_expire_in(self):
@@ -439,7 +439,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         key = '%s:%s' % (sessionid, name)
         expire_in = expire_in if expire_in is not None else self.session_default_expire_in
 
-        return self.cache.set(key, value, self._sessiondb, expire_in=expire_in)
+        return self.cache.set(key, value, dsn_or_conn=self._sessiondb, expire_in=expire_in)
 
     def session(self, name, value=None, expire_in=None):
         expire_in = expire_in if expire_in is not None else self.session_default_expire_in

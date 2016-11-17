@@ -30,93 +30,6 @@ class CacheDriver(object):
     def getconn(self):
         pass
 
-    def flushall(self):
-        raise NotImplementedError
-
-    def flushdb(self):
-        raise NotImplementedError
-
-    def get(self, key, expire_in, delete):
-        raise NotImplementedError
-
-    def set(self, key, val, expire_in):
-        raise NotImplementedError
-
-    def setnx(self, key, val, expire_in):
-        raise NotImplementedError
-
-    def delete(self, key):
-        raise NotImplementedError
-
-    def increase(self, key, amount, expire_in):
-        raise NotImplementedError
-
-    def llen(self, key):
-        raise NotImplementedError
-
-    def lrange(self, key, start, stop):
-        raise NotImplementedError
-
-    def rpush(self, key, value, expire_in):
-        raise NotImplementedError
-
-    def lpop(self, key):
-        raise NotImplementedError
-
-    def blpop(self, key, timeout):
-        raise NotImplementedError
-
-    def brpop(self, key, timeout):
-        raise NotImplementedError
-
-    def lrem(self, key, count, value):
-        raise NotImplementedError
-
-    def lpush(self, key, value, expire_in):
-        raise NotImplementedError
-
-    def rpop(self, key):
-        raise NotImplementedError
-
-    def smembers(self, key):
-        raise NotImplementedError
-
-    def scard(self, key, expire_in):
-        raise NotImplementedError
-
-    def sadd(self, key, value, expire_in):
-        raise NotImplementedError
-
-    def srem(self, key, value):
-        raise NotImplementedError
-
-    def publish(self, channel, message):
-        raise NotImplementedError
-
-    def hlen(self, key, expire_in):
-        raise NotImplementedError
-
-    def hgetall(self, key):
-        raise NotImplementedError
-
-    def hget(self, key, field):
-        raise NotImplementedError
-
-    def hset(self, key, field, val):
-        raise NotImplementedError
-
-    def hdel(self, key, field):
-        raise NotImplementedError
-
-    def keys(self, pattern):
-        raise NotImplementedError
-
-    def dbsize(self):
-        raise NotImplementedError
-
-    def ttl(self, key):
-        raise NotImplementedError
-
 
 class Cache(dpEngine):
     server_startup_at = None
@@ -143,17 +56,17 @@ class Cache(dpEngine):
 
     @property
     def pools(self):
-        if not hasattr(self, '_pools'):
-            self._pools = {}
+        if '_pools' not in self.__dict__:
+            self.__dict__['_pools'] = {}
 
-        return self._pools
+        return self.__dict__['_pools']
 
     @property
     def flags(self):
-        if not hasattr(self, '_flags'):
-            self._flags = {}
+        if '_flags' not in self.__dict__:
+            self.__dict__['_flags'] = {}
 
-        return self._flags
+        return self.__dict__['_flags']
 
     def _parse_config(self, config_dsn, delegate):
         if isinstance(config_dsn, dpInValueModelConfig):
@@ -265,182 +178,31 @@ class Cache(dpEngine):
 
         return driver.getconn()
 
-    def flushall(self, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+    def __getattr__(self, item):
+        def delegate(*args, **kwargs):
+            dsn_or_conn = kwargs['dsn_or_conn'] if 'dsn_or_conn' in kwargs else None
+            dsn_or_conn = kwargs['dsn'] if not dsn_or_conn and 'dsn' in kwargs else dsn_or_conn
 
-        return conn.flushall()
+            if 'dsn_or_conn' in kwargs:
+                del kwargs['dsn_or_conn']
 
-    def flushdb(self, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+            if 'dsn' in kwargs:
+                del kwargs['dsn']
 
-        return conn.flushdb()
+            if not dsn_or_conn:
+                raise Exception('The `dsn` argument must specify to invoke a method.')
 
-    def get(self, key, dsn_or_conn, expire_in=None, delete=False):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+            config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
+            conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+            method = getattr(conn, item, None)
 
-        return conn.get(key, expire_in, delete)
+            if not method:
+                message = 'The `%s`.`%s` method is not implemented.' % (conn.__class__.__name__, item)
+                raise NotImplementedError(message)
 
-    def set(self, key, val, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
+            return method(*args, **kwargs)
 
-        assert(expire_in is None or int(expire_in) >= 0)
-        return conn.set(key, val, expire_in)
-
-    def setnx(self, key, val, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        assert(expire_in is None or int(expire_in) >= 0)
-        return conn.setnx(key, val, expire_in)
-
-    def delete(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.delete(key)
-
-    def increase(self, key, amount, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        assert(expire_in is None or int(expire_in) >= 0)
-        return conn.increase(key, amount, expire_in)
-
-    def llen(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.llen(key)
-
-    def lrange(self, key, start, stop, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.lrange(key, start, stop)
-
-    def rpush(self, key, value, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.rpush(key, value, expire_in)
-
-    def lpop(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.lpop(key)
-
-    def blpop(self, key, timeout, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.blpop(key, timeout)
-
-    def brpop(self, key, timeout, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.brpop(key, timeout)
-
-    def lrem(self, key, count, value, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.lrem(key, count, value)
-
-    def lpush(self, key, value, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.lpush(key, value, expire_in)
-
-    def rpop(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.rpop(key)
-
-    def smembers(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.smembers(key)
-
-    def scard(self, key, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.scard(key, expire_in)
-
-    def sadd(self, key, value, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.sadd(key, value, expire_in)
-
-    def srem(self, key, value, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.srem(key, value)
-
-    def publish(self, channel, message, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.publish(channel, message)
-
-    def hlen(self, key, dsn_or_conn, expire_in=None):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.hlen(key, expire_in)
-
-    def hgetall(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.hgetall(key)
-
-    def hget(self, key, field, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.hget(key, field)
-
-    def hset(self, key, field, val, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.hset(key, field, val)
-
-    def hdel(self, key, val, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.hdel(key, val)
-
-    def keys(self, pattern, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.keys(pattern)
-
-    def dbsize(self, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.dbsize()
-
-    def ttl(self, key, dsn_or_conn):
-        config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, dpInValueModelConfig)) else None
-        conn = self.getconn(config_dsn) if config_dsn else dsn_or_conn
-
-        return conn.ttl(key)
+        return delegate
 
 
 class LockDecorator(object):
@@ -466,7 +228,7 @@ class LockDecorator(object):
             fn_args = args[1:]
 
             cache_key = 'dp:lock:val:%s:%s:%s' % (args[0].__class__, f.__name__, _engine_.ini.server.identifier)
-            acquired = _engine_.cache.setnx(cache_key, self._expire_at, self._dsn, expire_in=self._expire_in)
+            acquired = _engine_.cache.setnx(cache_key, self._expire_at, dsn_or_conn=self._dsn, expire_in=self._expire_in)
 
             if not acquired:
                 return False
@@ -474,10 +236,10 @@ class LockDecorator(object):
             try:
                 output = f(*args, **kwargs)
             except Exception as e:
-                _engine_.cache.delete(cache_key, self._dsn)
+                _engine_.cache.delete(cache_key, dsn_or_conn=self._dsn)
                 raise e
 
-            _engine_.cache.delete(cache_key, self._dsn)
+            _engine_.cache.delete(cache_key, dsn_or_conn=self._dsn)
             return output
 
         self._func_name = f.__name__
@@ -518,7 +280,7 @@ class Decorator(object):
     def _cached(self, cache_key):
         for dsn in self._dsn:
             if dsn:
-                cached = _engine_.cache.get(cache_key, dsn)
+                cached = _engine_.cache.get(cache_key, dsn_or_conn=dsn)
             else:
                 if hasattr(_cached_, cache_key):
                     cached = getattr(_cached_, cache_key, None)
@@ -549,7 +311,7 @@ class Decorator(object):
                 if hasattr(_cached_, cache_key):
                     delattr(_cached_, cache_key)
             else:
-                _engine_.cache.delete(cache_key, dsn)
+                _engine_.cache.delete(cache_key, dsn_or_conn=dsn)
 
         return True
 
@@ -568,7 +330,7 @@ class Decorator(object):
             if not dsn:
                 setattr(_cached_, cache_key, serialized)
             else:
-                _engine_.cache.set(cache_key, serialized, dsn, self._expire_in)
+                _engine_.cache.set(key=cache_key, val=serialized, expire_in=self._expire_in, dsn_or_conn=dsn)
 
         return True
 

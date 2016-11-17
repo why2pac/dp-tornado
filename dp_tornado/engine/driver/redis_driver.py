@@ -39,7 +39,7 @@ class RedisCacheDriver(dpCacheDriver):
     def flushdb(self):
         return self.conn.flushdb()
 
-    def get(self, key, expire_in, delete):
+    def get(self, key, expire_in=None, delete=False):
         if expire_in is None and not delete:
             return decoded_value(self.conn.get(key))
 
@@ -61,7 +61,7 @@ class RedisCacheDriver(dpCacheDriver):
             else:
                 return False
 
-    def set(self, key, val, expire_in):
+    def set(self, key, val, expire_in=None):
         if expire_in is None:
             return self.conn.set(key, val)
 
@@ -71,7 +71,7 @@ class RedisCacheDriver(dpCacheDriver):
             p.expire(key, int(expire_in))
             return p.execute()
 
-    def setnx(self, key, val, expire_in):
+    def setnx(self, key, val, expire_in=None):
         setnx = self.conn.setnx(key, val)
 
         if not setnx:
@@ -89,7 +89,7 @@ class RedisCacheDriver(dpCacheDriver):
     def delete(self, key):
         return self.conn.delete(key)
 
-    def increase(self, key, amount, expire_in):
+    def increase(self, key, amount, expire_in=None):
         if expire_in is None:
             return self.conn.incrby(key, amount)
 
@@ -105,7 +105,7 @@ class RedisCacheDriver(dpCacheDriver):
     def lrange(self, key, start, stop):
         return self.conn.lrange(key, start, stop)
 
-    def rpush(self, key, value, expire_in):
+    def rpush(self, key, value, expire_in=None):
         if expire_in is None:
             return self.conn.rpush(key, value)
 
@@ -130,7 +130,7 @@ class RedisCacheDriver(dpCacheDriver):
         lrem = self.conn.lrem(name=key, num=count, value=value)
         return lrem
 
-    def lpush(self, key, value, expire_in):
+    def lpush(self, key, value, expire_in=None):
         if expire_in is None:
             return self.conn.lpush(key, value)
 
@@ -146,7 +146,7 @@ class RedisCacheDriver(dpCacheDriver):
     def smembers(self, key):
         return self.conn.smembers(key)
 
-    def scard(self, key, expire_in):
+    def scard(self, key, expire_in=None):
         if expire_in is None:
             return self.conn.scard(key)
 
@@ -161,7 +161,7 @@ class RedisCacheDriver(dpCacheDriver):
             else:
                 return False
 
-    def sadd(self, key, value, expire_in):
+    def sadd(self, key, value, expire_in=None):
         if expire_in is None:
             return self.conn.sadd(key, value)
 
@@ -180,7 +180,7 @@ class RedisCacheDriver(dpCacheDriver):
     def publish(self, channel, message):
         return self.conn.publish(channel, message)
 
-    def hlen(self, key, expire_in):
+    def hlen(self, key, expire_in=None):
         if expire_in is None:
             return self.conn.hlen(key)
 

@@ -9,6 +9,8 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class ChildsSchema(dpTable):
     __table_name__ = 'childs'
 
+    __engine__ = 'InnoDB'
+
     child_id = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Child ID')
     parent_id = dpAttribute.field(dpAttribute.DataType.BIGINT, nn=True, un=True, comment='Parent ID')
     child_name = dpAttribute.field(dpAttribute.DataType.VARCHAR(128), nn=True, comment='Child Name')

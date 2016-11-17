@@ -66,9 +66,9 @@ class SchemaTestModel(dpModel):
         offset = 0
 
         fields = (
-            ('child_toys', 0, 'PRIMARY', 1, 'child_id', 'A', 0, None, None, '', 'BTREE', '', ''),
-            ('child_toys', 0, 'PRIMARY', 2, 'toy_id', 'A', 0, None, None, '', 'BTREE', '', ''),
-            ('child_toys', 0, 'uk_child_toys_toy_id', 1, 'toy_id', 'A', 0, None, None, '', 'BTREE', '', '')
+            ('child_toys', 0, 'PRIMARY', 1, 'child_id', 'A', False, False, False, '', 'BTREE', '', ''),
+            ('child_toys', 0, 'PRIMARY', 2, 'toy_id', 'A', False, False, False, '', 'BTREE', '', ''),
+            ('child_toys', 0, 'uk_child_toys_toy_id', 1, 'toy_id', 'A', False, False, False, '', 'BTREE', '', '')
         )
 
         for e in self.rows("""

@@ -9,6 +9,8 @@ from dp_tornado.engine.schema import Attribute as dpAttribute
 class FieldsSchema(dpTable):
     __table_name__ = 'fields'
 
+    __engine__ = 'MyISAM'
+
     PK = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Primary Key')
 
     INT = dpAttribute.field(dpAttribute.DataType.INT)
@@ -42,3 +44,6 @@ class FieldsSchema(dpTable):
 
     BINARY = dpAttribute.field(dpAttribute.DataType.BINARY(6))
     VARBINARY = dpAttribute.field(dpAttribute.DataType.VARBINARY(64))
+
+    idx_fields_char = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'CHAR')
+    idx_fields_varchar = dpAttribute.index(dpAttribute.IndexType.FULLTEXT, 'VARCHAR')

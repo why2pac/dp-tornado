@@ -412,14 +412,22 @@ class MySqlDriver(dpSchemaDriver):
             primary_key = ', '.join(['`%s`' % e[0] for e in sorted([(v.name, v.pk) for k, v in fields if v.pk is not None], key=lambda e: e[1])])
             primary_key = ', PRIMARY KEY (%s)' % primary_key if primary_key else ''
 
+            engine = getattr(table, '__engine__', None)
+            charset = getattr(table, '__charset__', None)
+
+            engine = 'ENGINE=%s' % engine if engine else ''
+            charset = 'DEFAULT CHARSET=%s' % charset if charset else ''
+
             proxy.execute("""
                 CREATE TABLE `{table_name}` (
                     {fields}
                     {primary_key}
-                )"""
+                ) {engine} {charset}"""
                           .replace('{fields}', fields_query)
                           .replace('{primary_key}', primary_key)
-                          .replace('{table_name}', table_name))
+                          .replace('{table_name}', table_name)
+                          .replace('{engine}', engine)
+                          .replace('{charset}', charset))
 
             return True
 

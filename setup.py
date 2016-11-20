@@ -122,7 +122,7 @@ setup(
         'BeautifulSoup4==4.5.1',
         'lxml==3.6.4',
         'httpagentparser==1.7.8',
-        'validators==0.11.0',
+        'validators==0.11.1',
         dp_requires_CyMySQL,
         dp_requires_futres
         # , 'selenium'

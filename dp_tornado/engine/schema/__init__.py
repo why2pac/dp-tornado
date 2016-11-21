@@ -279,6 +279,8 @@ class Table(object):
 
         if driver.startswith('mysql'):
             driver = 'mysql'
+        elif driver.startswith('sqlite'):
+            driver = 'sqlite'
         else:
             driver = None
 
@@ -350,6 +352,8 @@ class Table(object):
 
         if driver == 'mysql':
             from .driver.mysql_driver import MySqlDriver as SchemaDriver
+        elif driver == 'sqlite':
+            from .driver.sqlite_driver import SqliteDriver as SchemaDriver
         else:
             from .driver import SchemaDriver
 
@@ -366,6 +370,8 @@ class Table(object):
 
         if driver == 'mysql':
             from .driver.mysql_driver import MySqlDriver as SchemaDriver
+        elif driver == 'sqlite':
+            from .driver.sqlite_driver import SqliteDriver as SchemaDriver
         else:
             from .driver import SchemaDriver
 

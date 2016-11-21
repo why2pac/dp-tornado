@@ -205,14 +205,18 @@ class ModelSingleton(dpEngine, dpSingleton):
         return proxy.connection.close()
 
     def _bind_helper(self, conn, sql, bind):
+        """
+          tuple style binding -> dict style binding
+
         if conn and \
                 getattr(conn, 'engine', None) and \
                 getattr(getattr(conn, 'engine'), 'url', None) and \
                 getattr(getattr(conn, 'engine'), 'url').drivername == 'sqlite':
-            if isinstance(bind, (tuple, list)):
+            if sql.find('%s') != -1 and isinstance(bind, (tuple, list)):
                 param = tuple([':param_%s' % k for k in range(len(bind))])
                 bind = dict([('param_%s' % k, bind[k]) for k in range(len(bind))])
                 sql = sql % param
+        """
 
         return sql, bind
 

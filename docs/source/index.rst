@@ -29,8 +29,8 @@ Startup::
 
 or::
 
-    $ dp4p init --path app_dir
-    $ dp4p run --path app_dir
+    $ dp4p init --path app_dir --template=bbs
+    $ dp4p run --path app_dir --template=bbs
 
 or::
 

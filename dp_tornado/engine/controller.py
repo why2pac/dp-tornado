@@ -12,6 +12,29 @@ Here is a `foo_bar` controller example:
     class FooBarController(Controller):
         def get(self):
             self.finish('done')
+
+
+Directory/File and URL Mapping rules
+------------------------------------
+* */controller/__init__.py*, ``StarterController`` > **/**
+* */controller/blog/__init__.py*, ``BlogController`` > **/blog**
+* */controller/blog/admin/__init__.py*, ``AdminController`` > **/blog/admin**
+* */controller/blog/post.py*, ``PostController`` > **/blog/post**
+* */controller/blog/view.py*, ``ViewController`` > **/blog/view**
+* */controller/foo_bar.py*, ``FooBarController`` > **/foo_bar**
+
+
+Class/Method and URL Mapping rules
+----------------------------------
+* */controller/foo.py*, ``def get(self)``: **GET /foo**
+* */controller/foo.py*, ``def get(self, a)``: **GET /foo/{path}**
+* */controller/foo.py*, ``def get(self, a, b)``: **GET /foo/{path}/{path}**
+* */controller/foo.py*, ``def get(self, a, b=None)``: **GET /foo/{path}/{path}** and **GET /foo/{path}**
+* */controller/foo.py*, ``def post(self)``: **POST /foo**
+* */controller/foo.py*, ``def put(self)``: **PUT /foo**
+* */controller/foo.py*, ``def delete(self)``: **DELETE /foo**
+* */controller/foo.py*, ``def head(self)``: **HEAD /foo**
+* */controller/foo.py*, ``def patch(self)``: **PATCH /foo**
 """
 
 

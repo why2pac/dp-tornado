@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Controller
-The model directly manages the data, logic, and rules of the application. `<Wikipedia>
+"""The model directly manages the data, logic, and rules of the application. `<Wikipedia>
 <https://en.wikipedia.org/wiki/Model–view–controller>`_
 
 Here is a `foo_bar` model example:
@@ -10,8 +9,40 @@ Here is a `foo_bar` model example:
     from dp_tornado.engine.model import Model as dpModel
 
     class FooBarModel(dpModel):
-        def add(self, a, b):
+        def func1(self):
+            \"""
+            assert self.helper.foo.func1(10, 20) == None
+            \"""
+            return None
+
+        def func2(self, a):
+            \"""
+            assert self.helper.foo.func2(10) == 10
+            \"""
+            return a
+
+        def func3(self, a, b):
+            \"""
+            assert self.helper.foo.func3(10, 20) == 30
+            \"""
             return a + b
+
+
+File/Class Invoke rules
+-----------------------
+* */model/__init__.py*, **DO NOT IMPLEMENT ANY CODE IN THIS FILE**
+* */model/blog/__init__.py*, ``BlogModel`` > **model.blog**
+* */model/blog/admin/__init__.py*, ``AdminModel`` > **model.blog.admin**
+* */model/blog/post.py*, ``PostModel`` > **model.blog.post**
+* */model/blog/view.py*, ``ViewModel`` > **model.blog.view**
+* */model/foo_bar.py*, ``FooBarModel`` > **model.foo_bar**
+
+
+Method Invoke rules
+-------------------
+* */model/foo.py*, ``def func1(self)``: **model.foo.func1()**
+* */model/foo.py*, ``def func2(self, a)``: **model.foo.func2(a)**
+* */model/foo.py*, ``def func3(self, a, b)``: **model.foo.func3(a, b)**
 """
 
 from .engine import Engine as dpEngine

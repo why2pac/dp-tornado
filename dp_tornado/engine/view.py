@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Controller
-A view can be any output representation of information, such as a chart or a diagram. `<Wikipedia>
+"""A view can be any output representation of information, such as a chart or a diagram. `<Wikipedia>
 <https://en.wikipedia.org/wiki/Model–view–controller>`_
 
 Here is a view example:

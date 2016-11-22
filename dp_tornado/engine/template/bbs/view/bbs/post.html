@@ -1,0 +1,31 @@
+{% include "../common/header.html" %}
+
+<form class="bbs view post" method="post" action="/post" dp-req-res-type="json">
+    <table class="bbs view">
+        <caption>Post</caption>
+        <tbody>
+            <tr>
+                <th><label for="author">Author:</label></th>
+                <td><input type="text" id="author" class="author" dp-req-type="text" dp-req-required="yes" dp-req-missing="The `Author` field is required." /></td>
+            </tr>
+            <tr>
+                <th><label for="title">Title:</label></th>
+                <td><input type="text" id="title" class="title" dp-req-type="text" dp-req-required="yes" dp-req-missing="The `Title` field is required." /></td>
+            </tr>
+            <tr>
+                <th><label for="content">Content:</label></th>
+                <td><textarea id="content" dp-req-type="text" dp-req-required="yes" dp-req-missing="The `Content` field is required."></textarea></td>
+            </tr>
+        </tbody>
+        <tfoot class="buttons">
+            <tr>
+                <td colspan="2">
+                    <a href="javascript:void(0);" dp-req-type="button" dp-req-fade="yes" dp-req-multiple="no" dp-req-identifier="req-test-case-1" dp-req-confirm="Are you sure?" onclick="dp.req($(this).closest('form'), {success: function() { document.location.href = '/list'; }, error: function() { dp.alert('An error has occurred.'); }});">Post</a>
+                    <a href="{{ request_uri or prefixize('/list') }}">List</a>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</form>
+
+{% include "../common/footer.html" %}

@@ -111,18 +111,18 @@ setup(
     install_requires=[
         'tornado==4.4.2',
         'redis==2.10.5',
-        'requests==2.11.1',
+        'requests==2.12.1',
         'croniter==0.3.13',
         'pytz==2016.7',
         'pycrypto==2.6.1',
         'boto3==1.4.1',
-        'SQLAlchemy==1.1.3',
+        'SQLAlchemy==1.1.4',
         'Pillow==3.4.2',
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
         'lxml==3.6.4',
         'httpagentparser==1.7.8',
-        'validators==0.11.0',
+        'validators==0.11.1',
         dp_requires_CyMySQL,
         dp_requires_futres
         # , 'selenium'

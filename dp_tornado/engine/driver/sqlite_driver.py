@@ -145,8 +145,12 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             'DELETE FROM {table_name} WHERE expire_at < ?'.replace('{table_name}', self._table_name(self._config_dsn)),
             self.helper.datetime.timestamp.now(), self._config_dsn, cache=True)
 
-    def get(self, key, retry_count=0, raise_error=False):
+    def get(self, key, expire_in=None, retry_count=0, raise_error=False):
         self._referenced()
+
+        # TODO
+        if expire_in:
+            self.logging.warning('`sqlite_driver`.`get` method does not supported `expire_in` argument yet.')
 
         try:
             result = dpModelSingleton().row(

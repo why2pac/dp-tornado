@@ -141,6 +141,15 @@ class StaticURL(tornado.web.UIModule):
                                                                self.handler.vars.static.aws_endpoint) else False
 
         dp_static = True if 'dp' in options and options['dp'] else False
+        dp_init = True if dp_static and 'init' in options and options['init'] else False
+
+        if dp_init:
+            if self.handler.request.headers and 'X-Proxy-Prefix' in self.handler.request.headers:
+                dp_init = ["<script>var dp_prefix='%s';</script>" % self.handler.request.headers['X-Proxy-Prefix']]
+            else:
+                dp_init = []
+        else:
+            dp_init = []
 
         explicit = None
         explicit = 'debug' if 'debug' in options and options['debug'] else explicit
@@ -159,10 +168,10 @@ class StaticURL(tornado.web.UIModule):
         # for Debugging Mode, do not minify css or js.
         if explicit == 'debug' or (not explicit and self.handler.settings.get('debug')):
             mtime = self.handler.vars.compressor.helper.datetime.timestamp.now(ms=True)
-            return '\n'.join([self._template('%s?%s' % (t, mtime), dp_static=dp_static) for t in statics])
+            return '\n'.join(dp_init + [self._template('%s?%s' % (t, mtime), dp_static=dp_static) for t in statics])
 
         elif explicit == 'skip' or (not explicit and (not self.handler.vars.static.minify or explicit_proxy)):
-            return '\n'.join([self._template(
+            return '\n'.join(dp_init + [self._template(
                 '%s?%s' % (t, self.handler.application.startup_at), dp_static=dp_static) for t in statics])
 
         cache_key = 'key_%s_%s' % (explicit, self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))
@@ -188,7 +197,7 @@ class StaticURL(tornado.web.UIModule):
 
             if len(extensions) > 1:
                 options['_separate'] = False
-                return '\n'.join(self.render(*static, **options) for static in list(extensions.values()))
+                return '\n'.join(dp_init + [self.render(*static, **options) for static in list(extensions.values())])
             else:
                 statics = list(extensions.values())[0]
 

@@ -5,6 +5,7 @@ var dp = {
         }
     },
     vars: {
+        prefix: undefined,
         cached: {
 
         }
@@ -35,7 +36,10 @@ var dp = {
     }
 };
 
-var dp_prefix = undefined;
+try {
+    dp.vars.prefix = dp_prefix || undefined;
+}
+catch (e) { }
 var dp_jqlib = false;
 var dp_init = function(fn) {
     if (!dp_jqlib) return;

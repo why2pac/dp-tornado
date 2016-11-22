@@ -35,6 +35,9 @@ addons:
       - nginx
 
 before_script:
+  - sudo apt-get install -y -qq postfix
+  - sudo service postfix start
+
   - sudo cp ./travis/conf/nginx.conf /etc/nginx/nginx.conf
   - sudo cat /etc/nginx/nginx.conf
   

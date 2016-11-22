@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Controller
-The model directly manages the data, logic, and rules of the application. `<Wikipedia>
+"""The model directly manages the data, logic, and rules of the application. `<Wikipedia>
 <https://en.wikipedia.org/wiki/Model–view–controller>`_
 
 Here is a `foo_bar` model example:
@@ -10,8 +9,40 @@ Here is a `foo_bar` model example:
     from dp_tornado.engine.model import Model as dpModel
 
     class FooBarModel(dpModel):
-        def add(self, a, b):
+        def func1(self):
+            \"""
+            assert self.helper.foo.func1(10, 20) == None
+            \"""
+            return None
+
+        def func2(self, a):
+            \"""
+            assert self.helper.foo.func2(10) == 10
+            \"""
+            return a
+
+        def func3(self, a, b):
+            \"""
+            assert self.helper.foo.func3(10, 20) == 30
+            \"""
             return a + b
+
+
+File/Class Invoke rules
+-----------------------
+* */model/__init__.py*, **DO NOT IMPLEMENT ANY CODE IN THIS FILE**
+* */model/blog/__init__.py*, ``BlogModel`` > **model.blog**
+* */model/blog/admin/__init__.py*, ``AdminModel`` > **model.blog.admin**
+* */model/blog/post.py*, ``PostModel`` > **model.blog.post**
+* */model/blog/view.py*, ``ViewModel`` > **model.blog.view**
+* */model/foo_bar.py*, ``FooBarModel`` > **model.foo_bar**
+
+
+Method Invoke rules
+-------------------
+* */model/foo.py*, ``def func1(self)``: **model.foo.func1()**
+* */model/foo.py*, ``def func2(self, a)``: **model.foo.func2(a)**
+* */model/foo.py*, ``def func3(self, a, b)``: **model.foo.func3(a, b)**
 """
 
 from .engine import Engine as dpEngine
@@ -204,10 +235,28 @@ class ModelSingleton(dpEngine, dpSingleton):
     def close(self, proxy):
         return proxy.connection.close()
 
+    def _bind_helper(self, conn, sql, bind):
+        """
+          tuple style binding -> dict style binding
+
+        if conn and \
+                getattr(conn, 'engine', None) and \
+                getattr(getattr(conn, 'engine'), 'url', None) and \
+                getattr(getattr(conn, 'engine'), 'url').drivername == 'sqlite':
+            if sql.find('%s') != -1 and isinstance(bind, (tuple, list)):
+                param = tuple([':param_%s' % k for k in range(len(bind))])
+                bind = dict([('param_%s' % k, bind[k]) for k in range(len(bind))])
+                sql = sql % param
+        """
+
+        return sql, bind
+
     def execute(self, sql, bind=None, dsn_or_conn=None, cache=False):
         config_dsn = dsn_or_conn if isinstance(dsn_or_conn, (str, InValueModelConfig)) else None
         conn = self.getconn(config_dsn, cache=cache) if config_dsn else dsn_or_conn
         conn = conn.connection if isinstance(conn, ModelProxy) else conn
+
+        sql, bind = self._bind_helper(conn, sql, bind)
 
         if isinstance(bind, dict):
             result = conn.execute(sql, **bind)

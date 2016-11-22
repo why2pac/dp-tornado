@@ -1,8 +1,7 @@
 Helper
 ======
 
-.. warning::
-   This package is not documented yet.
+.. automodule:: dp_tornado.engine.helper
 
 .. toctree::
 

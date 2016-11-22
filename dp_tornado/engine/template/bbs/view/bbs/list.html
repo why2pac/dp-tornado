@@ -1,0 +1,39 @@
+{% include "../common/header.html" %}
+
+<table class="bbs list" cellpadding="0" cellspacing="0">
+    <caption>BBS</caption>
+    <thead>
+        <tr>
+            <th class="no">No</th>
+            <th class="title">Title</th>
+            <th class="author">Author</th>
+            <th class="signdate">Signdate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set offset = 0 %}
+        {% for e in articles['rows'] %}
+            {% set offset += 1 %}
+            <tr>
+                <td class="no">{{ articles['count'] - (articles['rpp'] * (articles['page'] - 1)) - offset + 1 }}</td>
+                <td class="title"><a href="{{ prefixize('/list/%s' % e['article_id'], {'request_uri': request_uri()}) }}">{{ e['title'] }}</a></td>
+                <td class="author">{{ e['author'] }}</td>
+                <td class="signdate">{{ yyyymmdd(timestamp=e['signdate'], concat='-') }} {{ hhiiss(timestamp=e['signdate'], concat=':') }}</td>
+            </tr>
+        {% end %}
+    </tbody>
+    <tfoot>
+        <tr class="pagination">
+            <td colspan="4">
+                {% module Pagination(total_count=articles['count'], page=articles['page'], rpp=articles['rpp']) %}
+            </td>
+        </tr>
+        <tr class="buttons">
+            <td colspan="4">
+                <a href="{{ prefixize('/post', {'request_uri': request_uri()}) }}">Post</a>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+{% include "../common/footer.html" %}

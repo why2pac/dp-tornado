@@ -1,0 +1,26 @@
+{% include "../common/header.html" %}
+
+<table class="bbs view">
+    <caption>View</caption>
+    <tbody>
+        <tr>
+            <th>Author</th>
+            <td>{{ article['author'] }} / {{ yyyymmdd(timestamp=article['signdate'], concat='-') }} {{ hhiiss(timestamp=article['signdate'], concat=':') }}</td>
+        </tr>
+        <tr>
+            <th>Title</th>
+            <td>{{ article['title'] }}</td>
+        </tr>
+        <tr>
+            <th>Content</th>
+            <td>{% raw nl2br(article['content']) %}</td>
+        </tr>
+    </tbody>
+    <tfoot class="buttons">
+        <tr>
+            <td colspan="2"><a href="{{ request_uri or prefixize('/list') }}">List</a></td>
+        </tr>
+    </tfoot>
+</table>
+
+{% include "../common/footer.html" %}

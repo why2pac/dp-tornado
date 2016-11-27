@@ -165,7 +165,7 @@ class StaticURL(tornado.web.UIModule):
             explicit = 'local'
             self.handler.logging.warning('Required AWS configuration. explicit option is ignored.')
 
-        # for Debugging Mode, do not minify css or js.
+        # for Debugging Mode, skip minify css or js.
         if explicit == 'debug' or (not explicit and self.handler.settings.get('debug')):
             mtime = self.handler.vars.compressor.helper.datetime.timestamp.now(ms=True)
             return '\n'.join(dp_init + [self._template('%s?%s' % (t, mtime), dp_static=dp_static) for t in statics])

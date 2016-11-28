@@ -148,10 +148,10 @@ class Scheduler(threading.Thread, dpEngine):
             url = '%s/%s' % (self.request_host, payload['command'])
             code, content = self.helper.web.http.get.text(url)
 
-            if code == 200:
+            if code != 200:
                 payload['ref'] -= 1
+                payload['enabled'] = True
 
-            payload['enabled'] = True
             payload['busy'] = False
 
         self.pool.submit(_req)

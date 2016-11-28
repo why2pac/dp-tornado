@@ -120,7 +120,7 @@ class Scheduler(threading.Thread, dpEngine):
                     except Exception as ex:
                         self.logging.exception(ex)
 
-                    if e['ref'] >= e['repeat']:
+                    if e['ref'] >= e['repeat'] > 0:
                         e['enabled'] = False
                         self.logging.info('Scheduler executed %s, last execution. done.' % e['command'])
                     else:

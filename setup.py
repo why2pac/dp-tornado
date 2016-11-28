@@ -60,7 +60,7 @@ dp_maintainer_email = dp_author_email
 dp_description = 'MVC Web Application Framework with Tornado.'
 
 dp_requires_CyMySQL = 'CyMySQL==0.8.9'
-dp_requires_futres = 'futures==3.0.5'
+dp_requires_futures = 'futures==3.0.5'
 
 
 class CustomInstallCommand(install):
@@ -86,12 +86,33 @@ class CustomInstallCommand(install):
             if self.dp_without_mysql:
                 dist.install_requires.remove(dp_requires_CyMySQL)
 
-            if sys.version_info[0] >= 3:
-                dist.install_requires.remove(dp_requires_futres)
-
     def run(self):
         install.run(self)
         install.do_egg_install(self)
+
+
+install_requires = [
+        'tornado==4.4.2',
+        'redis==2.10.5',
+        'requests==2.12.1',
+        'croniter==0.3.13',
+        'pytz==2016.7',
+        'pycrypto==2.6.1',
+        'boto3==1.4.1',
+        'SQLAlchemy==1.1.4',
+        'Pillow==3.4.2',
+        'validate_email==1.3',
+        'BeautifulSoup4==4.5.1',
+        'lxml==3.6.4',
+        'httpagentparser==1.7.8',
+        'validators==0.11.1',
+        dp_requires_CyMySQL,
+        # , 'selenium'
+    ]
+
+
+if sys.version_info[0] <= 2:
+    install_requires.append(dp_requires_futures)
 
 
 setup(
@@ -108,25 +129,7 @@ setup(
     packages=['dp_tornado'],
     include_package_data=True,
     cmdclass={'install': CustomInstallCommand},
-    install_requires=[
-        'tornado==4.4.2',
-        'redis==2.10.5',
-        'requests==2.12.1',
-        'croniter==0.3.13',
-        'pytz==2016.7',
-        'pycrypto==2.6.1',
-        'boto3==1.4.1',
-        'SQLAlchemy==1.1.4',
-        'Pillow==3.4.2',
-        'validate_email==1.3',
-        'BeautifulSoup4==4.5.1',
-        'lxml==3.6.4',
-        'httpagentparser==1.7.8',
-        'validators==0.11.1',
-        dp_requires_CyMySQL,
-        dp_requires_futres
-        # , 'selenium'
-    ],
+    install_requires=install_requires,
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[
         'Development Status :: 4 - Beta',

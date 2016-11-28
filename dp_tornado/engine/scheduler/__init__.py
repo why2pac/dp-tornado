@@ -7,7 +7,9 @@ import pytz
 import tornado.httpclient
 
 from dp_tornado.engine.engine import Engine as dpEngine
-from dp_tornado.engine.model import InValueModelConfig as dpInValueModelConfig
+
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Value
 
 
 try:
@@ -18,11 +20,8 @@ except ImportError:
 
 class Scheduler(threading.Thread, dpEngine):
     def __init__(self, schedules):
-        self.cache_dsn = dpInValueModelConfig(driver='sqlite', database='scheduler_cache')
-
-        self.cache.set('initiated', 'no', dsn_or_conn=self.cache_dsn)
-        self.cache.set('interrupt', 'no', dsn_or_conn=self.cache_dsn)
-
+        self.global_interrupt = Value('d', 0)
+        self.global_prepared = Value('d', 0)
         self.schedules = []
         self.ts = self.helper.datetime.timestamp.now()
         self.start_time = self.helper.datetime.now()
@@ -34,6 +33,8 @@ class Scheduler(threading.Thread, dpEngine):
         if self.ini.scheduler.timezone:
             tz = pytz.timezone(self.ini.scheduler.timezone)
             self.start_time = self.helper.datetime.now(timezone=tz)
+
+        job = 0
 
         for e in schedules:
             opts = e[2] if len(e) >= 3 and isinstance(e[2], dict) else {}  # options
@@ -58,6 +59,8 @@ class Scheduler(threading.Thread, dpEngine):
                 period = self.helper.numeric.cast.int(period) or 1
                 next_exec = self.ts
 
+            job += clone
+
             for i in range(clone):
                 self.schedules.append({
                     'command': command,
@@ -73,21 +76,22 @@ class Scheduler(threading.Thread, dpEngine):
                 dt_next = self.helper.datetime.convert(timestamp=next_exec)
                 self.logging.info('Scheduler registered %s, first fetching at %s' % (command, dt_next))
 
+        self.pool = ThreadPoolExecutor(min(64, job * 10))
         threading.Thread.__init__(self)
 
     def interrupt(self):
-        self.cache.set('interrupt', 'yes', dsn_or_conn=self.cache_dsn)
+        self.global_interrupt.value = 1
 
     @property
     def interrupted(self):
-        return self.cache.get('interrupt', dsn_or_conn=self.cache_dsn) == 'yes'
+        return True if self.global_interrupt.value else False
 
     def prepare(self):
-        self.cache.set('initiated', 'yes', dsn_or_conn=self.cache_dsn)
+        self.global_prepared.value = 1
 
     @property
     def prepared(self):
-        return self.cache.get('initiated', dsn_or_conn=self.cache_dsn) == 'yes'
+        return True if self.global_prepared.value else False
 
     def run(self):
         if not self.schedules:
@@ -95,6 +99,8 @@ class Scheduler(threading.Thread, dpEngine):
 
         while not self.interrupted and not self.prepared:
             time.sleep(0.1)
+
+        time.sleep(1.5)
 
         while not self.interrupted:
             ts = self.helper.datetime.timestamp.now()
@@ -138,13 +144,14 @@ class Scheduler(threading.Thread, dpEngine):
         return 'http://127.0.0.1:%s/dp/scheduler' % self.ini.server.port
 
     def request(self, payload):
-        def handle_response(o):
-            if o.reason != 'OK':
+        def _req():
+            url = '%s/%s' % (self.request_host, payload['command'])
+            code, content = self.helper.web.http.get.text(url)
+
+            if code == 200:
                 payload['ref'] -= 1
-                payload['enabled'] = True
 
-        url = '%s/%s' % (self.request_host, payload['command'])
-        http_client = tornado.httpclient.AsyncHTTPClient()
-        http_client.fetch(url, handle_response)
+            payload['enabled'] = True
+            payload['busy'] = False
 
-        payload['busy'] = False
+        self.pool.submit(_req)

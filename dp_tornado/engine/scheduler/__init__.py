@@ -7,6 +7,7 @@ import pytz
 import tornado.httpclient
 
 from dp_tornado.engine.engine import Engine as dpEngine
+from dp_tornado.engine.model import InValueModelConfig as dpInValueModelConfig
 
 
 try:
@@ -17,7 +18,11 @@ except ImportError:
 
 class Scheduler(threading.Thread, dpEngine):
     def __init__(self, schedules):
-        self.interrupted = False
+        self.cache_dsn = dpInValueModelConfig(driver='sqlite', database='scheduler_cache')
+
+        self.cache.set('initiated', 'no', dsn_or_conn=self.cache_dsn)
+        self.cache.set('interrupt', 'no', dsn_or_conn=self.cache_dsn)
+
         self.schedules = []
         self.ts = self.helper.datetime.timestamp.now()
         self.start_time = self.helper.datetime.now()
@@ -71,25 +76,25 @@ class Scheduler(threading.Thread, dpEngine):
         threading.Thread.__init__(self)
 
     def interrupt(self):
-        self.interrupted = True
+        self.cache.set('interrupt', 'yes', dsn_or_conn=self.cache_dsn)
+
+    @property
+    def interrupted(self):
+        return self.cache.get('interrupt', dsn_or_conn=self.cache_dsn) == 'yes'
+
+    def prepare(self):
+        self.cache.set('initiated', 'yes', dsn_or_conn=self.cache_dsn)
+
+    @property
+    def prepared(self):
+        return self.cache.get('initiated', dsn_or_conn=self.cache_dsn) == 'yes'
 
     def run(self):
         if not self.schedules:
             return
 
-        self.logging.set_level('requests', self.logging.level.WARNING)
-
-        while not self.interrupted:
-            code, res = self.helper.web.http.get.text('%s/ping' % self.request_host)
-
-            if res == 'pong':
-                break
-
-            self.logging.info('Scheduler waiting server ...')
-
-            time.sleep(0.5)
-
-        self.logging.set_level('requests', self.logging.level.INFO)
+        while not self.interrupted and not self.prepared:
+            time.sleep(0.1)
 
         while not self.interrupted:
             ts = self.helper.datetime.timestamp.now()

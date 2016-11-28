@@ -147,6 +147,9 @@ class Bootstrap(object):
             instance = tornado.ioloop.IOLoop.instance()
             instance.__setattr__('startup_at', getattr(application, 'startup_at'))
 
+            if scheduler:
+                scheduler.prepare()
+
             if not dryrun:
                 instance.start()
 

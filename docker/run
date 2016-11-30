@@ -17,7 +17,4 @@ fi
 # -it
 # -d
 
-# --net="bridge"
-# --net="host"
-
-sudo docker run --name "dp4p-$pyver-example" -d -p 8888:52848 -v "/Users/why/Dropbox/Repositories/dp-tornado/example:/data/app" dp4p:$pyver
+sudo docker run -it -p 8888:52848 -v "$(dirname \"$(pwd)\")/example:/data/app" dp4p:$pyver

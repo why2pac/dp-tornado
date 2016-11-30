@@ -4,4 +4,4 @@ yum update -y
 yum install wget git gcc openssl-devel sqlite-devel -y
 
 mkdir -p /data/dp
-echo "$port" > /data/dp/port
+echo "$dp_port" > /data/dp/port

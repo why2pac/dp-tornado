@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -d /data/python ]
+then
+  return
+fi
+
 mkdir -p /data/python
 cd /data/python
 
@@ -13,10 +18,12 @@ make altinstall
 cd /data
 rm -rf /data/python
 
-echo "alias dp-python='python$pyver_m'" >> ~/.bashrc
-echo "alias dp-pip='pip$pyver_m'" >> ~/.bashrc
+wget https://bootstrap.pypa.io/get-pip.py
+python$pyver_m get-pip.py
+rm get-pip.py
 
-source ~/.bashrc
+ln -s $(which python$pyver_m) /usr/bin/dp-python
+ln -s $(which pip$pyver_m) /usr/bin/dp-pip
 
 pip$pyver_m install pip --upgrade
 pip$pyver_m install dp-tornado

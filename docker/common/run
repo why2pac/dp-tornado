@@ -6,13 +6,24 @@ then
   exit 1
 fi
 
+echo "PIP Requirements installing .."
+
 if [ -f /data/app/requirements.txt ]
 then
-  dp-pip install -r /data/app/requirements.txt
+  dp-pip install -r /data/app/requirements.txt > /dev/null 2>&1
+
+  if [ $? -eq 0 ]
+  then
+    echo "PIP Requirements installed."
+  else
+    echo "PIP Requirements installing failed."
+    return
+  fi
 fi
 
 netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}' > /data/dp/host_addr
 export host_addr=$(cat /data/dp/host_addr)
 echo "$host_addr host.addr" >> /etc/hosts
 
-dp4p run --path=/data/app --port=$(cat /data/dp/port)
+cd /data/app
+dp4p run --mode=production --port=$(cat /data/dp/port) > /data/out.log 2>&1

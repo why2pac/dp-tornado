@@ -1,0 +1,22 @@
+#!/bin/bash
+
+mkdir -p /data/python
+cd /data/python
+
+wget https://www.python.org/ftp/python/$pyver/Python-$pyver.tgz
+tar -xzvf Python-$pyver.tgz
+rm -rf Python-$pyver.tgz
+cd Python-$pyver
+
+./configure
+make altinstall
+cd /data
+rm -rf /data/python
+
+echo "alias dp-python='python$pyver_m'" >> ~/.bashrc
+echo "alias dp-pip='pip$pyver_m'" >> ~/.bashrc
+
+source ~/.bashrc
+
+pip$pyver_m install pip --upgrade
+pip$pyver_m install dp-tornado

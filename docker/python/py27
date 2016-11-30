@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export pyver="2.7.12"
+export pyver_m="2.7"
+
+$(dirname "$0")/py

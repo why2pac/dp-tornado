@@ -1,0 +1,23 @@
+#!/bin/bash
+
+pyver=$1
+
+if [ "$pyver" = "" ]
+then
+  echo "usage: run py_version[py27|py34]"
+  return
+fi
+
+if [ ! -f ./python/$pyver ]
+then
+  echo "The specified python version ($pyver) is invalid or not supported."
+  return
+fi
+
+# -it
+# -d
+
+# --net="bridge"
+# --net="host"
+
+sudo docker run --name "dp4p-$pyver-example" -d -p 8888:52848 -v "/Users/why/Dropbox/Repositories/dp-tornado/example:/data/app" dp4p:$pyver

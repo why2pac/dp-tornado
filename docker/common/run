@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ ! -d /data/app ]
+then
+  echo "App. volume mount is required."
+  exit 1
+fi
+
+if [ -f /data/app/requirements.txt ]
+then
+  dp-pip install -r /data/app/requirements.txt
+fi
+
+netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}' > /data/dp/host_addr
+export host_addr=$(cat /data/dp/host_addr)
+echo "$host_addr host.addr" >> /etc/hosts
+
+dp4p run --path=/data/app --port=$(cat /data/dp/port)

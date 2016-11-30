@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$pyver_m" = "" ]
+then
+  echo "No python version specified."
+  exit 1
+fi
+
 if [ -d /data/python ]
 then
   return

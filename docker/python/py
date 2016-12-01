@@ -31,5 +31,4 @@ rm get-pip.py
 ln -s $(which python$pyver_m) /usr/bin/dp-python
 ln -s $(which pip$pyver_m) /usr/bin/dp-pip
 
-pip$pyver_m install pip --upgrade
-pip$pyver_m install dp-tornado
+dp-pip install dp-tornado

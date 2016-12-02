@@ -1,7 +1,8 @@
 #!/bin/bash
 
+yum install epel-release -y
 yum update -y
-yum install wget git gcc openssl-devel sqlite-devel -y
+yum install wget git gcc openssl-devel sqlite-devel python-devel bzip2-devel libxslt-devel libxml2-devel libtiff-devel libjpeg-devel libzip-devel freetype-devel lcms2-devel libwebp-devel openjpeg-devel tcl-devel tk-devel -y
 
 mkdir -p /data/dp
 echo "$dp_port" > /data/dp/port

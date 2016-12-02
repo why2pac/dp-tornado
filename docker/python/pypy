@@ -58,7 +58,7 @@ ln -s /usr/lib64/libwebp.so /usr/lib64/libwebp.pypy-41.so
 ln -s /usr/lib64/libwebpmux.so /usr/lib64/libwebpmux.pypy-41.so
 ln -s /usr/lib64/libwebpdemux.so /usr/lib64/libwebpdemux.pypy-41.so
 
-dp-pip install pillow --global-option="build_ext"
+dp-pip install pillow --global-option="build_ext" \
                       --global-option="--enable-zlib" \
                       --global-option="--enable-jpeg" \
                       --global-option="--enable-tiff" \

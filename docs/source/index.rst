@@ -42,8 +42,8 @@ or::
 
 with Docker::
 
-    $ docker pull why2pac/dp4p:latest-py34  # py27, py34, pypy27
-    $ docker run --name "dp4p-example" -d -p 8080:52848 -v "$(pwd)/app_dir:/data/app" why2pac/dp4p:latest-py34
+    $ docker pull why2pac/dp4p:py34  # py27, py34, pypy27
+    $ docker run --name "dp4p-example" -d -p 8080:52848 -v "$(pwd)/app_dir:/data/app" why2pac/dp4p:py34
 
 
 Documentation

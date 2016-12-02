@@ -94,11 +94,11 @@ class CustomInstallCommand(install):
 install_requires = [
         'tornado==4.4.2',
         'redis==2.10.5',
-        'requests==2.12.1',
+        'requests==2.12.3',
         'croniter==0.3.13',
         'pytz==2016.7',
         'pycrypto==2.6.1',
-        'boto3==1.4.1',
+        'boto3==1.4.2',
         'SQLAlchemy==1.1.4',
         'Pillow==3.4.2',
         'validate_email==1.3',

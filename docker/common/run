@@ -24,7 +24,7 @@ netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}' > /data/dp/host_addr
 export host_addr=$(cat /data/dp/host_addr)
 echo "$host_addr host.addr" >> /etc/hosts
 
-if [ -f /data/before]
+if [ -f /data/before ]
 then
   bash /data/before
 fi

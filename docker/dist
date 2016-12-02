@@ -3,12 +3,12 @@
 account="why2pac"
 ver="0.1"
 
-for pyver in py27 py34; do
+for pyver in py27 py34 pypy27; do
   sudo docker build --tag $account/dp4p:$ver-$pyver --build-arg pyver=$pyver .
   sudo docker build --tag $account/dp4p:latest-$pyver --build-arg pyver=$pyver .
 done
 
-for pyver in py27 py34; do
+for pyver in py27 py34 pypy27; do
   sudo docker push $account/dp4p:$ver-$pyver
   sudo docker push $account/dp4p:latest-$pyver
 done

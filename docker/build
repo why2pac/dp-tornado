@@ -4,7 +4,7 @@ pyver=$1
 
 if [ "$pyver" = "" ]
 then
-  echo "usage: build py_version[py27|py34]"
+  echo "usage: build py_version[py27|py34|pypy27]"
   return
 fi
 

@@ -1,0 +1,70 @@
+#!/bin/bash
+
+if [ "$PYPY_VERSION" = "" ]
+then
+  echo "No python version specified."
+  exit 1
+fi
+
+if [ -d /data/python ]
+then
+  return
+fi
+
+yum install -y gcc-c++ libffi-devel ncurses-devel expat-devel gdbm-devel
+
+#
+
+export pyver="2.7.12"
+export pyver_m="2.7"
+
+/data/script/python/py27
+
+#
+
+mkdir -p /data/python
+cd /data/python
+
+wget https://bitbucket.org/pypy/pypy/downloads/$PYPY_VERSION-src.tar.bz2
+bzip2 -d pypy*$PYPY_VERSION_M*-src.tar.bz2
+tar -xvf pypy*$PYPY_VERSION_M*-src.tar
+rm -rf pypy*$PYPY_VERSION_M*-src.tar
+cd /data/python/pypy*-src/pypy/goal
+dp-python ../../rpython/bin/rpython --continuation --no-pdb -Ojit targetpypystandalone
+
+cd /data/python/pypy*-src/pypy/tool/release
+dp-python package.py --archive-name dp-pypy
+cd /tmp/usession-release-pypy*/build/dp-pypy
+cd ..
+cp -R dp-pypy /data/python
+rm -rf /data/python/pypy*-src
+
+rm -rf /usr/bin/dp-python
+rm -rf /usr/bin/dp-pip
+
+ln -s /data/python/dp-pypy/bin/pypy /usr/bin/dp-python
+
+wget https://bootstrap.pypa.io/get-pip.py
+dp-python get-pip.py
+rm -rf get-pip.py
+ln -s /data/python/dp-pypy/bin/pip /usr/bin/dp-pip
+
+ln -s /usr/lib64/libz.so /usr/lib64/libz.pypy-41.so
+ln -s /usr/lib64/libjpeg.so /usr/lib64/libjpeg.pypy-41.so
+ln -s /usr/lib64/libtiff.so /usr/lib64/libtiff.pypy-41.so
+ln -s /usr/lib64/libfreetype.so /usr/lib64/libfreetype.pypy-41.so
+ln -s /usr/lib64/liblcms2.so /usr/lib64/liblcms2.pypy-41.so
+ln -s /usr/lib64/libwebp.so /usr/lib64/libwebp.pypy-41.so
+ln -s /usr/lib64/libwebpmux.so /usr/lib64/libwebpmux.pypy-41.so
+ln -s /usr/lib64/libwebpdemux.so /usr/lib64/libwebpdemux.pypy-41.so
+
+dp-pip install pillow --global-option="build_ext"
+                      --global-option="--enable-zlib" \
+                      --global-option="--enable-jpeg" \
+                      --global-option="--enable-tiff" \
+                      --global-option="--enable-freetype" \
+                      --global-option="--enable-lcms" \
+                      --global-option="--enable-webp" \
+                      --global-option="--enable-webpmux"
+
+dp-pip install dp-tornado

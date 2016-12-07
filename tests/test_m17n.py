@@ -8,7 +8,7 @@ def switch_ko():
     # Switch to ko -> Check switched to ko -> Render ko string
 
     utils.expecting_text(
-        'get', '/m17n/view', 'ko_hello/ko_hello', 200, session=utils.expecting_text(
+        'get', '/m17n/view', 'ko_hello_한글/ko_hello_한글', 200, session=utils.expecting_text(
             'get', '/m17n/check', 'ko', 200, session=utils.expecting_text('get', '/m17n/switch/ko', 'done', 200)))
 
 

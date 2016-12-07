@@ -2,4 +2,4 @@
 
 
 class M17n(object):
-    hello = 'ko_hello'
+    hello = 'ko_hello_한글'

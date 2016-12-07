@@ -38,10 +38,6 @@ class RestfulApplication(tornado.web.Application):
     def __init__(self, handlers, kwargs):
         self.startup_at = int(round(time.time() * 1000))
 
-        kwargs['ui_modules']['Static'] = StaticURL
-        kwargs['ui_modules']['Pagination'] = Pagination
-        kwargs['ui_methods'] = ui_methods
-
         super(RestfulApplication, self).__init__(handlers, **kwargs)
 
 

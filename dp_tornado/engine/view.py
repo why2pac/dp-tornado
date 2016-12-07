@@ -26,25 +26,29 @@ import os
 engine = dpEngine()
 
 
+class Dummy(object):
+    pass
+
+
 class View(dpSingleton):
     @staticmethod
-    def _ui_methods_default():
-        if getattr(View, '__ui_methods_default', None) is not None:
-            return getattr(View, '__ui_methods_default')
+    def _ui_modules():
+        if getattr(View, '__ui_modules', None) is not None:
+            return getattr(View, '__ui_modules')
 
         o = {
             'Static': StaticURL,
             'Pagination': Pagination
         }
 
-        setattr(View, '__ui_methods_default', o)
+        setattr(View, '__ui_modules', o)
 
         return o
 
     @staticmethod
-    def _ui_methods_prototype():
-        if getattr(View, '__ui_methods_prototype', None) is not None:
-            return getattr(View, '__ui_methods_prototype')
+    def _ui_methods():
+        if getattr(View, '__ui_methods', None) is not None:
+            return getattr(View, '__ui_methods')
 
         o = {}
 
@@ -52,15 +56,21 @@ class View(dpSingleton):
             if not e.startswith("_") and e[0].lower() == e[0]:
                 o[e] = getattr(ui_methods, e)
 
-        setattr(View, '__ui_methods_prototype', o)
+        setattr(View, '__ui_methods', o)
 
         return o
 
     @staticmethod
-    def _ui_methods_extra(controller):
-        o = {}
+    def _ui_namespaces(controller):
+        o = {
+            'c': lambda *args, **kwargs: controller,
+            '_tt_modules': Dummy()
+        }
 
-        for k, v in View._ui_methods_prototype().items():
+        for k, v in View._ui_modules().items():
+            setattr(o['_tt_modules'], k, v(controller).render)
+
+        for k, v in View._ui_methods().items():
             o[k] = View._ui_method(controller, v)
 
         return o
@@ -86,8 +96,7 @@ class View(dpSingleton):
     @staticmethod
     def render_string(controller, template_name, kwargs=None, encode=True):
         t = View._loader().load(template_name)
-        n = View._ui_methods_default()
-        n.update(View._ui_methods_extra(controller))
+        n = View._ui_namespaces(controller)
         n.update(kwargs if kwargs else {})
         t = t.generate(**n)
 

@@ -58,10 +58,6 @@ def m17n(c, m17n_lang=None):
     return c.m17n.get(m17n_lang)
 
 
-def c(c):
-    return c
-
-
 def get(c, arg, default=None):
     return c.get_argument(arg, default=default)
 

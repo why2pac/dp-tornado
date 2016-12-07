@@ -117,6 +117,11 @@ class Bootstrap(object):
         combined_url = combined_path
         combined_path = os.path.join(application_path, 'static', combined_path)
 
+        engine.ini.static.set('combined_prefix', combined_prefix)
+        engine.ini.static.set('combined_url', combined_url)
+        engine.ini.static.set('combined_path', combined_path)
+        engine.ini.static.set('path_sys', os.path.join(application_path, 'static'))
+
         engine.ini.server.set('application_path', application_path)
         engine.ini.server.set('python', sys.executable)
 
@@ -205,11 +210,7 @@ class Bootstrap(object):
             'static_combined_url': combined_url,
             'combined_static_path': combined_path,
             'combined_static_url_prefix': combined_prefix,
-            'compressors': {
-                'minifier': None
-            },
             'debug': engine.ini.server.debug,
             'gzip': engine.ini.server.gzip,
-            'cookie_secret': engine.ini.server.get('cookie_secret', default='default_cookie_secret'),
-            'ui_modules': {}
+            'cookie_secret': engine.ini.server.get('cookie_secret', default='default_cookie_secret')
         }

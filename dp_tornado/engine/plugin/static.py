@@ -3,24 +3,19 @@
 
 import os
 import requests
-import tornado.web
 import subprocess
 import tempfile
 
-from ..cache import dpInValueModelConfig
-from ..engine import Engine as dpEngine
+from dp_tornado.engine.cache import dpInValueModelConfig
+from dp_tornado.engine.engine import Engine as dpEngine
 
 
 class Compressor(dpEngine):
     def __init__(self, handler):
         self.handler = handler
-        self.compressors = handler.settings.get('compressors', False) if handler else None
         self.provider = {
             'minifier': 'minify'
         }
-
-        if self.compressors and 'minifier' in self.compressors and self.compressors['minifier']:
-            self.provider['minifier'] = self.compressors['minifier']
 
     def _commands(self, path, files, ext, tempname):
         files = [os.path.join(path, fn[1:] if fn.startswith('/') else fn) for fn in files]
@@ -110,16 +105,22 @@ class Compressor(dpEngine):
                 os.remove(path)
 
 
-class StaticURL(tornado.web.UIModule):
+class StaticURL(dpEngine):
+    def __init__(self, handler):
+        self.handler = handler
+
+        if not self.vars.server.start_at:
+            self.vars.server.start_at = self.helper.datetime.timestamp.now()
+
     def render(self, *statics, **options):
         if not self.handler.vars.compressor:
             self.handler.vars.compressor = Compressor(self.handler)
-            self.handler.vars.static.minify = self.handler.settings.get('static_minify')
-            self.handler.vars.static.path = self.handler.settings.get('static_path')
-            self.handler.vars.static.prefix = self.handler.settings.get('static_url_prefix')
-            self.handler.vars.static.combined_url = self.handler.settings.get('static_combined_url')
-            self.handler.vars.static.combined_path = self.handler.settings.get('combined_static_path')
-            self.handler.vars.static.combined_prefix = self.handler.settings.get('combined_static_url_prefix')
+            self.handler.vars.static.minify = self.ini.static.get('minify')
+            self.handler.vars.static.path = self.ini.static.get('path_sys')
+            self.handler.vars.static.prefix = self.ini.static.get('prefix')
+            self.handler.vars.static.combined_url = self.ini.static.get('combined_url')
+            self.handler.vars.static.combined_path = self.ini.static.get('combined_path')
+            self.handler.vars.static.combined_prefix = self.ini.static.get('combined_prefix')
             self.handler.vars.static.cache_config = dpInValueModelConfig('sqlite', 'static_url', pure=True)
 
             path_dp = self.handler.helper.io.path.dirname(__file__)  # engine/plugin
@@ -166,13 +167,13 @@ class StaticURL(tornado.web.UIModule):
             self.handler.logging.warning('Required AWS configuration. explicit option is ignored.')
 
         # for Debugging Mode, skip minify css or js.
-        if explicit == 'debug' or (not explicit and self.handler.settings.get('debug')):
+        if explicit == 'debug' or (not explicit and self.ini.server.debug):
             mtime = self.handler.vars.compressor.helper.datetime.timestamp.now(ms=True)
             return '\n'.join(dp_init + [self._template('%s?%s' % (t, mtime), dp_static=dp_static) for t in statics])
 
         elif explicit == 'skip' or (not explicit and (not self.handler.vars.static.minify or explicit_proxy)):
             return '\n'.join(dp_init + [self._template(
-                '%s?%s' % (t, self.handler.application.startup_at), dp_static=dp_static) for t in statics])
+                '%s?%s' % (t, self.vars.server.start_at), dp_static=dp_static) for t in statics])
 
         cache_key = 'key_%s_%s' % (explicit, self.handler.helper.security.crypto.hash.sha224('/'.join(sorted(statics))))
         prepared = (self.handler.vars.static.prepared.__getattr__(cache_key) or

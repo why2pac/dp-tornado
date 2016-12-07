@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
-import tornado.web
-
 from dp_tornado.engine.engine import Engine as dpEngine
 
 
-class Pagination(tornado.web.UIModule, dpEngine):
+class Pagination(dpEngine):
+    def __init__(self, handler):
+        self.handler = handler
+        self.request = handler.parent.request if getattr(handler, 'parent', None) else None
+
     region_tag = 'div'
     region_class = 'pagination'
 

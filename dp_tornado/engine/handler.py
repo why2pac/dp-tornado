@@ -325,10 +325,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         t = x._render['t']
         k = x._render['k']
 
-        if not k:
-            self.render(t)
-        else:
-            self.render(t, **k)
+        self.finish(self.view.render_string(self, t, k, encode=False))
 
     def __write(self, x):
         if not x._write:

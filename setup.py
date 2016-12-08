@@ -96,7 +96,7 @@ install_requires = [
         'redis==2.10.5',
         'requests==2.12.3',
         'croniter==0.3.13',
-        'pytz==2016.7',
+        'pytz==2016.10',
         'pycrypto==2.6.1',
         'boto3==1.4.2',
         'SQLAlchemy==1.1.4',

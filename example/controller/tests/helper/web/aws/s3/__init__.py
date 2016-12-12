@@ -6,110 +6,119 @@ from dp_tornado.engine.controller import Controller
 
 class S3Controller(Controller):
     def get(self):
-        # PREPARE
-        content = 'aws-s3-test'
+        for _ in range(3):
+            try:
+                # PREPARE
+                content = 'aws-s3-test'
 
-        filepath = 'aws'
-        filename = 'temp_%s.txt' % self.helper.datetime.timestamp.now()
+                filepath = 'aws'
+                filename = 'temp_%s.txt' % self.helper.datetime.timestamp.now()
 
-        key_prefix = 'tests/%s' % self.ini.server.identifier
-        s3_key = '%s/foo/bar/%s' % (key_prefix, filename)
+                key_prefix = 'tests/%s' % self.ini.server.identifier
+                s3_key = '%s/foo/bar/%s' % (key_prefix, filename)
 
-        self.helper.io.file.remove(filepath)
-        assert self.helper.io.path.mkdir(filepath)
+                self.helper.io.file.remove(filepath)
+                assert self.helper.io.path.mkdir(filepath)
 
-        self.helper.io.file.write('%s/%s' % (filepath, filename), content)
+                self.helper.io.file.write('%s/%s' % (filepath, filename), content)
 
-        # UPLOAD
+                # UPLOAD
 
-        with open('%s/%s' % (filepath, filename), 'rb') as fp:
-            uploaded = self.helper.web.aws.s3.upload(
-                src=fp,
-                dest=s3_key,
-                access_key_id=self.ini.static.aws_id,
-                secret_access_key=self.ini.static.aws_secret,
-                region_name=self.ini.static.aws_region,
-                bucket_name=self.ini.static.aws_bucket)
+                with open('%s/%s' % (filepath, filename), 'rb') as fp:
+                    uploaded = self.helper.web.aws.s3.upload(
+                        src=fp,
+                        dest=s3_key,
+                        access_key_id=self.ini.static.aws_id,
+                        secret_access_key=self.ini.static.aws_secret,
+                        region_name=self.ini.static.aws_region,
+                        bucket_name=self.ini.static.aws_bucket)
 
-            assert uploaded
+                    assert uploaded
 
-        # COPY 1
+                # COPY 1
 
-        s3_key_copy = '%s/foo/bar/copy/%s' % (key_prefix, filename)
+                s3_key_copy = '%s/foo/bar/copy/%s' % (key_prefix, filename)
 
-        copied = self.helper.web.aws.s3.copy(
-            access_key_id=self.ini.static.aws_id,
-            secret_access_key=self.ini.static.aws_secret,
-            region_name=self.ini.static.aws_region,
-            src_bucket_name=self.ini.static.aws_bucket,
-            src_key=s3_key,
-            dest_bucket_name=self.ini.static.aws_bucket,
-            dest_key=s3_key_copy)
+                copied = self.helper.web.aws.s3.copy(
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    region_name=self.ini.static.aws_region,
+                    src_bucket_name=self.ini.static.aws_bucket,
+                    src_key=s3_key,
+                    dest_bucket_name=self.ini.static.aws_bucket,
+                    dest_key=s3_key_copy)
 
-        assert copied
+                assert copied
 
-        # COPY 2
+                # COPY 2
 
-        s3_key_copy_2 = '%s/foo/bar/copy2/%s' % (key_prefix, filename)
+                s3_key_copy_2 = '%s/foo/bar/copy2/%s' % (key_prefix, filename)
 
-        copied = self.helper.web.aws.s3.copy(
-            access_key_id=self.ini.static.aws_id,
-            secret_access_key=self.ini.static.aws_secret,
-            region_name=self.ini.static.aws_region,
-            src_bucket_name=self.ini.static.aws_bucket,
-            src_key=s3_key,
-            dest_bucket_name=self.ini.static.aws_bucket,
-            dest_key=s3_key_copy_2)
+                copied = self.helper.web.aws.s3.copy(
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    region_name=self.ini.static.aws_region,
+                    src_bucket_name=self.ini.static.aws_bucket,
+                    src_key=s3_key,
+                    dest_bucket_name=self.ini.static.aws_bucket,
+                    dest_key=s3_key_copy_2)
 
-        assert copied
+                assert copied
 
-        # BROWSE
+                # BROWSE
 
-        items = self.helper.web.aws.s3.browse(
-            access_key_id=self.ini.static.aws_id,
-            secret_access_key=self.ini.static.aws_secret,
-            region_name=self.ini.static.aws_region,
-            bucket_name=self.ini.static.aws_bucket,
-            prefix='%s/foo/bar/' % key_prefix)
+                items = self.helper.web.aws.s3.browse(
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    region_name=self.ini.static.aws_region,
+                    bucket_name=self.ini.static.aws_bucket,
+                    prefix='%s/foo/bar/' % key_prefix)
 
-        assert isinstance(items, (list, tuple))
-        assert len([e for e in items if len(e) == 2 and e[0] == s3_key]) == 1
+                assert isinstance(items, (list, tuple))
+                assert len([e for e in items if len(e) == 2 and e[0] == s3_key]) == 1
 
-        # DOWNLOAD
+                # DOWNLOAD
 
-        download_path = '%s/download_%s' % (filepath, filename)
+                download_path = '%s/download_%s' % (filepath, filename)
 
-        downloaded = self.helper.web.aws.s3.download(
-            src=s3_key,
-            dest=download_path,
-            access_key_id=self.ini.static.aws_id,
-            secret_access_key=self.ini.static.aws_secret,
-            region_name=self.ini.static.aws_region,
-            bucket_name=self.ini.static.aws_bucket)
+                downloaded = self.helper.web.aws.s3.download(
+                    src=s3_key,
+                    dest=download_path,
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    region_name=self.ini.static.aws_region,
+                    bucket_name=self.ini.static.aws_bucket)
 
-        assert downloaded
+                assert downloaded
 
-        with open(download_path, 'r') as fp:
-            assert fp.read() == content
+                with open(download_path, 'r') as fp:
+                    assert fp.read() == content
 
-        self.helper.io.file.remove(filepath)
+                self.helper.io.file.remove(filepath)
 
-        # REMOVE
+                # REMOVE
 
-        removed = self.helper.web.aws.s3.remove(
-            access_key_id=self.ini.static.aws_id,
-            secret_access_key=self.ini.static.aws_secret,
-            region_name=self.ini.static.aws_region,
-            bucket_name=self.ini.static.aws_bucket,
-            key=s3_key_copy)
+                removed = self.helper.web.aws.s3.remove(
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    region_name=self.ini.static.aws_region,
+                    bucket_name=self.ini.static.aws_bucket,
+                    key=s3_key_copy)
 
-        assert len(removed) == 1 and removed[0] == s3_key_copy
+                assert len(removed) == 1 and removed[0] == s3_key_copy
 
-        removed = self.helper.web.aws.s3.remove(
-            access_key_id=self.ini.static.aws_id,
-            secret_access_key=self.ini.static.aws_secret,
-            region_name=self.ini.static.aws_region,
-            bucket_name=self.ini.static.aws_bucket,
-            prefix='%s/foo' % key_prefix)
+                removed = self.helper.web.aws.s3.remove(
+                    access_key_id=self.ini.static.aws_id,
+                    secret_access_key=self.ini.static.aws_secret,
+                    region_name=self.ini.static.aws_region,
+                    bucket_name=self.ini.static.aws_bucket,
+                    prefix='%s/foo' % key_prefix)
 
-        assert len(removed) == 2 and len([True for e in removed if e in (s3_key_copy_2, s3_key)]) == 2
+                assert len(removed) == 2 and len([True for e in removed if e in (s3_key_copy_2, s3_key)]) == 2
+
+                return self.finish('done')
+
+            except Exception as e:
+                self.logging.exception(e)
+
+        return self.finish_with_error(500)

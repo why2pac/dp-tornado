@@ -4,7 +4,7 @@ pyver=$1
 
 if [ "$pyver" = "" ]
 then
-  echo "usage: build py_version[py27|py34|pypy27]"
+  echo "usage: run py_version[py27|py34|py35|pypy27]"
   return
 fi
 
@@ -14,4 +14,7 @@ then
   return
 fi
 
-sudo docker build --tag dp4p:$pyver --build-arg pyver=$pyver .
+# -it
+# -d
+
+sudo docker run -it -p 8888:52848 -v "$(dirname $(dirname $(pwd)))/example:/data/app" dp4p:base-$pyver bash

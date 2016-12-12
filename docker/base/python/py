@@ -31,13 +31,3 @@ rm get-pip.py
 ln -s $(which python$pyver_m) /usr/bin/dp-python
 ln -s $(which pip$pyver_m) /usr/bin/dp-pip
 
-dp-pip install pillow --global-option="build_ext" \
-                      --global-option="--enable-zlib" \
-                      --global-option="--enable-jpeg" \
-                      --global-option="--enable-tiff" \
-                      --global-option="--enable-freetype" \
-                      --global-option="--enable-lcms" \
-                      --global-option="--enable-webp" \
-                      --global-option="--enable-webpmux"
-
-dp-pip install dp-tornado

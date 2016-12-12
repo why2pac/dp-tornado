@@ -6,4 +6,4 @@ yum install wget git gcc openssl-devel sqlite-devel python-devel bzip2-devel lib
 
 mkdir -p /data/dp
 echo "$dp_port" > /data/dp/port
-echo "20161202150000-$pyver" > /data/dp/version
+echo "20161212170000-$pyver" > /data/dp/version

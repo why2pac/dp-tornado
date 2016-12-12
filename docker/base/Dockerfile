@@ -15,4 +15,3 @@ RUN chmod +x -R /data/script && \
 
 EXPOSE $dp_port
 
-CMD ["/bin/bash", "/data/script/common/run"]

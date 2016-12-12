@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export pyver="3.5.2"
+export pyver_m="3.5"
+
+$(dirname "$0")/py

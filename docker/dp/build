@@ -1,0 +1,13 @@
+#!/bin/bash
+
+pyver=$1
+dpver=$(cat dpver)
+
+if [ "$pyver" = "" ]
+then
+  echo "usage: build py_version[py27|py34|py35|pypy27]"
+  return
+fi
+
+sudo docker build --tag dp4p:$dpver-$pyver --build-arg dpver=$dpver ./$pyver
+

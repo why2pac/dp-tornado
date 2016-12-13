@@ -86,11 +86,11 @@ def run_with_port():
 
 
 def run_debug():
-    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'debug', '--dryrun', 'yes'], 'Server Mode : Debugging')
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'debug', '--dryrun', 'yes'], 'Server Mode : Production (debug)')
 
 
 def run_production():
-    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'production', '--dryrun', 'yes'], 'Server Mode : Production')
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'production', '--dryrun', 'yes'], 'Server Mode : Production (production)')
 
 
 def init_variety_methods():

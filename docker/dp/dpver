@@ -1,1 +1,11 @@
-0.9.4.0
+#!/usr/bin/env python
+
+import os
+
+version_py = os.path.join(os.getcwd(), '../../dp_tornado/version.py')
+
+with file(version_py, 'r') as fp:
+    for c in fp.read().split('\n'):
+        exec(c)
+
+print(__version__)

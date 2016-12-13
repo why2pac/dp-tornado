@@ -1,7 +1,7 @@
 #!/bin/bash
 
 account="why2pac"
-dpver=$(cat dpver)
+dpver=$(./dpver)
 
 for pyver in py27 py34 py35 pypy27; do
   sudo docker build --tag $account/dp4p:$dpver-$pyver --build-arg dpver=$dpver ./$pyver

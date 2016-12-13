@@ -11,6 +11,7 @@ from dp_tornado.version import __version__
 
 
 engine = dpEngineSingleton()
+logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s')
 
 
 class Bootstrap(object):
@@ -84,17 +85,15 @@ class Bootstrap(object):
         if args.mode:
             engine.ini.app.set('mode', args.mode)
 
-        engine.ini.app.get('mode', default='debug')
+        engine.ini.app.get('mode', default='NOT SET')
 
         # Specify Sandbox Mode
         if (engine.ini.app.mode or '').lower() in ('debug', 'sandbox', 'test', 'dev', 'development', 'develop'):
-            engine.ini.server.set('num_processes', 1)
-            engine.ini.server.set('debug', True)
+            pass
 
         # Specify Production Mode
         elif (engine.ini.app.mode or '').lower() in ('prod', 'production', 'real', 'service'):
-            engine.ini.server.set('num_processes', 0)
-            engine.ini.server.set('debug', False)
+            pass
 
         combined_path = engine.ini.static.get('path', default='combined')
         static_prefix = engine.ini.static.get('prefix', default='/s/')
@@ -138,7 +137,13 @@ class Bootstrap(object):
         engine.ini.server.get('max_worker', default=1)
         engine.ini.server.get('num_processes', default=0)
         engine.ini.server.get('port', default=8080)
-        engine.ini.server.get('debug', default=False)
+
+        # Enabled production mode when running via cli.
+        if not as_cli:
+            engine.ini.server.get('debug', default=False)
+        else:
+            engine.ini.server.set('debug', False)
+
         engine.ini.server.get('gzip', default=True)
         engine.ini.crypto.get('key', default='CR$t0-$CR@T')
         engine.ini.session.get('dsn', default=None)
@@ -189,9 +194,6 @@ class Bootstrap(object):
 
         # dp Logging
         engine.logger.set_level(engine.logger.default_logger_name, dp_logging or 100)
-
-        # Initialize Basic Logger Format
-        logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s')
 
         # SQLAlchemy logging level
         if sql_logging:

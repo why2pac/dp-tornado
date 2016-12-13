@@ -105,7 +105,10 @@ class Bootstrap(object):
         num_processed = engine.ini.server.num_processes if engine.ini.server.num_processes \
             else multiprocessing.cpu_count()
 
-        engine.logger.sys_log('Server Mode : %s' % ('Production' if not engine.ini.server.debug else 'Debugging'))
+        deploy_mode = 'Production' if not engine.ini.server.debug else 'Debugging'
+        identify_mode = engine.ini.app.mode
+
+        engine.logger.sys_log('Server Mode : %s (%s)' % (deploy_mode, identify_mode))
         engine.logger.sys_log('Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
         engine.logger.sys_log('Server Port : %s' % engine.ini.server.port)
         engine.logger.sys_log('Processors  : %s' % num_processed)

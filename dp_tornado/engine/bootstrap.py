@@ -145,6 +145,10 @@ class Bootstrap(object):
         engine.ini.session.get('expire_in', default=7200)
         engine.ini.server.get('max_body_size', default=1024*1024*10)
 
+        # If enabled debugging mode, disable process forking.
+        if engine.ini.server.debug:
+            engine.ini.server.set('num_processes', 1)
+
         m17n = engine.ini.server.get('m17n', default='').strip()
         m17n = m17n.split(',') if m17n else ['dummy']
         m17n = [e.strip() for e in m17n]
@@ -167,6 +171,7 @@ class Bootstrap(object):
         sql_logging = engine.ini.logging.get('sql', default=False)
         aws_logging = engine.ini.logging.get('aws', default=False)
         http_logging = engine.ini.logging.get('http', default=False)
+        dp_logging = engine.ini.logging.get('dp', default=30 if not engine.ini.server.debug else 10)
 
         if exception_delegate:
             try:
@@ -178,10 +183,15 @@ class Bootstrap(object):
 
         engine.ini.logging.set('exception_delegate', exception_delegate)
 
-        # Initialize Logging
-        logging.basicConfig(
-            level=logging.DEBUG if access_logging else logging.WARN,
-            format='[%(asctime)s][%(levelname)s] %(message)s')
+        # Access Logging
+        import tornado.log
+        engine.logger.set_level(tornado.log.access_log.name, logging.DEBUG if access_logging else logging.WARN)
+
+        # dp Logging
+        engine.logger.set_level(engine.logger.default_logger_name, dp_logging or 100)
+
+        # Initialize Basic Logger Format
+        logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s')
 
         # SQLAlchemy logging level
         if sql_logging:

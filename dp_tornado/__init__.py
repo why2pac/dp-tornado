@@ -60,9 +60,9 @@ class Bootstrap(object):
         settings = EngineBootstrap.init_ini(
             application_path=application_path, ini_file=custom_config_file, as_cli=as_cli)
 
-        engine.logger.log(100, '---------------------------------')
-        engine.logger.log(100, 'dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
-        engine.logger.log(100, '---------------------------------')
+        engine.logger.sys_log('---------------------------------')
+        engine.logger.sys_log('dp for Python            v%s' % '.'.join([str(e) for e in __version_info__]))
+        engine.logger.sys_log('---------------------------------')
 
         services_raw = [
             (r"/dp/scheduler/(.*)", 'dp_tornado.engine.scheduler_handler.SchedulerHandler'),
@@ -105,12 +105,12 @@ class Bootstrap(object):
         num_processed = engine.ini.server.num_processes if engine.ini.server.num_processes \
             else multiprocessing.cpu_count()
 
-        engine.logger.log(100, 'Server Mode : %s' % ('Production' if not engine.ini.server.debug else 'Debugging'))
-        engine.logger.log(100, 'Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
-        engine.logger.log(100, 'Server Port : %s' % engine.ini.server.port)
-        engine.logger.log(100, 'Processors  : %s' % num_processed)
-        engine.logger.log(100, 'CPU Count   : %d' % multiprocessing.cpu_count())
-        engine.logger.log(100, '---------------------------------')
+        engine.logger.sys_log('Server Mode : %s' % ('Production' if not engine.ini.server.debug else 'Debugging'))
+        engine.logger.sys_log('Server time : %s' % time.strftime('%Y.%m.%d %H:%M:%S'))
+        engine.logger.sys_log('Server Port : %s' % engine.ini.server.port)
+        engine.logger.sys_log('Processors  : %s' % num_processed)
+        engine.logger.sys_log('CPU Count   : %d' % multiprocessing.cpu_count())
+        engine.logger.sys_log('---------------------------------')
 
         application = RestfulApplication(services, settings)
         service = tornado.httpserver.HTTPServer(

@@ -16,12 +16,52 @@ except ImportError:
 
 class Logger(dpSingleton):
     def __init__(self, engine=None):
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s][%(levelname)s] %(message)s')
-
+        self.loggers = {}
         self.engine = engine
+
+        self.set_logger(self.default_logger, logging.DEBUG)
+        self.set_logger(self.sys_logger, logging.DEBUG)
 
         self.delegate_queue = None
         self.delegate_handler = None
+
+    @property
+    def default_logger_name(self):
+        return 'dp_logger'
+
+    @property
+    def default_logger(self):
+        return self.get_logger(self.default_logger_name)
+
+    @property
+    def sys_logger_name(self):
+        return 'dp_logger_sys'
+
+    @property
+    def sys_logger(self):
+        return self.get_logger(self.sys_logger_name)
+
+    def get_logger(self, name):
+        if name in self.loggers:
+            return self.loggers[name]
+
+        logger = logging.getLogger(name)
+        self.loggers[name] = logger
+
+        return logger
+
+    def set_logger(self, logger, level, format_string=None, add_handler=False):
+        if format_string is None:
+            format_string = '[%(asctime)s][%(levelname)s] %(message)s'
+
+        logger.setLevel(level)
+        handler = logging.StreamHandler()
+        handler.setLevel(level)
+
+        if add_handler:
+            formatter = logging.Formatter(format_string)
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
 
     def set_delegate_handler(self, handler=None):
         self.delegate_handler = handler or self.engine.ini.logging.exception_delegate
@@ -50,30 +90,33 @@ class Logger(dpSingleton):
         if self.delegate_handler and self.delegate_queue:
             self.delegate_queue.put((logging.ERROR, msg, tb))
 
-        logging.exception(msg, *args, **kwargs)
+        self.default_logger.exception(msg, *args, **kwargs)
 
     def error(self, msg, *args, **kwargs):
-        logging.error(self.strip(str(msg), True), *args, **kwargs)
+        self.default_logger.error(self.strip(str(msg), True), *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
-        logging.info(self.strip(msg), *args, **kwargs)
+        self.default_logger.info(self.strip(msg), *args, **kwargs)
 
     def warning(self, msg, *args, **kwargs):
-        logging.warning(self.strip(msg), *args, **kwargs)
+        self.default_logger.warning(self.strip(msg), *args, **kwargs)
 
     def debug(self, msg, *args, **kwargs):
-        logging.debug(self.strip(msg), *args, **kwargs)
+        self.default_logger.debug(self.strip(msg), *args, **kwargs)
 
     def log(self, level, msg, *args, **kwargs):
-        logging.log(level, self.strip(msg), *args, **kwargs)
+        self.default_logger.log(level, self.strip(msg), *args, **kwargs)
+
+    def sys_log(self, msg, *args, **kwargs):
+        self.sys_logger.info(self.strip(msg), *args, **kwargs)
 
     def delegate_interrupt(self):
         if self.delegate_handler:
             self.delegate.interrupted = True
             self.delegate_queue.put(False)
 
-    def set_level(self, logger_name, level):
-        logging.getLogger(logger_name).setLevel(level)
+    def set_level(self, name, level):
+        self.get_logger(name).setLevel(level)
 
     @property
     def level(self):

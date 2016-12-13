@@ -23,16 +23,8 @@ import sys
 import logging
 
 
-try:
-    from setuptools import setup
-
-except ImportError:
-    from distutils.core import setup
-
-try:
-    import distutils.core as core
-except ImportError:
-    core = None
+from setuptools import find_packages, setup
+import distutils.core as core
 
 try:
     from setuptools.command.install import install
@@ -88,7 +80,6 @@ class CustomInstallCommand(install):
 
     def run(self):
         install.run(self)
-        install.do_egg_install(self)
 
 
 install_requires = [

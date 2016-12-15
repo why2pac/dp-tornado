@@ -55,33 +55,6 @@ dp_requires_CyMySQL = 'CyMySQL==0.8.9'
 dp_requires_futures = 'futures==3.0.5'
 
 
-class CustomInstallCommand(install):
-    user_options = install.user_options + [
-        ('dp-identifier=', None, 'Specify identifier for dp.'),
-        ('dp-without-mysql', None, 'Specify this option if you do not want to install mysql dependency.')
-    ]
-
-    def initialize_options(self):
-        install.initialize_options(self)
-
-        self.dp_identifier = None
-        self.dp_without_mysql = False
-
-    def finalize_options(self):
-        install.finalize_options(self)
-
-        dist = getattr(core, '_setup_distribution', None) if core else None
-
-        if not dist:
-            logging.warning('Aditional requires cannot installed.')
-        else:
-            if self.dp_without_mysql:
-                dist.install_requires.remove(dp_requires_CyMySQL)
-
-    def run(self):
-        install.run(self)
-
-
 install_requires = [
         'tornado==4.4.2',
         'redis==2.10.5',
@@ -119,7 +92,6 @@ setup(
     long_description=__doc__,
     packages=['dp_tornado'],
     include_package_data=True,
-    cmdclass={'install': CustomInstallCommand},
     install_requires=install_requires,
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[

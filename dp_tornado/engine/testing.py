@@ -11,13 +11,13 @@ Run Test:
 Available syntax:
 
 * **expect(criteria)**
-* **expect(priority, ruels)**
+* **expect(priority, rules)**
 * **!expect(criteria)**
-* **!expect(priority, ruels)**
+* **!expect(priority, rules)**
 
 .. testcode::
 
-    ruels:
+    rules:
         controller:
             code, text, json, args(arguments separated by /), params(query string, form values)
         model, helper:

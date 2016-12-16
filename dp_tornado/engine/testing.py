@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Testing module provides unittest by pre-defined testing syntax.
-You can define testing syntax as method `docstring`.
+You can define testing syntax as method `docstring`, **`.. test::` indicates the beginning of testing syntaxes.**
 
 Run Test:
 
@@ -24,6 +24,10 @@ Available syntax:
             int, long, bool, str, json, args (arguments by list), kwargs (arguments by dict)
 
 .. testcode::
+
+    from dp_tornado.engine.controller import Controller as dpController
+    from dp_tornado.engine.model import Model as dpModel
+    from dp_tornado.engine.helper import Helper as dpHelper
 
     class FooController(dpController):
         def get(self):

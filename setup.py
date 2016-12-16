@@ -58,7 +58,7 @@ dp_requires_futures = 'futures==3.0.5'
 install_requires = [
         'tornado==4.4.2',
         'redis==2.10.5',
-        'requests==2.12.3',
+        'requests==2.12.4',
         'croniter==0.3.13',
         'pytz==2016.10',
         'pycrypto==2.6.1',
@@ -67,7 +67,7 @@ install_requires = [
         'Pillow==3.4.2',
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
-        'lxml==3.6.4',
+        'lxml==3.7.0',
         'httpagentparser==1.7.8',
         'validators==0.11.1',
         dp_requires_CyMySQL,

@@ -178,4 +178,7 @@ class DynamodbController(Controller):
             except Exception as e:
                 self.logging.exception(e)
 
+                import time
+                time.sleep(10)
+
         return self.finish_with_error(500)

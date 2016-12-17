@@ -264,55 +264,64 @@ class ImageHelper(dpHelper):
             if mode not in self.helper.io.image.mode.modes:
                 raise Exception('The specified mode is not supported.')
 
-            # Image Resizing
-            if mode == self.helper.io.image.mode.center:
-                width_calc = width_new
-                height_calc = height_origin * width_calc / width_origin
+            seqs = []
 
-                if height_calc > height_new:
-                    height_calc = height_new
-                    width_calc = width_origin * height_calc / height_origin
+            for i, im in self._iter_seqs(img, kwargs):
+                # Image Resizing
+                if mode == self.helper.io.image.mode.center:
+                    width_calc = width_new
+                    height_calc = height_origin * width_calc / width_origin
 
-                img = img.resize((int(width_calc), int(height_calc)), Image.ANTIALIAS)
-                img = self.radius(img, **kwargs)
+                    if height_calc > height_new:
+                        height_calc = height_new
+                        width_calc = width_origin * height_calc / height_origin
 
-                img = ImageOps.expand(
-                    img, border=(int((width_new - width_calc) / 2), int((height_new - height_calc) / 2)), fill=background)
+                    im = im.resize((int(width_calc), int(height_calc)), Image.ANTIALIAS)
+                    im = self.radius(im, **kwargs)
 
-                radius = int(kwargs['radius'] or 0) if 'radius' in kwargs else None
+                    im = ImageOps.expand(
+                        im, border=(int((width_new - width_calc) / 2), int((height_new - height_calc) / 2)), fill=background)
 
-                if radius:
-                    img_empty = Image.new('RGB', (width_new, height_new), background)
-                    img_empty.paste(img, (0, 0), img)
-                    img = img_empty
+                    radius = int(kwargs['radius'] or 0) if 'radius' in kwargs else None
 
-                img.__dict__['__radius_processed__'] = True
+                    if radius:
+                        img_empty = Image.new('RGB', (width_new, height_new), background)
+                        img_empty.paste(im, (0, 0), im)
+                        im = img_empty
 
-            elif mode == self.helper.io.image.mode.fill:
-                ratio_origin = float(width_origin) / float(height_origin)
-                ratio_new = float(width_new) / float(height_new)
+                    im.__dict__['__radius_processed__'] = True
 
-                if ratio_origin > ratio_new:
-                    tw = int(round(height_new * ratio_origin))
-                    img = img.resize((tw, height_new), Image.ANTIALIAS)
-                    left = int(round((tw - width_new) / 2.0))
-                    img = img.crop((left, 0, left + width_new, height_new))
+                elif mode == self.helper.io.image.mode.fill:
+                    ratio_origin = float(width_origin) / float(height_origin)
+                    ratio_new = float(width_new) / float(height_new)
 
-                elif ratio_origin < ratio_new:
-                    th = int(round(width_new / ratio_origin))
-                    img = img.resize((width_new, th), Image.ANTIALIAS)
-                    top = int(round((th - height_new) / 2.0))
-                    img = img.crop((0, top, width_new, top + height_new))
+                    if ratio_origin > ratio_new:
+                        tw = int(round(height_new * ratio_origin))
+                        im = im.resize((tw, height_new), Image.ANTIALIAS)
+                        left = int(round((tw - width_new) / 2.0))
+                        im = im.crop((left, 0, left + width_new, height_new))
 
-                else:
-                    img = img.resize((width_new, height_new), Image.ANTIALIAS)
+                    elif ratio_origin < ratio_new:
+                        th = int(round(width_new / ratio_origin))
+                        im = im.resize((width_new, th), Image.ANTIALIAS)
+                        top = int(round((th - height_new) / 2.0))
+                        im = im.crop((0, top, width_new, top + height_new))
 
-            elif mode == self.helper.io.image.mode.resize:
-                if width_new > width_origin or height_new > height_origin:
-                    width_new = width_origin
-                    height_new = height_origin
+                    else:
+                        im = im.resize((width_new, height_new), Image.ANTIALIAS)
 
-                img = img.resize((int(width_new), int(height_new)), Image.ANTIALIAS)
+                elif mode == self.helper.io.image.mode.resize:
+                    if width_new > width_origin or height_new > height_origin:
+                        width_new = width_origin
+                        height_new = height_origin
+
+                    im = im.resize((width_new, height_new), Image.ANTIALIAS)
+
+                seqs.append(im)
+
+            img = seqs[0]
+            seqs.remove(img)
+            img.__dict__['__frames__'] = seqs
 
             return img
 
@@ -350,11 +359,76 @@ class ImageHelper(dpHelper):
             if ext.lower() == 'jpg':
                 ext = 'jpeg'
 
-            img.save(dest, format=ext, quality=100)
+            args = {
+                'format': ext,
+                'quality': 100
+            }
+
+            if self._animatable(img, kwargs):
+                # PILLOW Issue, #1592 (github)
+                seqs = []
+
+                for i, im in self._iter_seqs(img, kwargs):
+                    im = im.convert('RGBA')
+                    seqs.append(im)
+
+                img = seqs[0]
+                seqs.remove(img)
+
+                img = img.convert('RGBA')
+                img = img.convert('P')
+
+                args['append_images'] = seqs
+                args['save_all'] = True
+                args['format'] = 'GIF'
+
+            img.save(dest, **args)
 
             return True
 
         return self.execute(src, fn, **o_kwargs)
+
+    def _iter_seqs(self, img, kwargs):
+        if '__frames__' in img.__dict__ and img.__dict__['__frames__']:
+            yield 0, img
+
+            for i in range(min(len(img.__dict__['__frames__']), self._iterable_frames(kwargs) - 1)):
+                yield i, img.__dict__['__frames__'][i]
+
+        elif not self._animatable(img, kwargs):
+            yield 0, img
+
+        else:
+            for i in range(min(img.n_frames, self._iterable_frames(kwargs))):
+                img.seek(i)
+                yield i, img
+
+    def _iterable_frames(self, kwargs):
+        if not self.helper.misc.type.check.numeric(kwargs['frame']):
+            return 10**7
+        else:
+            return kwargs['frame']
+
+    def _animatable(self, img, kwargs, img_frames=False):
+        if '__frames__' in img.__dict__ and img.__dict__['__frames__']:
+            return True
+
+        if 'frame' not in kwargs or not kwargs['frame']:
+            return False
+
+        if not img:
+            return False
+
+        if not img.format or img.format.upper() != 'GIF':
+            return False
+
+        if not img.mode or img.mode.upper() != 'P':
+            return False
+
+        if not getattr(img, 'n_frames', None) or img.n_frames <= 1:
+            return False
+
+        return True
 
     def manipulate(self, src, **kwargs):
         kwargs['_org'] = src

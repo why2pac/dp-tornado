@@ -312,7 +312,7 @@ class ImageHelper(dpHelper):
                     width_new = width_origin
                     height_new = height_origin
 
-                img = img.resize((width_new, height_new), Image.ANTIALIAS)
+                img = img.resize((int(width_new), int(height_new)), Image.ANTIALIAS)
 
             return img
 
@@ -344,8 +344,11 @@ class ImageHelper(dpHelper):
             # JPEG : L, RGB, CMYK
 
             # Invalid format specified
-            if ext in ('jpg', 'jpeg') and img.mode == 'P':  # JPEG does not support P mode
+            if ext.lower() in ('jpg', 'jpeg') and img.mode == 'P':  # JPEG does not support P mode
                 img = img.convert('RGBA')
+
+            if ext.lower() == 'jpg':
+                ext = 'jpeg'
 
             img.save(dest, format=ext, quality=100)
 

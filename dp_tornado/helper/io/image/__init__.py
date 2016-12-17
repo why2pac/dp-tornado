@@ -365,18 +365,30 @@ class ImageHelper(dpHelper):
             }
 
             if self._animatable(img, kwargs):
+                transparency = img.info['transparency'] if 'transparency' in img.info else None
+                background = img.info['background'] if 'background' in img.info else None
+
                 # PILLOW Issue, #1592 (github)
+
                 seqs = []
 
                 for i, im in self._iter_seqs(img, kwargs):
                     im = im.convert('RGBA')
+
+                    if transparency is not None:
+                        im.info['transparency'] = transparency
+                    if background is not None:
+                        im.info['background'] = background
+
                     seqs.append(im)
 
                 img = seqs[0]
                 seqs.remove(img)
 
-                img = img.convert('RGBA')
-                img = img.convert('P')
+                if transparency is not None:
+                    args['transparency'] = transparency
+                if background is not None:
+                    args['background'] = background
 
                 args['append_images'] = seqs
                 args['save_all'] = True
@@ -392,7 +404,7 @@ class ImageHelper(dpHelper):
         if '__frames__' in img.__dict__ and img.__dict__['__frames__']:
             yield 0, img
 
-            for i in range(min(len(img.__dict__['__frames__']), self._iterable_frames(kwargs) - 1)):
+            for i in range(1, min(len(img.__dict__['__frames__']), self._iterable_frames(kwargs)) - 1):
                 yield i, img.__dict__['__frames__'][i]
 
         elif not self._animatable(img, kwargs):
@@ -404,7 +416,7 @@ class ImageHelper(dpHelper):
                 yield i, img
 
     def _iterable_frames(self, kwargs):
-        if not self.helper.misc.type.check.numeric(kwargs['frame']):
+        if kwargs['frame'] is True or not self.helper.misc.type.check.numeric(kwargs['frame']):
             return 10**7
         else:
             return kwargs['frame']

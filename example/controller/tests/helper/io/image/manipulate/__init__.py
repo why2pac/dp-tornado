@@ -126,3 +126,5 @@ class ManipulateController(Controller):
         assert self.helper.io.image.compare(resize_img_dest, resize_img_compare, error=3)
 
         self.helper.io.file.remove(save_prefix)
+
+        self.finish('done')

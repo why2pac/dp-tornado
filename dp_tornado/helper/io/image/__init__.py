@@ -3,21 +3,6 @@
 
 import tempfile
 
-try:
-    from PIL import Image
-except ImportError:
-    Image = None
-
-try:
-    from PIL import ImageDraw
-except ImportError:
-    ImageDraw = None
-
-try:
-    from PIL import ImageOps
-except ImportError:
-    ImageOps = None
-
 from dp_tornado.engine.helper import Helper as dpHelper
 
 
@@ -52,11 +37,23 @@ class ImageHelper(dpHelper):
 
         return True
 
-    def load(self, src):
+    def _driver(self, options=None, **kwargs):
+        if not options and kwargs:
+            options = kwargs
+
+        if options and 'driver' in options and options['driver'] == 'wand':
+            return self.helper.io.image.driver.wand
+
+        return self.helper.io.image.driver.pillow
+
+    def load(self, src, options=None, **kwargs):
+        if not options and kwargs:
+            options = kwargs
+
         tmp = None
 
         try:
-            if isinstance(src, Image.Image):
+            if isinstance(src, (self.helper.io.image.driver.pillow.Image, self.helper.io.image.driver.wand.Image)):
                 return src
 
             elif self.helper.web.url.validate(src):
@@ -74,7 +71,7 @@ class ImageHelper(dpHelper):
             else:
                 tmp = None
 
-            img = Image.open(tmp if tmp else src)
+            img = self._driver(options=options).load(tmp if tmp else src)
 
             if not img:
                 raise Exception('The specified image is invalid.')
@@ -90,31 +87,40 @@ class ImageHelper(dpHelper):
             if tmp:
                 self.helper.io.file.remove(tmp)
 
-    def execute(self, src, fn, **kwargs):
-        img = self.load(src)
+    def execute(self, src, fn, options=None, **kwargs):
+        if not options and kwargs:
+            options = kwargs
+
+        img = self.load(src, options=options)
 
         if not img:
             return False
 
         try:
-            return fn(img, **kwargs)
+            return fn(img, options)
 
         except Exception as e:
             self.logging.exception(e)
 
             return False
 
-    def size(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def size(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             if not img:
                 return -1, -1
 
             return img.width, img.height
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def crop(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def crop(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             crop = kwargs['crop'] if 'crop' in kwargs else None
 
             if not crop:
@@ -146,14 +152,17 @@ class ImageHelper(dpHelper):
                     e_bottom = crop[2]
                     e_left = crop[3]
 
-            img = img.crop((e_left, e_top, img.size[0] - e_right, img.size[1] - e_bottom))
+            img = self._driver(options=kwargs).crop(img, e_left, e_top, img.size[0] - e_right, img.size[1] - e_bottom)
 
             return img
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def border(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def border(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             border = int(kwargs['border']) if 'border' in kwargs else 0
             border_color = kwargs['border_color'] if 'border_color' in kwargs else '#000000'
 
@@ -163,17 +172,17 @@ class ImageHelper(dpHelper):
             if '_org' in kwargs and 'radius' in kwargs and kwargs['radius']:
                 return img
 
-            if img.mode == 'P':
-                img = img.convert('RGBA')
-
-            img = ImageOps.expand(img, border=(border, border), fill=border_color)
+            img = self._driver(options=kwargs).border(img, border, border_color)
 
             return img
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def radius(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def radius(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             radius = int(kwargs['radius'] or 0) if 'radius' in kwargs else None
             border = int(kwargs['border']) if 'border' in kwargs else 0
             border_color = kwargs['border_color'] if 'border_color' in kwargs else '#000000'
@@ -183,48 +192,38 @@ class ImageHelper(dpHelper):
             elif '__radius_processed__' in img.__dict__:
                 return img
 
-            img = img.convert('RGBA')
-            img.putalpha(self._rounded_mask(img.size, min(radius, *img.size)))
-
-            # Border with radius
-            if border:
-                img_o = img
-                bordered_size = (img.size[0] + (border * 2), img.size[1] + (border * 2))
-                img = Image.new('RGBA', bordered_size, border_color)
-                img.putalpha(self._rounded_mask(bordered_size, min(radius, *bordered_size)))
-                img.paste(img_o, (border, border), img_o)
-
+            img = self._driver(options=kwargs).radius(img, radius, border, border_color)
             img.__dict__['__radius_processed__'] = True
 
             return img
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def colorize(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def colorize(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             colorize = kwargs['colorize'] if 'colorize' in kwargs else None
 
             if not colorize:
                 return img
 
-            img = img.convert('RGBA')
-            r, g, b, a = img.split()
-            gray = ImageOps.grayscale(img)
-            result = ImageOps.colorize(gray, colorize, (255, 255, 255, 0))
-            result.putalpha(a)
-            img = result
+            img = self._driver(options=kwargs).colorize(img, colorize)
 
             return img
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def resize(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def resize(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             size = kwargs['size'] if 'size' in kwargs else None
             mode = kwargs['mode'] if 'mode' in kwargs else None
             scale = int(kwargs['scale']) if 'scale' in kwargs else 1
             limit = True if 'limit' in kwargs and kwargs['limit'] else False
-            background = kwargs['background'] if 'background' in kwargs else None
             border = int(kwargs['border']) if 'border' in kwargs else 0
 
             if not size:
@@ -266,30 +265,10 @@ class ImageHelper(dpHelper):
 
             seqs = []
 
-            for i, im in self._iter_seqs(img, kwargs):
+            for i, im in self._driver(options=kwargs).iter_seqs(img, kwargs):
                 # Image Resizing
                 if mode == self.helper.io.image.mode.center:
-                    width_calc = width_new
-                    height_calc = height_origin * width_calc / width_origin
-
-                    if height_calc > height_new:
-                        height_calc = height_new
-                        width_calc = width_origin * height_calc / height_origin
-
-                    im = im.resize((int(width_calc), int(height_calc)), Image.ANTIALIAS)
-                    im = self.radius(im, **kwargs)
-
-                    im = ImageOps.expand(
-                        im, border=(int((width_new - width_calc) / 2), int((height_new - height_calc) / 2)), fill=background)
-
-                    radius = int(kwargs['radius'] or 0) if 'radius' in kwargs else None
-
-                    if radius:
-                        img_empty = Image.new('RGB', (width_new, height_new), background)
-                        img_empty.paste(im, (0, 0), im)
-                        im = img_empty
-
-                    im.__dict__['__radius_processed__'] = True
+                    im = self._driver(options=kwargs).resize(im, width_new, height_new, kwargs)
 
                 elif mode == self.helper.io.image.mode.fill:
                     ratio_origin = float(width_origin) / float(height_origin)
@@ -297,25 +276,25 @@ class ImageHelper(dpHelper):
 
                     if ratio_origin > ratio_new:
                         tw = int(round(height_new * ratio_origin))
-                        im = im.resize((tw, height_new), Image.ANTIALIAS)
+                        im = self._driver(options=kwargs).resize(im, tw, height_new)
                         left = int(round((tw - width_new) / 2.0))
-                        im = im.crop((left, 0, left + width_new, height_new))
+                        im = self._driver(options=kwargs).crop(im, left, 0, left + width_new, height_new)
 
                     elif ratio_origin < ratio_new:
                         th = int(round(width_new / ratio_origin))
-                        im = im.resize((width_new, th), Image.ANTIALIAS)
+                        im = self._driver(options=kwargs).resize(im, width_new, th)
                         top = int(round((th - height_new) / 2.0))
-                        im = im.crop((0, top, width_new, top + height_new))
+                        im = self._driver(options=kwargs).crop(im, 0, top, width_new, top + height_new)
 
                     else:
-                        im = im.resize((width_new, height_new), Image.ANTIALIAS)
+                        im = self._driver(options=kwargs).resize(im, width_new, height_new)
 
                 elif mode == self.helper.io.image.mode.resize:
                     if width_new > width_origin or height_new > height_origin:
                         width_new = width_origin
                         height_new = height_origin
 
-                    im = im.resize((width_new, height_new), Image.ANTIALIAS)
+                    im = self._driver(options=kwargs).resize(im, width_new, height_new)
 
                 seqs.append(im)
 
@@ -325,10 +304,13 @@ class ImageHelper(dpHelper):
 
             return img
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def save(self, src, **o_kwargs):
-        def fn(img, **kwargs):
+    def save(self, src, options=None, **o_kwargs):
+        if not options and o_kwargs:
+            options = o_kwargs
+
+        def fn(img, kwargs):
             ext = kwargs['format'] if 'format' in kwargs else None
             dest = kwargs['dest'] if 'dest' in kwargs else None
 
@@ -348,138 +330,54 @@ class ImageHelper(dpHelper):
                 # TODO
                 return False
 
-            # PNG : 1, L, P, RGB, RGBA
-            # GIF : L, P
-            # JPEG : L, RGB, CMYK
-
-            # Invalid format specified
-            if ext.lower() in ('jpg', 'jpeg') and img.mode == 'P':  # JPEG does not support P mode
-                img = img.convert('RGBA')
-
-            if ext.lower() == 'jpg':
-                ext = 'jpeg'
-
-            args = {
-                'format': ext,
-                'quality': 100
-            }
-
-            if self._animatable(img, kwargs):
-                transparency = img.info['transparency'] if 'transparency' in img.info else None
-                background = img.info['background'] if 'background' in img.info else None
-
-                # PILLOW Issue, #1592 (github)
-
-                seqs = []
-
-                for i, im in self._iter_seqs(img, kwargs):
-                    im = im.convert('RGBA')
-
-                    if transparency is not None:
-                        im.info['transparency'] = transparency
-                    if background is not None:
-                        im.info['background'] = background
-
-                    seqs.append(im)
-
-                img = seqs[0]
-                seqs.remove(img)
-
-                if transparency is not None:
-                    args['transparency'] = transparency
-                if background is not None:
-                    args['background'] = background
-
-                args['append_images'] = seqs
-                args['save_all'] = True
-                args['format'] = 'GIF'
-
-            img.save(dest, **args)
+            if not self._driver(options=kwargs).save(img, ext, dest, kwargs):
+                return False
 
             return True
 
-        return self.execute(src, fn, **o_kwargs)
+        return self.execute(src, fn, options=options)
 
-    def _iter_seqs(self, img, kwargs):
-        if '__frames__' in img.__dict__ and img.__dict__['__frames__']:
-            yield 0, img
+    def manipulate(self, src, options=None, **kwargs):
+        if not options and kwargs:
+            options = kwargs
 
-            for i in range(1, min(len(img.__dict__['__frames__']), self._iterable_frames(kwargs)) - 1):
-                yield i, img.__dict__['__frames__'][i]
-
-        elif not self._animatable(img, kwargs):
-            yield 0, img
-
-        else:
-            for i in range(min(img.n_frames, self._iterable_frames(kwargs))):
-                img.seek(i)
-                yield i, img
-
-    def _iterable_frames(self, kwargs):
-        if kwargs['frame'] is True or not self.helper.misc.type.check.numeric(kwargs['frame']):
-            return 10**7
-        else:
-            return kwargs['frame']
-
-    def _animatable(self, img, kwargs, img_frames=False):
-        if '__frames__' in img.__dict__ and img.__dict__['__frames__']:
-            return True
-
-        if 'frame' not in kwargs or not kwargs['frame']:
-            return False
-
-        if not img:
-            return False
-
-        if not img.format or img.format.upper() != 'GIF':
-            return False
-
-        if not img.mode or img.mode.upper() != 'P':
-            return False
-
-        if not getattr(img, 'n_frames', None) or img.n_frames <= 1:
-            return False
-
-        return True
-
-    def manipulate(self, src, **kwargs):
-        kwargs['_org'] = src
+        options['_org'] = src
 
         try:
-            img = self.load(src)
+            img = self.load(src, options=options)
 
             # Crop
-            img = self.crop(img, **kwargs)
+            img = self.crop(img, options=options)
 
             if not img:
                 return False
 
             # Resize
-            img = self.resize(img, **kwargs)
+            img = self.resize(img, options=options)
 
             if not img:
                 return False
 
             # Radius
-            img = self.radius(img, **kwargs)
+            img = self.radius(img, options=options)
 
             if not img:
                 return False
 
             # Border
-            img = self.border(img, **kwargs)
+            img = self.border(img, options=options)
 
             if not img:
                 return False
 
             # Colorize
-            img = self.colorize(img, **kwargs)
+            img = self.colorize(img, options=options)
 
             if not img:
                 return False
 
             # Save
-            saved = self.save(img, **kwargs)
+            saved = self.save(img, options=options)
 
             if saved is None:
                 return img
@@ -492,21 +390,3 @@ class ImageHelper(dpHelper):
             self.logging.exception(e)
 
             return False
-
-    def _rounded_mask(self, size, radius, factor=2):
-        width, height = size
-        radius = min(radius, *size)
-
-        mask = Image.new("L", (width * factor, height * factor))
-        mask_draw = ImageDraw.Draw(mask)
-        mask_draw.ellipse((0, 0, radius * factor, radius * factor), fill='#FFFFFF')
-
-        flip = mask.transpose(Image.FLIP_LEFT_RIGHT)
-        mask.paste(flip, (0, 0), flip)
-        mask_draw.rectangle((radius * factor / 2, 0, (width - (radius / 2)) * factor, radius * factor), fill='#FFFFFF')
-        flip = mask.transpose(Image.FLIP_TOP_BOTTOM)
-        mask.paste(flip, (0, 0), flip)
-        mask_draw.rectangle((0, radius * factor / 2, width * factor, (height - (radius / 2)) * factor), fill='#FFFFFF')
-        mask = mask.resize((width, height), Image.ANTIALIAS)
-
-        return mask

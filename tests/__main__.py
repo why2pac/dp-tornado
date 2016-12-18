@@ -72,6 +72,7 @@ def run(main):
     test_helper.io_file_zip()
 
     test_helper.io_image_manipulate()
+    test_helper.io_image_manipulate_wand()
 
     test_helper.web_aws_s3()
     test_helper.web_aws_s3_post()

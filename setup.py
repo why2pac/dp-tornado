@@ -65,6 +65,7 @@ install_requires = [
         'boto3==1.4.2',
         'SQLAlchemy==1.1.4',
         'Pillow==3.4.2',
+        'wand==0.4.4',
         'validate_email==1.3',
         'BeautifulSoup4==4.5.1',
         'lxml==3.7.0',

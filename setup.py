@@ -50,9 +50,6 @@ dp_maintainer_email = dp_author_email
 
 dp_description = 'MVC Web Application Framework with Tornado.'
 
-dp_requires_CyMySQL = 'CyMySQL==0.8.9'
-dp_requires_futures = 'futures==3.0.5'
-
 
 install_requires = [
         'tornado==4.4.2',
@@ -70,13 +67,13 @@ install_requires = [
         'lxml==3.7.0',
         'httpagentparser==1.7.8',
         'validators==0.11.1',
-        dp_requires_CyMySQL,
+        'CyMySQL==0.8.9',
         # , 'selenium'
     ]
 
 
 if sys.version_info[0] <= 2:
-    install_requires.append(dp_requires_futures)
+    install_requires.append('futures==3.0.5')
 
 
 # Will not install dependencies when it starts from readthedocs.

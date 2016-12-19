@@ -20,11 +20,10 @@ Run
 
 
 import sys
-import logging
+import os
 
 
-from setuptools import find_packages, setup
-import distutils.core as core
+from setuptools import setup
 
 try:
     from setuptools.command.install import install
@@ -78,6 +77,11 @@ install_requires = [
 
 if sys.version_info[0] <= 2:
     install_requires.append(dp_requires_futures)
+
+
+# Will not install dependencies when it starts from readthedocs.
+if os.environ.get('READTHEDOCS') == 'True':
+    install_requires = []
 
 
 setup(

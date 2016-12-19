@@ -60,7 +60,7 @@ class ImageHelper(dpHelper):
                 code, res = self.helper.web.http.get.raw(src)
 
                 if code != 200:
-                    return False
+                    raise Exception('The specified image url is invalid.')
 
                 tmp = tempfile.NamedTemporaryFile(delete=False)
                 tmp.write(res)
@@ -70,6 +70,9 @@ class ImageHelper(dpHelper):
 
             else:
                 tmp = None
+
+            if not tmp and not src:
+                raise Exception('The specified image is invalid.')
 
             img = self._driver(options=options).load(tmp if tmp else src)
 

@@ -79,6 +79,11 @@ if sys.version_info[0] <= 2:
     install_requires.append(dp_requires_futures)
 
 
+# Will not install dependencies when it starts from readthedocs.
+if os.environ.get('READTHEDOCS') == 'True':
+    install_requires = []
+
+
 setup(
     name=dp_project_name,
     version=dp_version,
@@ -92,8 +97,7 @@ setup(
     long_description=__doc__,
     packages=['dp_tornado'],
     include_package_data=True,
-    # Will not install dependencies when it starts from readthedocs.
-    install_requires=[] if os.environ.get('READTHEDOCS') == 'True' else install_requires,
+    install_requires=install_requires,
     keywords=['MVC', 'Web Application Framework'],
     classifiers=[
         'Development Status :: 4 - Beta',

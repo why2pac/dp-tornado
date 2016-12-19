@@ -81,7 +81,7 @@ if sys.version_info[0] <= 2:
 
 # Will not install dependencies when it starts from readthedocs.
 if os.environ.get('READTHEDOCS') == 'True':
-    exec 'install_requires = []'
+    exec('install_requires = []')
 
 
 setup(

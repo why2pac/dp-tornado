@@ -1,0 +1,18 @@
+#!/bin/sh
+
+rm -rf .archive
+mkdir .archive
+cp -R ./.ebextensions ./.archive/
+cp ./*.aws.json ./.archive/
+
+DATE=`date +%Y%m%d%H%M%S`
+
+echo "Zip archiving."
+
+rm -f myapp-archive-*.zip
+cd ./.archive/
+zip -q -r -X ../myapp-archive-${DATE}.zip ./
+cd ..
+rm -rf  ./.archive
+
+echo "Done."

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cat .ebextensions/conf/nginx > /etc/nginx/nginx.conf
+
+mkdir -p /data
+chown ec2-user:ec2-user /data
+
+mkdir -p /data/nginx/conf.d
+chown ec2-user:ec2-user -R /data/nginx/conf.d

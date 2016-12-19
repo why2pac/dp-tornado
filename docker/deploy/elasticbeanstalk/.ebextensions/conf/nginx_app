@@ -1,0 +1,43 @@
+upstream {appname}_proxy {
+    server 127.0.0.1:{port};
+}
+
+server {
+    listen                  80;
+    server_name             {domain};
+
+    client_max_body_size    10M;
+
+    rewrite ^/s/(.*)$ /static/$1 last;
+
+    location ~ /\. {
+        deny  all;
+    }
+
+    location ^~ /static/ {
+        access_log          off;
+        log_not_found       off;
+        expires             max;
+
+        add_header Pragma public;
+        add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+
+        root    /data/dist/{appname};
+
+        error_page 403 /pp_403.html;
+        error_page 404 /pp_404.html;
+        error_page 405 /pp_405.html;
+        error_page 500 501 502 503 504 /pp_5xx.html;
+    }
+
+    location / {
+        proxy_pass_header       Server;
+        proxy_set_header        Host $http_host;
+        proxy_redirect          off;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Scheme $scheme;
+        
+        proxy_set_header        X-Proxy-Prefix '/';
+        proxy_pass              http://{appname}_proxy/;
+    }
+}

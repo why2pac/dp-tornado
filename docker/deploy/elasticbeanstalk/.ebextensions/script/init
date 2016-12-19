@@ -1,0 +1,6 @@
+echo ZONE=\"Asia/Seoul\" > /etc/sysconfig/clock
+ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+echo "" >> /home/ec2-user/.ssh/config
+chmod 600 /home/ec2-user/.ssh/config
+chown ec2-user:ec2-user /home/ec2-user/.ssh/config

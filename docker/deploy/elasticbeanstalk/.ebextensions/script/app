@@ -1,0 +1,57 @@
+APP_GIT_VHOST=$(head -n 1 /var/app/current/.ebextensions/$1/git/host)
+APP_GIT_RHOST=$(head -n 2 /var/app/current/.ebextensions/$1/git/host | tail -n 1)
+APP_GIT_URL=$(head -n 1 /var/app/current/.ebextensions/$1/git/url)
+
+APP_DOCKER_IAMGE=$(head -n 1 /var/app/current/.ebextensions/$1/docker/image)
+
+APP_NGINX_PORT=$(head -n 1 /var/app/current/.ebextensions/$1/nginx/port)
+APP_NGINX_DOMAIN=$(head -n 1 /var/app/current/.ebextensions/$1/nginx/domain)
+
+echo "-------------------------"
+echo "PATH : $(pwd)"
+echo "APP NAME : $1"
+echo "APP GIT VHOST : $APP_GIT_VHOST"
+echo "APP GIT RHOST : $APP_GIT_RHOST"
+echo "APP GIT : $APP_GIT_URL"
+echo "APP DOCKER IMAGE : $APP_DOCKER_IAMGE"
+echo "NGINX PORT : $APP_NGINX_PORT"
+echo "NGINX DOMAIN : $APP_NGINX_DOMAIN"
+echo "-------------------------"
+
+if [ ! -f ~/.ssh/$1.key ]
+then
+    rm -f ~/.ssh/$1.key
+    cp /var/app/current/.ebextensions/$1/git/key ~/.ssh/$1.key
+    chmod 600 ~/.ssh/$1.key
+
+    echo "Host $APP_GIT_VHOST" >> ~/.ssh/config
+    echo "    StrictHostKeyChecking no" >> ~/.ssh/config
+    echo "    Hostname github.com" >> ~/.ssh/config
+    echo "    IdentityFile ~/.ssh/$1.key" >> ~/.ssh/config
+fi
+
+cp /var/app/current/.ebextensions/conf/nginx_app /data/nginx/conf.d/$1.conf
+
+sed -i -e "s/{appname}/$1/" /data/nginx/conf.d/$1.conf
+sed -i -e "s/{port}/${APP_NGINX_PORT}/" /data/nginx/conf.d/$1.conf
+sed -i -e "s/{domain}/${APP_NGINX_DOMAIN}/" /data/nginx/conf.d/$1.conf
+
+mkdir -p /data/dist
+sudo rm -rf /data/dist/$1_clone
+git clone $APP_GIT_URL /data/dist/$1_clone
+sudo rm -rf /data/dist/$1
+mv /data/dist/$1_clone /data/dist/$1
+
+sudo docker pull $APP_DOCKER_IAMGE
+sudo docker ps -a
+sudo docker images
+
+if [ "$(sudo docker ps -a | grep dp4p-$1)" != "" ]
+then
+    sudo docker kill dp4p-$1
+    sudo docker rm dp4p-$1
+fi
+
+sudo docker images
+sudo docker run --name "dp4p-$1" -d -p $APP_NGINX_PORT:52848 -v "/data/dist/$1:/data/app" $APP_DOCKER_IAMGE
+sudo docker ps -a

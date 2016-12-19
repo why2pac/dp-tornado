@@ -1,0 +1,11 @@
+DOCKER_REDIS="redis:3.2"
+
+sudo docker pull $DOCKER_REDIS
+
+if [ "$(sudo docker ps -a | grep redis)" = "" ]
+then
+    #sudo docker kill redis
+    #sudo docker rm redis
+    
+    sudo docker run --name "redis" -v /var/app/current/.ebextensions/conf/redis:/redis.conf -d -p 6379:6379 $DOCKER_REDIS redis-server /redis.conf
+fi

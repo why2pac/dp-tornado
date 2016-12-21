@@ -76,7 +76,7 @@ class Pagination(dpEngine):
         if link_class:
             link_class = ' class="%s"' % link_class
 
-        uri = self.helper.web.url.parse(self)
+        uri = self.helper.web.url.parse(self.handler)
         url = link_url or uri.path
         params = uri.query
         params = dict(params, **link_params)

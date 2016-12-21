@@ -8,13 +8,4 @@ then
   return
 fi
 
-if [ ! -f ./python/$pyver ]
-then
-  echo "The specified python version ($pyver) is invalid or not supported."
-  return
-fi
-
-# -it
-# -d
-
 sudo docker run -it -p 8888:52848 -v "$(dirname $(dirname $(pwd)))/example:/data/app" dp4p:base-$pyver bash

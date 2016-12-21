@@ -1,4 +1,4 @@
-FROM why2pac/dp4p:base-py35
+FROM why2pac/dp4p:base-py35-0.1
 MAINTAINER Parker <oss@dp.farm>
 
 ARG dpver

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+account="why2pac"
+ver="0.1"
+
+for pyver in py27 py34 py35 pypy27; do
+  sudo docker rmi $account/dp4p:core-$pyver
+  sudo docker build --tag dp4p/core-$pyver --build-arg pyver=$pyver .
+  sudo docker build --tag $account/dp4p:core-$pyver --build-arg pyver=$pyver .
+
+  if [ "$(sudo docker images | grep why2pac/dp4p | grep core-$pyver)" = "" ]
+  then
+    echo "Failed to build a dockerfile. ($pyver)"
+    exit 1
+  fi
+done
+
+for pyver in py27 py34 py35 pypy27; do
+  sudo docker push $account/dp4p:core-$pyver
+done

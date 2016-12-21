@@ -34,5 +34,5 @@ then
 fi
 
 cd /data/app
-dp4p run --mode=production --port=$(cat /data/dp/port) > /data/out.log 2>&1 &
+nohup dp4p run --mode=production --port=$(cat /data/dp/port) > /data/out.log 2>&1 &
 

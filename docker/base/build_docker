@@ -1,0 +1,17 @@
+#!/bin/bash
+
+pyver=$1
+
+if [ "$pyver" = "" ]
+then
+  echo "usage: build py_version[py27|py34|py35|pypy27]"
+  return
+fi
+
+rm -rf .Docker
+mkdir .Docker
+cp Dockerfile .Docker/
+cp -r common .Docker/
+sed -i -e "s/{tag}/$pyver/" .Docker/Dockerfile
+sudo docker build --tag $2 .Docker/
+rm -rf .Docker

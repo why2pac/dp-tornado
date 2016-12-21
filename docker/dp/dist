@@ -4,8 +4,18 @@ account="why2pac"
 dpver=$(./dpver)
 
 for pyver in py27 py34 py35 pypy27; do
+  sudo docker rmi $account/dp4p:$dpver-$pyver
+  sudo docker rmi $account/dp4p:latest-$pyver
+
+  sudo docker build --tag dp4p/$dpver-$pyver --build-arg dpver=$dpver ./$pyver
   sudo docker build --tag $account/dp4p:$dpver-$pyver --build-arg dpver=$dpver ./$pyver
   sudo docker build --tag $account/dp4p:latest-$pyver --build-arg dpver=$dpver ./$pyver
+
+  if [ "$(sudo docker images | grep $account/dp4p | grep $dpver-$pyver)" = "" ]
+  then
+    echo "Failed to build a dockerfile. ($pyver)"
+    exit 1
+  fi
 done
 
 for pyver in py27 py34 py35 pypy27; do

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+pyver=$1
+
+if [ "$pyver" = "" ]
+then
+  echo "usage: build py_version[py27|py34|py35|pypy27]"
+  return
+fi
+
+if [ ! -f ./python/$pyver ]
+then
+  echo "The specified python version ($pyver) is invalid or not supported."
+  return
+fi
+
+sudo docker build --tag dp4p:core-$pyver --build-arg pyver=$pyver .

@@ -1,5 +1,58 @@
 # -*- coding: utf-8 -*-
 
+"""Schema module provides auto-generate relational database model as object based.
+
+File/Class Invoke rules
+-----------------------
+* */schema/__init__.py*, **DO NOT IMPLEMENT ANY CODE IN THIS FILE**
+* */schema/blog/__init__.py*, ``BlogSchema`` > **schema.blog**
+* */schema/blog/articles.py*, ``ArticlesSchema`` > **schema.blog.articles**
+* */schema/blog/comments.py*, ``CommentsSchema`` > **schema.blog.comments**
+
+Table migration(create or alter) will be executed by invoking ``.migrate()`` method manually.
+For example, you can migrate ``comments`` table with invoking ``schema.blog.comments.migrate()`` method.
+
+There are 2 types of schema. One is **__dsn__ specifier** and another one is **table describer**.
+``__init__.py`` file of each directory must be **__dsn__ specifier**.
+and child ``.py`` files are must be **table describer**.
+
+Here is a **__dsn__ specifier** example **(/schema/blog/__init__.py)**:
+
+.. testcode::
+
+    from dp_tornado.engine.schema import Schema as dpSchema
+
+
+    class BlogSchema(dpSchema):
+        __dsn__ = 'tests.model_test/drv_mysql_test'
+
+
+and Here is a **table describer** example **(/schema/blog/comments.py)**:
+
+.. testcode::
+
+    from dp_tornado.engine.schema import Table as dpTable
+    from dp_tornado.engine.schema import Schema as dpSchema
+    from dp_tornado.engine.schema import Attribute as dpAttribute
+
+    class CommentsSchema(dpSchema):
+        __table_name__ = 'comments'
+
+        __engine__ = 'InnoDB'
+        __charset__ = 'utf8'
+
+        comment_id = dpAttribute.field(dpAttribute.DataType.BIGINT, ai=True, pk=True, nn=True, un=True, comment='Comment ID')
+        article_id = dpAttribute.field(dpAttribute.DataType.BIGINT, nn=True, un=True, comment='Parent Article ID')
+        author = dpAttribute.field(dpAttribute.DataType.VARCHAR(32), nn=True, comment='Author')
+        comment = dpAttribute.field(dpAttribute.DataType.VARCHAR(128), nn=True, comment='Comment')
+
+        primary_key = dpAttribute.index(dpAttribute.IndexType.PRIMARY, 'comment_id')
+
+        idx_articles_author_and_comment = dpAttribute.index(dpAttribute.IndexType.INDEX, ('author', 'comment'))
+        idx_articles_comment = dpAttribute.index(dpAttribute.IndexType.INDEX, 'comment')
+
+        fk_comments_article_id = dpAttribute.foreign_key(('article_id', dpSchema.field().blog.articles, 'article_id'))
+"""
 
 import inspect
 

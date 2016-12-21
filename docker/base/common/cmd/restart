@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/data/script/common/cmd/stop
+/data/script/common/cmd/start

@@ -58,7 +58,7 @@ install_requires = [
         'croniter==0.3.13',
         'pytz==2016.10',
         'pycrypto==2.6.1',
-        'boto3==1.4.2',
+        'boto3==1.4.3',
         'SQLAlchemy==1.1.4',
         'Pillow==3.4.2',
         'wand==0.4.4',

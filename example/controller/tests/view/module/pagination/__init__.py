@@ -14,6 +14,19 @@ class PaginationController(Controller):
         self.test_last_page()
         self.test_first_block()
         self.test_last_block()
+        self.test_render()
+
+    def test_render(self):
+        params = {
+            'total_count': 100,
+            'page': 3,
+            'rpp': 10,
+            'kwargs': {
+
+            }
+        }
+
+        self.render('tests/view/module/pagination.html', params)
 
     def test_simple_1(self):
         params = {

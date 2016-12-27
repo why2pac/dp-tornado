@@ -9,7 +9,7 @@ for pyver in py27 py34 py35 pypy27; do
 
   bash build_docker $pyver dp4p/base-$pyver-$ver
   bash build_docker $pyver $account/dp4p:base-$pyver-$ver
-  bash build_docker $pyver $account/dp4p:base-$pyver
+  #bash build_docker $pyver $account/dp4p:base-$pyver
 
   if [ "$(sudo docker images | grep $account/dp4p | grep base-$pyver)" = "" ]
   then
@@ -20,5 +20,5 @@ done
 
 for pyver in py27 py34 py35 pypy27; do
   sudo docker push $account/dp4p:base-$pyver-$ver
-  sudo docker push $account/dp4p:base-$pyver
+  #sudo docker push $account/dp4p:base-$pyver
 done

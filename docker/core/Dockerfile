@@ -11,7 +11,7 @@ RUN yum install epel-release -y && \
                 libxslt-devel libxml2-devel libtiff-devel \
                 libjpeg-devel libzip-devel freetype-devel \
                 lcms2-devel libwebp-devel openjpeg-devel \
-                tcl-devel tk-devel -y && \
+                tcl-devel tk-devel ImageMagick-devel -y && \
     mkdir -p /data/dp && \
     echo "20161221-$pyver" > /data/dp/version_core && \
     echo "cat /data/dp/version_core" > /usr/bin/dp-version-core && \

@@ -51,9 +51,19 @@ class ImageHelper(dpHelper):
             options = kwargs
 
         tmp = None
+        drivers = []
+
+        pillow_image = self.helper.io.image.driver.pillow.Image
+        wand_image = self.helper.io.image.driver.wand.Image
+
+        if pillow_image:
+            drivers.append(pillow_image)
+
+        if wand_image:
+            drivers.append(wand_image)
 
         try:
-            if isinstance(src, (self.helper.io.image.driver.pillow.Image, self.helper.io.image.driver.wand.Image)):
+            if isinstance(src, tuple(drivers)):
                 return src
 
             elif self.helper.web.url.validate(src):

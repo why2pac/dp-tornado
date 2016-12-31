@@ -27,6 +27,7 @@ dp.ui = {
             var template = dp.ui.util._alert_template.clone();
             template.attr('id', 'uniqid-' + dp.helper.string.uniqid());
 
+            var bg = template.find('._bg');
             var message = template.find('._msg');
             var button = template.find('._btn');
             var box = template.find('._box');
@@ -96,18 +97,18 @@ dp.ui = {
             }
 
             var box_height = 0;
-            var pongdang = 25;
+            var pongdang = 15;
 
             var _dismiss = function() {
                 box.animate({
-                    'margin-top': (((box_height / 2) + (pongdang * 2)) * -1) + 'px'
+                    'margin-top': (((box_height / 2) + 30) * -1) + 'px'
                 }, 150, function() {
                     box.animate({
-                        'margin-top': (((box_height / 2) - (pongdang * 6)) * -1) + 'px',
+                        'margin-top': (((box_height / 2) - 70) * -1) + 'px',
                         'opacity': 0
                     }, 150);
 
-                    template.fadeTo(300, 0, function() {
+                    bg.fadeTo(300, 0, function() {
                         template.remove();
 
                         if (dp.ui.util.alert_focus) {
@@ -137,21 +138,23 @@ dp.ui = {
 
             box_height = box.height();
 
-            template.fadeTo(0, 0.001);
-            box.fadeTo(0, 0.001);
-            box.css('margin-top', (((box_height / 2) + (pongdang * 10)) * -1) + 'px');
+            var bg_opacity = parseFloat(bg.css('opacity'));
 
-            template.fadeTo(200, 1.0);
+            bg.fadeTo(0, 0.001);
+            box.fadeTo(0, 0.001);
+            box.css('margin-top', (((box_height / 2) + 70) * -1) + 'px');
+
+            bg.fadeTo(200, bg_opacity);
             box.delay(50).animate({
-                'margin-top': (((box_height / 2) - pongdang) * -1) + 'px',
+                'margin-top': (((box_height / 2) - 10) * -1) + 'px',
                 'opacity': 1.0
             }, 200, function() {
                 box.animate({
-                    'margin-top': ((box_height / 2 + (pongdang / 2)) * -1) + 'px'
-                }, 140, function() {
+                    'margin-top': ((box_height / 2 + 5) * -1) + 'px'
+                }, 150, function() {
                     box.animate({
                         'margin-top': ((box_height / 2) * -1) + 'px'
-                    }, 140);
+                    }, 150);
                 });
             });
 

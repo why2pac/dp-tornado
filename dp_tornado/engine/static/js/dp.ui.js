@@ -155,6 +155,10 @@ dp.ui = {
                 });
             });
 
+            if (button) {
+                button.find('._i-0').focus();
+            }
+
             return template;
         },
         noti: function(a, b, c, d) {

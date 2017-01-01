@@ -98,6 +98,7 @@ dp.ui = {
 
             var box_height = 0;
             var pongdang = 15;
+            var delegate = undefined;
 
             var _dismiss = function() {
                 box.animate({
@@ -115,6 +116,10 @@ dp.ui = {
                             dp.ui.util.alert_focus.focus();
                             dp.ui.util.alert_focus = undefined;
                         }
+
+                        if (delegate) {
+                            delegate(template);
+                        }
                     });
                 });
             };
@@ -125,7 +130,7 @@ dp.ui = {
                 btn.text(e[0]);
                 btn.click(function() {
                     if (e[1] && typeof(e[1]) == 'function') {
-                        e[1](template);
+                        delegate = e[1];
                     }
 
                     _dismiss();

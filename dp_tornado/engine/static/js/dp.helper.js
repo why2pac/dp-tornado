@@ -196,7 +196,11 @@ dp.helper = {
         var finalize = function(data) {
             if (data && typeof(data) == 'object') {
                 if (data.message) {
-                    dp.alert(data.message);
+                    dp.alert(data.message, function() {
+                        if (data.redirect) {
+                            alert(data.redirect);
+                        }
+                    });
                 }
             }
         };

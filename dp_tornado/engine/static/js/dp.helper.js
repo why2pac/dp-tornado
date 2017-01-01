@@ -193,10 +193,18 @@ dp.helper = {
             return output;
         }
 
+        var finalize = function(data) {
+            if (data && typeof(data) == 'object') {
+                if (data.message) {
+                    dp.alert(data.message);
+                }
+            }
+        };
+
         var success = function(data) {
             if (dataType && dataType.toLowerCase() == 'json') {
                 if (data.result != undefined && !data.result) {
-                    error(data);
+                    error(undefined, undefined, undefined, data);
                     return;
                 }
             }
@@ -206,14 +214,18 @@ dp.helper = {
             if (obj.success) {
                 obj.success(data);
             }
+
+            finalize(data);
         };
 
-        var error = function(a, b, c) {
+        var error = function(a, b, c, data) {
             fn_finalize();
 
             if (obj.error) {
-                obj.error(undefined, a, b, c);
+                obj.error(data, a, b, c);
             }
+
+            finalize(data);
         };
 
         var ajax_req = function() {

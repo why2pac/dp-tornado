@@ -45,6 +45,7 @@ dp.test = {
 
         var a_wait = 280;
         var a_done = 550;
+        var an_done = 700;
 
         // dp.req
 
@@ -166,7 +167,10 @@ dp.test = {
 
             setTimeout(function() {
                 dp_jqlib(a2.find('button').get(0)).trigger('click');
-                dp_assert(a2_done, 'helper-alert-msg-cf-delegate');
+
+                setTimeout(function() {
+                    dp_assert(a2_done, 'helper-alert-msg-cf-delegate!');
+                }, an_done);
             }, a_done);
         }, a_wait);
 
@@ -176,7 +180,10 @@ dp.test = {
 
             setTimeout(function() {
                 dp_jqlib(a3.find('button').get(1)).trigger('click');
-                dp_assert(a3_done, 'helper-alert-msg-cf-delegate-ds-delegate');
+
+                setTimeout(function() {
+                    dp_assert(a3_done, 'helper-alert-msg-cf-delegate-ds-delegate');
+                }, an_done);
             }, a_done);
         }, a_wait * 2);
 
@@ -191,7 +198,10 @@ dp.test = {
                         return false;
                     }
                 });
-                dp_assert(a4_done, 'helper-alert-msg-cf-text-delegate-ds-delegate');
+
+                setTimeout(function() {
+                    dp_assert(a4_done, 'helper-alert-msg-cf-text-delegate-ds-delegate');
+                }, an_done);
             }, a_done);
         }, a_wait * 3);
 
@@ -206,7 +216,10 @@ dp.test = {
                         return false;
                     }
                 });
-                dp_assert(a5_done, 'helper-alert-msg-cf-text-delegate-ds-text-delegate');
+
+                setTimeout(function() {
+                    dp_assert(a5_done, 'helper-alert-msg-cf-text-delegate-ds-text-delegate');
+                }, an_done);
             }, a_done);
         }, a_wait * 4);
 
@@ -235,7 +248,10 @@ dp.test = {
                         return false;
                     }
                 });
-                dp_assert(a6_done, 'helper-alert-custom');
+
+                setTimeout(function() {
+                    dp_assert(a6_done, 'helper-alert-custom');
+                }, an_done);
             }, a_done);
         }, a_wait * 5);
 

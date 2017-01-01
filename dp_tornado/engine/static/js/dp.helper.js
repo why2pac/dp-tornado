@@ -38,6 +38,10 @@ dp.helper = {
                 obj.fade = _btn.attr('dp-req-fade') != 'no' && _btn.attr('dp-req-fade') != 'false';
                 obj.multiple = _btn.attr('dp-req-multiple') != 'no' && _btn.attr('dp-req-multiple') != 'false';
 
+                if (!_btn.attr('dp-req-identifier')) {
+                    _btn.attr('dp-req-identifier', 'req-' + dp.helper.string.uniqid());
+                }
+
                 if (_btn.attr('dp-req-identifier')) {
                     obj.identifier = _btn.attr('dp-req-identifier');
                 }

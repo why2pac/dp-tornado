@@ -194,6 +194,13 @@ dp.helper = {
         }
 
         var success = function(data) {
+            if (dataType && dataType.toLowerCase() == 'json') {
+                if (data.result != undefined && !data.result) {
+                    error(data);
+                    return;
+                }
+            }
+
             fn_finalize();
 
             if (obj.success) {
@@ -205,7 +212,7 @@ dp.helper = {
             fn_finalize();
 
             if (obj.error) {
-                obj.error(a, b, c);
+                obj.error(undefined, a, b, c);
             }
         };
 

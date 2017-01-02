@@ -198,17 +198,17 @@ dp.helper = {
                 if (data.message) {
                     dp.alert(data.message, function() {
                         if (data.redirect) {
-                            alert(data.redirect);
+                            document.location.href = data.redirect;
                         }
                     });
                 }
             }
         };
 
-        var success = function(data) {
+        var success = function(res) {
             if (dataType && dataType.toLowerCase() == 'json') {
-                if (data.result != undefined && !data.result) {
-                    error(undefined, undefined, undefined, data);
+                if (res.result != undefined && !res.result) {
+                    error(undefined, undefined, undefined, res);
                     return;
                 }
             }
@@ -216,20 +216,20 @@ dp.helper = {
             fn_finalize();
 
             if (obj.success) {
-                obj.success(data);
+                obj.success(res, data);
             }
 
-            finalize(data);
+            finalize(res);
         };
 
-        var error = function(a, b, c, data) {
+        var error = function(a, b, c, res) {
             fn_finalize();
 
             if (obj.error) {
-                obj.error(data, a, b, c);
+                obj.error(res, a, b, c);
             }
 
-            finalize(data);
+            finalize(res);
         };
 
         var ajax_req = function() {

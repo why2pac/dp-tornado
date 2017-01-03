@@ -25,7 +25,12 @@ class CryptoHelper(dpHelper):
         return self._encrypt(payload, key=key)
 
     def decrypt(self, encrypted, key=None, raw=False, encode=True, pad=True):
-        decrypted = self._decrypt(encrypted, key=key, encode=encode, pad=pad)
+        try:
+            decrypted = self._decrypt(encrypted, key=key, encode=encode, pad=pad)
+        except Exception as e:
+            self.logging.exception(e)
+
+            return False
 
         if raw:
             return decrypted

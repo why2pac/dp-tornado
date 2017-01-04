@@ -186,7 +186,6 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
                 if result['type'] in self._types_required_serialize():
                     try:
-                        print('xxx')
                         ret = self.helper.string.serialization.serialize(
                             result['val'], method='json', raise_exception=True)
 

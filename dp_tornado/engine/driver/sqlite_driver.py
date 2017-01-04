@@ -150,13 +150,13 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
 
         try:
             result = dpModelSingleton().row(
-                'SELECT '
-                '   * '
-                'FROM {table_name} WHERE key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+                """SELECT
+                        *
+                    FROM
+                        {table_name}
+                    WHERE
+                        key = ?""".replace('{table_name}', self._table_name(self._config_dsn)),
                 key, self._config_dsn, cache=True)
-
-            if expire_in:
-                self.expire(key, expire_in)
 
         except OperationalError as e:
             # Retry (hack for sqlite database locking)
@@ -182,6 +182,9 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             if result['expire_at'] and result['expire_at'] < self.helper.datetime.timestamp.now():
                 return None
             else:
+                if expire_in:
+                    self.expire(key, expire_in)
+
                 type = self._key_to_type(result['type'])
 
                 if result['type'] in self._types_required_serialize():
@@ -264,16 +267,15 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
         try:
             if expire_in:
                 ret = dpModelSingleton().execute(
-                    'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
-                    '   VALUES (?, ?, ?, ?)'
-                    .replace('{table_name}', self._table_name(self._config_dsn)),
+                    """INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at)
+                            VALUES (?, ?, ?, ?)""".replace('{table_name}', self._table_name(self._config_dsn)),
                     (key, val_serialized, type, expire_in), self._config_dsn, cache=True)
 
             else:
                 ret = dpModelSingleton().execute(
-                    'INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at) '
-                    '   VALUES (?, ?, ?, (SELECT expire_at FROM {table_name} WHERE key = ?))'
-                    .replace('{table_name}', self._table_name(self._config_dsn)),
+                    """INSERT OR REPLACE INTO {table_name} (key, val, type, expire_at)
+                            VALUES (?, ?, ?, (SELECT expire_at FROM {table_name} WHERE key = ?))""".replace(
+                        '{table_name}', self._table_name(self._config_dsn)),
                     (key, val_serialized, type, key), self._config_dsn, cache=True)
 
             return ret
@@ -310,33 +312,33 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
             expire_in = self.helper.datetime.timestamp.now() + expire_in
 
         if expire_in:
-            return dpModelSingleton().execute(
-                'UPDATE {table_name} '
-                '   SET '
-                '       val = val + ?,'
-                '       expire_at = ? '
-                '   WHERE '
-                '       key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+            return dpModelSingleton().execute("""
+                UPDATE {table_name}
+                   SET
+                       val = val + ?,
+                       expire_at = ?
+                   WHERE
+                       key = ?""".replace('{table_name}', self._table_name(self._config_dsn)),
                 (amount, expire_in, key), self._config_dsn, cache=True)
 
         else:
-            return dpModelSingleton().execute(
-                'UPDATE {table_name} '
-                '   SET '
-                '       val = val + ?'
-                '   WHERE '
-                '       key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+            return dpModelSingleton().execute("""
+                UPDATE {table_name}
+                   SET
+                       val = val + ?
+                   WHERE
+                       key = ?""".replace('{table_name}', self._table_name(self._config_dsn)),
                 (amount, key), self._config_dsn, cache=True)
 
     def expire(self, key, expire_in=None):
         expire_in = self.helper.datetime.timestamp.now() + (expire_in or 0)
 
-        return dpModelSingleton().execute(
-            'UPDATE {table_name} '
-            '   SET '
-            '       expire_at = ? '
-            '   WHERE '
-            '       key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+        return dpModelSingleton().execute("""
+            UPDATE {table_name}
+               SET
+                   expire_at = ?
+               WHERE
+                   key = ?""".replace('{table_name}', self._table_name(self._config_dsn)),
             (expire_in, key), self._config_dsn, cache=True)
 
     def ttl(self, key):

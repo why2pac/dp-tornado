@@ -12,11 +12,11 @@ class SetController(Controller):
         else:
             self.session(k, v)
 
-        assert(self.session(k) == v)
+        assert(self.session(k, expire_in=expire_in) == v)
 
         if expire_in:
             import time
-            time.sleep(expire_in + 1)
+            time.sleep(expire_in + 2)
 
             assert(not self.session(k))
 

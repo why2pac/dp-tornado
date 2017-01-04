@@ -148,16 +148,16 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
     def get(self, key, expire_in=None, retry_count=0, raise_error=False):
         self._referenced()
 
-        # TODO
-        if expire_in:
-            self.logging.warning('`sqlite_driver`.`get` method does not supported `expire_in` argument yet.')
-
         try:
             result = dpModelSingleton().row(
                 'SELECT '
                 '   * '
                 'FROM {table_name} WHERE key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
                 key, self._config_dsn, cache=True)
+
+            if expire_in:
+                self.expire(key, expire_in)
+
         except OperationalError as e:
             # Retry (hack for sqlite database locking)
             if retry_count:
@@ -328,6 +328,17 @@ class SqliteCacheDriver(dpEngine, dpCacheDriver):
                 '   WHERE '
                 '       key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
                 (amount, key), self._config_dsn, cache=True)
+
+    def expire(self, key, expire_in=None):
+        expire_in = self.helper.datetime.timestamp.now() + (expire_in or 0)
+
+        return dpModelSingleton().execute(
+            'UPDATE {table_name} '
+            '   SET '
+            '       expire_at = ? '
+            '   WHERE '
+            '       key = ?'.replace('{table_name}', self._table_name(self._config_dsn)),
+            (expire_in, key), self._config_dsn, cache=True)
 
     def ttl(self, key):
         record = dpModelSingleton().row("""

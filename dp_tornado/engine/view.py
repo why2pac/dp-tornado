@@ -95,7 +95,12 @@ class View(dpSingleton):
 
     @staticmethod
     def render_string(controller, template_name, kwargs=None, encode=True):
-        t = View._loader().load(template_name)
+        l = View._loader()
+
+        if controller.ini.server.debug:
+            l.reset()
+
+        t = l.load(template_name)
         n = View._ui_namespaces(controller)
         n.update(kwargs if kwargs else {})
         t = t.generate(**n)

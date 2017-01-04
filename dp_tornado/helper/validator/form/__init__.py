@@ -25,7 +25,7 @@ class FormHelper(dpHelper):
                 return self._validate_response(controller, error_res, field, invalid_reason, invalid_message)
 
             # Check required
-            if value is None and 'required' in payload and payload['required']:
+            if (value is None or value == '') and 'required' in payload and payload['required']:
                 return self._validate_response(controller, error_res, field, missing_reason, missing_message)
 
             output[field] = value

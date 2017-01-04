@@ -22,6 +22,7 @@ then
   rm -rf nodeps
   virtualenv nodeps/2.7 --python=python2.7
   virtualenv nodeps/3.4 --python=python3.4
+  brew install phantomjs
 fi
 
 for py_ver in 2.7 3.4; do

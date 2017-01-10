@@ -60,13 +60,13 @@ install_requires = [
         'pycrypto==2.6.1',
         'boto3==1.4.3',
         'SQLAlchemy==1.1.4',
-        'Pillow==3.4.2',
+        'Pillow==4.0.0',
         'wand==0.4.4',
         'validate_email==1.3',
-        'BeautifulSoup4==4.5.1',
-        'lxml==3.7.0',
+        'BeautifulSoup4==4.5.3',
+        'lxml==3.7.2',
         'httpagentparser==1.7.8',
-        'validators==0.11.1',
+        'validators==0.11.2',
         'CyMySQL==0.8.9',
         # , 'selenium'
     ]

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
+import os
+import sys
+
 from dp_tornado.engine.engine import Engine as dpEngine
 from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
 from dp_tornado.engine.testing import Testing as dpTesting
@@ -17,6 +20,7 @@ class CliHandler(dpEngine):
             ['action', {'nargs': 1}],
             ['options', {'nargs': '*'}],
             ['--identifier', {'help': 'Identifier'}],
+            ['--debug', {'help': 'Debug Mode, If this value specified `yes` then enabled.'}],
             ['--dryrun', {'help': 'Dryrun, If this value specified `yes` then enabled.'}],
             ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
             ['--logging', {'help': 'Logging'}],
@@ -24,12 +28,19 @@ class CliHandler(dpEngine):
             ['--port', {'help': 'Binding port', 'type': int}]
         ]
 
+        # Auto reload for Debugging mode.
+        if 'DP_CLI_ARGV' in os.environ:
+            sys.argv = os.environ['DP_CLI_ARGV'].split('|')
+
         for e in args:
             parser.add_argument(e[0], **e[1])
 
         self.parser = parser
         self.args, self.args_unknown = parser.parse_known_args()
         self.cwd = self.helper.io.path.cwd()
+
+        if self.args.debug and not self.args.dryrun:
+            os.environ['DP_CLI_ARGV'] = '|'.join(sys.argv)
 
     def main(self):
         self.logging.info('------------------------')

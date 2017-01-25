@@ -77,7 +77,7 @@ class Bootstrap(object):
         return parser.parse_known_args()
 
     @staticmethod
-    def init_ini(application_path, ini_file, as_cli=False):
+    def init_ini(application_path, ini_file, cli=False):
         args, args_unkonwn = Bootstrap.init_args()
 
         # App Options
@@ -139,10 +139,13 @@ class Bootstrap(object):
         engine.ini.server.get('port', default=8080)
 
         # Enabled production mode when running via cli.
-        if not as_cli:
+        if not cli:
             engine.ini.server.get('debug', default=False)
         else:
-            engine.ini.server.set('debug', False)
+            if (cli.args.debug or '').lower() in ('1', 'yes', 'y', 'true', 't'):
+                engine.ini.server.set('debug', True)
+            else:
+                engine.ini.server.set('debug', False)
 
         engine.ini.server.get('gzip', default=True)
         engine.ini.crypto.get('key', default='CR$t0-$CR@T')

@@ -86,7 +86,7 @@ def run_with_port():
 
 
 def run_debug():
-    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'debug', '--dryrun', 'yes'], 'Server Mode : Production (debug)')
+    assert_output(['dp4p', 'run', '__cli_test__/app_dir', '--identifier', consts.dp_testing_identifier, '--port', consts.dp_testing_port, '--mode', 'debug', '--dryrun', 'yes', '--debug', 'yes'], 'Server Mode : Debugging (debug)')
 
 
 def run_production():

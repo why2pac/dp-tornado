@@ -24,6 +24,7 @@ import importlib
 from dp_tornado.engine.engine import EngineSingleton as dpEngineSingleton
 from dp_tornado.engine.bootstrap import Bootstrap as EngineBootstrap
 from dp_tornado.engine.scheduler import Scheduler
+from dp_tornado.engine.testing import Testing
 from dp_tornado.engine.plugin.static import Compressor
 from dp_tornado.engine.plugin.static import StaticURL
 from dp_tornado.engine.plugin.pagination import Pagination
@@ -114,6 +115,9 @@ class Bootstrap(object):
         engine.logger.sys_log('Processors  : %s' % num_processed)
         engine.logger.sys_log('CPU Count   : %d' % multiprocessing.cpu_count())
         engine.logger.sys_log('---------------------------------')
+
+        if not Testing('', application_path, doctest=True).traverse() and engine.ini.server.get('assert'):
+            return
 
         application = RestfulApplication(services, settings)
         service = tornado.httpserver.HTTPServer(

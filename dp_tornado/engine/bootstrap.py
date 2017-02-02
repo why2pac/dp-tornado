@@ -137,6 +137,7 @@ class Bootstrap(object):
         engine.ini.server.get('max_worker', default=1)
         engine.ini.server.get('num_processes', default=0)
         engine.ini.server.get('port', default=8080)
+        engine.ini.server.get('assert', default=True)
 
         # Enabled production mode when running via cli.
         if not cli:

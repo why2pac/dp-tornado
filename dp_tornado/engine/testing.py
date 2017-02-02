@@ -142,7 +142,7 @@ from .engine import Engine as dpEngine
 
 
 class Testing(dpEngine):
-    def __init__(self, app_module, path):
+    def __init__(self, app_module, path, doctest=True):
         self.app_module = app_module
         self.app_identifier = 'dp-tornado-testing-9x48923'
         self.app_port = 48923
@@ -151,6 +151,8 @@ class Testing(dpEngine):
 
         self.tests = {}
         self.modules = {}
+
+        self.doctest = doctest
 
         for e in ('controller', 'model', 'helper'):
             self.tests[e] = []
@@ -200,6 +202,9 @@ class Testing(dpEngine):
 
             if cls is False:
                 return False
+
+            if not self.doctest:
+                continue
 
             priority = 1000000
 
@@ -252,7 +257,7 @@ class Testing(dpEngine):
             return path, None
 
         cls_name = ''.join([e.capitalize() for e in (path[-1] if path else 'starter').split('_')] + [mod.capitalize()])
-        module = '.'.join([self.app_module, mod] + path)
+        module = '.'.join(([self.app_module, mod] if self.app_module else [mod]) + path)
 
         # noinspection PyBroadException
         try:
@@ -266,7 +271,7 @@ class Testing(dpEngine):
 
             return path, cls
 
-        except:
+        except Exception as e:
             self.logging.info('* File import error, %s' % module)
 
             return path, False

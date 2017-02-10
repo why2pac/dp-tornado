@@ -463,8 +463,8 @@ class Testing(dpEngine):
         expected = {}
 
         for k in ('int', 'long', 'bool', 'str', 'json'):
-            if k in payload:
-                expected[k] = payload[k]
+            if k in payload[4]:
+                expected[k] = payload[4][k]
 
         for k, v in expected.items():
             vo = v

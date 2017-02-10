@@ -186,6 +186,9 @@ class Testing(dpEngine):
                 stderr=subprocess.STDOUT)
 
     def traverse(self):
+        # Add app. path
+        sys.path.append(self.path)
+
         for module in ('controller', 'model', 'helper'):
             if not self._traverse(module, self.helper.io.path.join(self.path, module)):
                 return False

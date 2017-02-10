@@ -2,6 +2,7 @@
 
 
 from dp_tornado.engine.model import Model as dpModel
+from config.foo import FooConfig
 
 
 class TestingModel(dpModel):

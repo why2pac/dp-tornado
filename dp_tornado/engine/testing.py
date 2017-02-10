@@ -188,6 +188,9 @@ class Testing(dpEngine):
                 stderr=subprocess.STDOUT)
 
     def traverse(self):
+        # Add app. path
+        sys.path.append(self.path)
+
         for module in ('controller', 'model', 'helper'):
             if not self._traverse(module, self.helper.io.path.join(self.path, module)):
                 return False
@@ -468,8 +471,8 @@ class Testing(dpEngine):
         expected = {}
 
         for k in ('int', 'long', 'bool', 'str', 'json'):
-            if k in payload:
-                expected[k] = payload[k]
+            if k in payload[4]:
+                expected[k] = payload[4][k]
 
         for k, v in expected.items():
             vo = v

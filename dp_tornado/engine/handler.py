@@ -76,7 +76,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             if self.vars.dp_var.controller.urls:
                 for url in self.vars.dp_var.controller.urls:
                     m = url[0].match(path)
-                    if m:
+                    if m is not None:
                         if m.groups():
                             r = '/'.join((url[1], ) + m.groups())
                         else:

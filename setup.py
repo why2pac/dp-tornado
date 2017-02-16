@@ -55,7 +55,7 @@ install_requires = [
         'tornado==4.4.2',
         'redis==2.10.5',
         'requests==2.13.0',
-        'croniter==0.3.14',
+        'croniter==0.3.15',
         'pytz==2016.10',
         'pycrypto==2.6.1',
         'boto3==1.4.4',

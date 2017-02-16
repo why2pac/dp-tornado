@@ -39,8 +39,10 @@ Class/Method and URL Mapping rules
 
 
 import sys
+import re
 
 from .engine import Engine as dpEngine
+from functools import wraps
 
 
 class NoneValue(object):
@@ -267,3 +269,18 @@ class Controller(dpEngine):
             return m17n if m17n in self.ini.server.m17n else self.ini.server.m17n[0]
 
         return self.parent.m17n_lang(lang)
+
+    @staticmethod
+    def route(path):
+        def inside_decorator(fn):
+            if not dpEngine().vars.dp_var.controller.urls:
+                dpEngine().vars.dp_var.controller.urls = []
+
+            controller_path = fn.__module__.replace('.', '/')
+            if controller_path.startswith('controller/'):
+                controller_path = controller_path[len('controller/'):]
+
+            dpEngine().vars.dp_var.controller.urls.append((re.compile(path), controller_path))
+
+            return fn
+        return inside_decorator

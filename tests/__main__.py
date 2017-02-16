@@ -38,6 +38,15 @@ def run(main):
 
     test_controller.prefix()
 
+    test_controller.route_urls_1()
+    test_controller.route_urls_2()
+    test_controller.route_urls_3()
+    test_controller.route_urls_foo()
+    test_controller.route_urls_foo_origin()
+    test_controller.route_urls_bar_1()
+    test_controller.route_urls_bar_2()
+    test_controller.route_urls_bar_origin()
+
     from . import test_handler
 
     test_handler.exception_before()

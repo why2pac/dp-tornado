@@ -80,3 +80,35 @@ def cookie_get_and_set():
 
 def prefix():
     utils.expecting_text('get', '/controller/methods/request_uri/prefix', None, 200, host=consts.dp_testing_nginx_host)
+
+
+def route_urls_1():
+    utils.expecting_text('get', '/test/1/a/b', None, 404, host=consts.dp_testing_host)
+
+
+def route_urls_2():
+    utils.expecting_text('get', '/test-1', 'done!', 200, host=consts.dp_testing_host)
+
+
+def route_urls_3():
+    utils.expecting_text('get', '/test-2', 'done!', 200, host=consts.dp_testing_host)
+
+
+def route_urls_foo():
+    utils.expecting_text('get', '/test/foo/a/1/b', 'a/1/b', 200, host=consts.dp_testing_host)
+
+
+def route_urls_foo_origin():
+    utils.expecting_text('get', '/controller/urls/foo/a/1/b', 'a/1/b', 200)
+
+
+def route_urls_bar_1():
+    utils.expecting_text('get', '/test/bar/a/1', None, 404, host=consts.dp_testing_host)
+
+
+def route_urls_bar_2():
+    utils.expecting_text('get', '/test/bar/a/1/', 'a/1/c', 200, host=consts.dp_testing_host)
+
+
+def route_urls_bar_origin():
+    utils.expecting_text('get', '/controller/urls/bar/a/1/b', 'a/1/b', 200)

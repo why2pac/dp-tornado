@@ -13,7 +13,7 @@ except (ValueError, SystemError):
 
 def req(session, method, url, params=None, retry=3, retry_delay=1, host=None):
     session = session if session else requests.Session()
-    url = '%s%s' % (consts.dp_testing_path if not host else host, url)
+    url = '%s%s' % (consts.dp_testing_path if host is None else host, url)
 
     for e in range(retry):
         try:

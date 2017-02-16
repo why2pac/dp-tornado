@@ -73,7 +73,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     @ConcurrentDecorator(tornado.concurrent.run_on_executor)
     def route(self, method, path, initialize=None):
         try:
-            if self.vars.dp_var.controller.urls:
+            if path and self.vars.dp_var.controller.urls:
                 for url in self.vars.dp_var.controller.urls:
                     m = url[0].match(path)
                     if m is not None:

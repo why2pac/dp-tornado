@@ -1,7 +1,7 @@
 #!/bin/bash
 
 account="why2pac"
-ver="0.1"
+ver="0.2"
 
 for pyver in py27 py34 py35 pypy27; do
   sudo docker rmi $account/dp4p:base-$pyver-$ver

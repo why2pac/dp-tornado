@@ -1,5 +1,10 @@
 # Migration
 
+### 0.9.4.8
+
+* **cli > `ini`: Argument added. You can the specify config.ini file name as a cli argument.
+* **cli > `mode`: Argument removed. Use config.ini instead of `mode` cli argument. 
+
 ### 0.9.4.1
 
 * **Docker**: Support docker images. Find out more information about dp4p docker, [Here, http://hub.docker.com/r/why2pac/dp4p](http://hub.docker.com/r/why2pac/dp4p).

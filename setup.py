@@ -76,9 +76,9 @@ if sys.version_info[0] <= 2:
     install_requires.append('futures==3.0.5')
 
 
-# Will not install dependencies when it starts from readthedocs.
+# Will not install pillow when it starts from readthedocs.
 if os.environ.get('READTHEDOCS') == 'True':
-    exec('install_requires = []')
+    install_requires = list(filter(lambda x: not x.startswith('Pillow'), install_requires))
 
 
 setup(

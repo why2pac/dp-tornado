@@ -9,4 +9,4 @@ then
   return
 fi
 
-sudo docker run -d -p 8888:52848 -v "$(dirname $(dirname $(pwd)))/dp_tornado/engine/template/bbs:/data/app" dp4p:$dpver-$pyver
+sudo docker run -d -p 8888:52848 -e dp_ini=config.prod.ini -v "$(dirname $(dirname $(pwd)))/dp_tornado/engine/template/bbs:/data/app" dp4p:$dpver-$pyver

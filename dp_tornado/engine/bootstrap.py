@@ -69,7 +69,6 @@ class Bootstrap(object):
         parser = argparse.ArgumentParser()
 
         parser.add_argument('--app-path', help='App Path')
-        parser.add_argument('--mode', help='Mode')
 
         parser.add_argument('-i', '--identifier', help='Identifier')
         parser.add_argument('-p', '--port', type=int, help='Binding port')
@@ -81,9 +80,6 @@ class Bootstrap(object):
         args, args_unkonwn = Bootstrap.init_args()
 
         # App Options
-
-        if args.mode:
-            engine.ini.app.set('mode', args.mode)
 
         engine.ini.app.get('mode', default='NOT SET')
 

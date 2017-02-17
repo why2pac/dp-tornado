@@ -53,7 +53,7 @@ class UserAgent(object):
         family = family or 'Unknown'
         version = version or 'Unknown'
 
-        css = [('_device-%s-%s' % (family, version)).lower().replace(' ', '_')]
+        css = [('_device-%s-%s' % (family, version)).lower().replace(' ', '_').replace('.', '-')]
 
         if major:
             css.append(('_device-%s-%s' % (family, major)).lower().replace(' ', '_'))
@@ -95,7 +95,7 @@ class UserAgent(object):
         family = family or 'Unknown'
         version = version or 'Unknown'
 
-        css = [('_os-%s-%s' % (family, version)).lower().replace(' ', '_')]
+        css = [('_os-%s-%s' % (family, version)).lower().replace(' ', '_').replace('.', '-')]
 
         if major:
             css.append(('_os-%s-%s' % (family, major)).lower().replace(' ', '_'))

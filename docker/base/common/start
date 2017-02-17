@@ -33,6 +33,27 @@ then
   bash /data/before
 fi
 
+if [ "$dp_mode" != "" ]
+then
+  __DP_CFG_MODE__=$dp_mode
+else
+  __DP_CFG_MODE__=production
+fi
+
+if [ "$dp_ini" != "" ]
+then
+  __DP_CFG_INI__=$dp_ini
+else
+  __DP_CFG_INI__=config.ini
+fi
+
+if [ "$dp_debug" != "" ]
+then
+  __DP_CFG_DEBUG__=$dp_debug
+else
+  __DP_CFG_DEBUG__=no
+fi
+
 cd /data/app
-nohup dp4p run --mode=production --port=$(cat /data/dp/port) > /data/out.log 2>&1 &
+nohup dp4p run --mode=$__DP_CFG_MODE__ --ini=$__DP_CFG_INI__ --debug=$__DP_CFG_DEBUG__ --port=$(cat /data/dp/port) > /data/out.log 2>&1 &
 

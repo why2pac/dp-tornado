@@ -2,8 +2,8 @@
 
 ### 0.9.4.8
 
-* **cli > `ini`: Argument added. You can the specify config.ini file name as a cli argument.
-* **cli > `mode`: Argument removed. Use config.ini instead of `mode` cli argument. 
+* **cli > `ini`**: Argument added. You can the specify config.ini file name as a cli argument.
+* **cli > `mode`**: Argument removed. Use config.ini instead of `mode` cli argument. 
 
 ### 0.9.4.1
 

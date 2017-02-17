@@ -7,8 +7,8 @@ from dp_tornado.engine.controller import Controller
 class GetUserAgentController(Controller):
     def get(self):
         user_agents = [
-            (False, 10, 7, 0, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A', '_os-mac_os_x-10.9.3 _os-mac_os_x-10 _browser-safari-7-0-3 _browser-safari-7 _device-unknown-unknown'),
-            (False, 6, 6, 6, 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25', '_os-ios-6.0 _os-ios-6 _browser-safari-6-0 _browser-safari-6 _device-ipad-6.0 _device-ipad-6'),
+            (False, 10, 7, 0, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A', '_os-mac_os_x-10-9-3 _os-mac_os_x-10 _browser-safari-7-0-3 _browser-safari-7 _device-unknown-unknown'),
+            (False, 6, 6, 6, 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25', '_os-ios-6-0 _os-ios-6 _browser-safari-6-0 _browser-safari-6 _device-ipad-6-0 _device-ipad-6'),
             (False, 10, 5, 0, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2', None),
 
             (False, 7, 40, 0, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1', None),

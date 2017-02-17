@@ -49,7 +49,11 @@ class Bootstrap(object):
 
         custom_scheduler = kwargs['scheduler'] if 'scheduler' in kwargs else None
         custom_service = kwargs['service'] if 'service' in kwargs else None
-        custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
+
+        if cli and cli.args.ini:
+            custom_config_file = cli.args.ini
+        else:
+            custom_config_file = kwargs['config_file'] if 'config_file' in kwargs else 'config.ini'
 
         application_path = kwargs['application_path'] if 'application_path' in kwargs else None
         engine_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'engine')

@@ -25,6 +25,7 @@ class CliHandler(dpEngine):
             ['--template', {'help': 'Template Name', 'default': 'helloworld'}],
             ['--logging', {'help': 'Logging'}],
             ['--path', {'help': 'App Path'}],
+            ['--ini', {'help': 'INI File Path'}],
             ['--port', {'help': 'Binding port', 'type': int}]
         ]
 

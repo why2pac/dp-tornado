@@ -13,12 +13,28 @@ class MysqlModel(dpModel):
         return 100
 
     def test(self):
-        self.execute_test_tuple()
+        datetime_of_birth = self.helper.datetime.now()
+
+        self.execute_test_tuple(datetime_of_birth)
         assert self.scalar_test_tuple_name() == 'James'
         assert self.scalar_test_tuple_birth_year() == 1988
 
-        self.execute_test_dict()
+        dt_tuple_value = self.helper.datetime.tuple(datetime_of_birth)
+        dt_tuple_fetch = self.helper.datetime.tuple(self.scalar_test_tuple_birth_datetime())
+
+        assert dt_tuple_value == dt_tuple_fetch
+
+        datetime_of_birth = self.helper.datetime.date.now()
+
+        self.execute_test_dict(datetime_of_birth)
         assert self.scalar_test_dict() == 1989
+
+        parent = self.row_test()
+
+        dt_tuple_value = self.helper.datetime.tuple(datetime_of_birth)
+        dt_tuple_fetch = self.helper.datetime.tuple(parent['datetime_of_birth'])
+
+        assert dt_tuple_value == dt_tuple_fetch
 
         assert self.row_test()['parent_name'] == 'James'
         assert self.rows_test()[0]['parent_name'] == 'James'
@@ -26,32 +42,35 @@ class MysqlModel(dpModel):
         assert self.transaction_succ_test()
         assert not self.transaction_fail_test()
 
-    def execute_test_tuple(self):
+    def execute_test_tuple(self, datetime_of_birth):
         return self.execute("""
             INSERT INTO `parents`
-                (`parent_id`, `parent_name`, `parent_type`, `year_of_birth`)
-                    VALUES (%s, %s, %s, %s)
+                (`parent_id`, `parent_name`, `parent_type`, `year_of_birth`, `datetime_of_birth`)
+                    VALUES (%s, %s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
                             `parent_name` = VALUES(`parent_name`),
                             `parent_type` = VALUES(`parent_type`),
-                            `year_of_birth` = VALUES(`year_of_birth`)
-        """, (self.parent_test_id, 'James', 'FATHER', 1988), 'tests.model_test/drv_mysql_test')
+                            `year_of_birth` = VALUES(`year_of_birth`),
+                            `datetime_of_birth` = VALUES(`datetime_of_birth`)
+        """, (self.parent_test_id, 'James', 'FATHER', 1988, datetime_of_birth), 'tests.model_test/drv_mysql_test')
 
-    def execute_test_dict(self):
+    def execute_test_dict(self, datetime_of_birth):
         params = {
             'parent_id': self.parent_test_id,
             'parent_name': 'James',
             'parent_type': 'FATHER',
-            'year_of_birth': 1989}
+            'year_of_birth': 1989,
+            'datetime_of_birth': datetime_of_birth}
 
         return self.execute("""
             INSERT INTO `parents`
-                (`parent_id`, `parent_name`, `parent_type`, `year_of_birth`)
-                    VALUES (%(parent_id)s, %(parent_name)s, %(parent_type)s, %(year_of_birth)s)
+                (`parent_id`, `parent_name`, `parent_type`, `year_of_birth`, `datetime_of_birth`)
+                    VALUES (%(parent_id)s, %(parent_name)s, %(parent_type)s, %(year_of_birth)s, %(datetime_of_birth)s)
                         ON DUPLICATE KEY UPDATE
                             `parent_name` = VALUES(`parent_name`),
                             `parent_type` = VALUES(`parent_type`),
-                            `year_of_birth` = VALUES(`year_of_birth`)
+                            `year_of_birth` = VALUES(`year_of_birth`),
+                            `datetime_of_birth` = VALUES(`datetime_of_birth`)
         """, params, 'tests.model_test/drv_mysql_test')
 
     def scalar_test_tuple_name(self):
@@ -68,6 +87,16 @@ class MysqlModel(dpModel):
         return self.scalar("""
             SELECT
                 `year_of_birth`
+            FROM
+                `parents`
+            WHERE
+                `parent_id` = %s
+        """, self.parent_test_id, 'tests.model_test/drv_mysql_test')
+
+    def scalar_test_tuple_birth_datetime(self):
+        return self.scalar("""
+            SELECT
+                `datetime_of_birth`
             FROM
                 `parents`
             WHERE
@@ -93,7 +122,7 @@ class MysqlModel(dpModel):
     def row_test(self):
         return self.row("""
             SELECT
-                `parent_name`, `parent_type`
+                `parent_name`, `parent_type`, `year_of_birth`, `datetime_of_birth`
             FROM
                 `parents`
             WHERE

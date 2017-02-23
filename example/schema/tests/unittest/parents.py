@@ -16,6 +16,8 @@ class ParentsSchema(dpTable):
     parent_name = dpAttribute.field(dpAttribute.DataType.VARCHAR(128), nn=True, comment='Parent Name')
     parent_type = dpAttribute.field(dpAttribute.DataType.ENUM('FATHER', 'MOTHER'), nn=True, default='FATHER', comment='Parent Type')
 
+    year_of_birth = dpAttribute.field(dpAttribute.DataType.INT, nn=False, comment='Year of Birth')  # Test
+
     primary_key = dpAttribute.index(dpAttribute.IndexType.PRIMARY, 'parent_id')
 
     idx_parents_parent_type = dpAttribute.index(dpAttribute.IndexType.INDEX, 'parent_type')

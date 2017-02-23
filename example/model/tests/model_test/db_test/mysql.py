@@ -13,44 +13,61 @@ class MysqlModel(dpModel):
         return 100
 
     def test(self):
-        assert self.execute_test_tuple().rowcount == 1
-        assert self.execute_test_dict().rowcount == 1
-        assert self.scalar_test_tuple() == 'James'
-        assert self.scalar_test_dict() == 'James'
+        self.execute_test_tuple()
+        assert self.scalar_test_tuple_name() == 'James'
+        assert self.scalar_test_tuple_birth_year() == 1988
+
+        self.execute_test_dict()
+        assert self.scalar_test_dict() == 1989
+
         assert self.row_test()['parent_name'] == 'James'
         assert self.rows_test()[0]['parent_name'] == 'James'
+
         assert self.transaction_succ_test()
         assert not self.transaction_fail_test()
 
     def execute_test_tuple(self):
         return self.execute("""
             INSERT INTO `parents`
-                (`parent_id`, `parent_name`, `parent_type`)
-                    VALUES (%s, %s, %s)
+                (`parent_id`, `parent_name`, `parent_type`, `year_of_birth`)
+                    VALUES (%s, %s, %s, %s)
                         ON DUPLICATE KEY UPDATE
                             `parent_name` = VALUES(`parent_name`),
-                            `parent_type` = VALUES(`parent_type`)
-        """, (self.parent_test_id, 'James', 'FATHER'), 'tests.model_test/drv_mysql_test')
+                            `parent_type` = VALUES(`parent_type`),
+                            `year_of_birth` = VALUES(`year_of_birth`)
+        """, (self.parent_test_id, 'James', 'FATHER', 1988), 'tests.model_test/drv_mysql_test')
 
     def execute_test_dict(self):
         params = {
             'parent_id': self.parent_test_id,
             'parent_name': 'James',
-            'parent_type': 'FATHER'}
+            'parent_type': 'FATHER',
+            'year_of_birth': 1989}
 
         return self.execute("""
             INSERT INTO `parents`
-                (`parent_id`, `parent_name`, `parent_type`)
-                    VALUES (%(parent_id)s, %(parent_name)s, %(parent_type)s)
+                (`parent_id`, `parent_name`, `parent_type`, `year_of_birth`)
+                    VALUES (%(parent_id)s, %(parent_name)s, %(parent_type)s, %(year_of_birth)s)
                         ON DUPLICATE KEY UPDATE
                             `parent_name` = VALUES(`parent_name`),
-                            `parent_type` = VALUES(`parent_type`)
+                            `parent_type` = VALUES(`parent_type`),
+                            `year_of_birth` = VALUES(`year_of_birth`)
         """, params, 'tests.model_test/drv_mysql_test')
 
-    def scalar_test_tuple(self):
+    def scalar_test_tuple_name(self):
         return self.scalar("""
             SELECT
                 `parent_name`
+            FROM
+                `parents`
+            WHERE
+                `parent_id` = %s
+        """, self.parent_test_id, 'tests.model_test/drv_mysql_test')
+
+    def scalar_test_tuple_birth_year(self):
+        return self.scalar("""
+            SELECT
+                `year_of_birth`
             FROM
                 `parents`
             WHERE
@@ -65,7 +82,7 @@ class MysqlModel(dpModel):
 
         return self.scalar("""
             SELECT
-                `parent_name`
+                `year_of_birth`
             FROM
                 `parents`
             WHERE

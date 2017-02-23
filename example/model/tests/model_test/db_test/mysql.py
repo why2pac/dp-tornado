@@ -13,14 +13,16 @@ class MysqlModel(dpModel):
         return 100
 
     def test(self):
-        assert self.execute_test().rowcount == 1
-        assert self.scalar_test() == 'James'
+        assert self.execute_test_tuple().rowcount == 1
+        assert self.execute_test_dict().rowcount == 1
+        assert self.scalar_test_tuple() == 'James'
+        assert self.scalar_test_dict() == 'James'
         assert self.row_test()['parent_name'] == 'James'
         assert self.rows_test()[0]['parent_name'] == 'James'
         assert self.transaction_succ_test()
         assert not self.transaction_fail_test()
 
-    def execute_test(self):
+    def execute_test_tuple(self):
         return self.execute("""
             INSERT INTO `parents`
                 (`parent_id`, `parent_name`, `parent_type`)
@@ -30,7 +32,22 @@ class MysqlModel(dpModel):
                             `parent_type` = VALUES(`parent_type`)
         """, (self.parent_test_id, 'James', 'FATHER'), 'tests.model_test/drv_mysql_test')
 
-    def scalar_test(self):
+    def execute_test_dict(self):
+        params = {
+            'parent_id': self.parent_test_id,
+            'parent_name': 'James',
+            'parent_type': 'FATHER'}
+
+        return self.execute("""
+            INSERT INTO `parents`
+                (`parent_id`, `parent_name`, `parent_type`)
+                    VALUES (%(parent_id)s, %(parent_name)s, %(parent_type)s)
+                        ON DUPLICATE KEY UPDATE
+                            `parent_name` = VALUES(`parent_name`),
+                            `parent_type` = VALUES(`parent_type`)
+        """, params, 'tests.model_test/drv_mysql_test')
+
+    def scalar_test_tuple(self):
         return self.scalar("""
             SELECT
                 `parent_name`
@@ -39,6 +56,22 @@ class MysqlModel(dpModel):
             WHERE
                 `parent_id` = %s
         """, self.parent_test_id, 'tests.model_test/drv_mysql_test')
+
+    def scalar_test_dict(self):
+        params = {
+            'parent_id': self.parent_test_id,
+            'parent_type': 'FATHER'
+        }
+
+        return self.scalar("""
+            SELECT
+                `parent_name`
+            FROM
+                `parents`
+            WHERE
+                `parent_id` = %(parent_id)s AND
+                `parent_type` = %(parent_type)s
+        """, params, 'tests.model_test/drv_mysql_test')
 
     def row_test(self):
         return self.row("""

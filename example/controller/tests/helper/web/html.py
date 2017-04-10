@@ -14,6 +14,8 @@ class HtmlController(Controller):
         assert(self.helper.web.html.unescape('new&#60;br&#62;line.') == 'new<br>line.')
 
         assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);">xss</a>') == 'xss')
+        assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);" class="foo">xss</a>') == 'xss')
+        assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);" class="foo bar">xss</a>') == 'xss')
         assert(self.helper.web.html.strip_xss('<iframe src="http://www.google.com">no iframe</iframe>') == 'no iframe')
         assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);">x<p>xss</p></a>') == 'x<p>xss</p>')
         assert(self.helper.web.html.strip_xss('<span onmousemove="javascript:alert(0);">on</span>') == 'on')

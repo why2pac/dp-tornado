@@ -78,7 +78,10 @@ class HtmlHelper(dpHelper):
                         found = True
                         break
 
-                    s_val = ea_v.strip()
+                    if self.helper.misc.type.check.array(ea_v):
+                        s_val = ' '.join(ea_v).strip()
+                    else:
+                        s_val = ea_v.strip()
 
                     for xe in self.helper.string.whitespace:
                         s_val = s_val.replace(xe, '')

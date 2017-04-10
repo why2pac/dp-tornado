@@ -160,6 +160,23 @@ class Bootstrap(object):
 
         engine.ini.server.set('m17n', m17n)
 
+        # Configuration from Environment
+
+        if 'DP_STATIC_AWS_ACCESS_KEY' in os.environ:
+            engine.ini.static.set('aws_id', os.environ['DP_STATIC_AWS_ACCESS_KEY'])
+
+        if 'DP_STATIC_AWS_SECRET_KEY' in os.environ:
+            engine.ini.static.set('aws_secret', os.environ['DP_STATIC_AWS_SECRET_KEY'])
+
+        if 'DP_STATIC_AWS_BUCKET' in os.environ:
+            engine.ini.static.set('aws_bucket', os.environ['DP_STATIC_AWS_BUCKET'])
+
+        if 'DP_STATIC_AWS_REGION' in os.environ:
+            engine.ini.static.set('aws_region', os.environ['DP_STATIC_AWS_REGION'])
+
+        if 'DP_STATIC_AWS_ENDPOINT' in os.environ:
+            engine.ini.static.set('aws_endpoint', os.environ['DP_STATIC_AWS_ENDPOINT'])
+
         # Static AWS
         engine.ini.static.get('aws_id')
         engine.ini.static.get('aws_secret')

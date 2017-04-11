@@ -257,9 +257,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 return self.postprocess(handler)
 
         if status_code == 404:
-            return self.render('system/http/pp_404.html')
+            return self.finish(self.view.render_string(self, 'system/http/pp_404.html', encode=False))
 
-        return self.render('system/http/pp_5xx.html')
+        return self.finish(self.view.render_string(self, 'system/http/pp_5xx.html', encode=False))
 
     def head(self, path=None):
         self.routed = True

@@ -112,3 +112,11 @@ def route_urls_bar_2():
 
 def route_urls_bar_origin():
     utils.expecting_text('get', '/controller/urls/bar/a/1/b', 'a/1/b', 200)
+
+
+def common_error_404():
+    utils.expecting_text('get', '/error/not-found-page/404', '404', 404, host=consts.dp_testing_host)
+
+
+def common_error_5xx():
+    utils.expecting_text('get', '/error/error5xx', '5xx', 500, host=consts.dp_testing_host)

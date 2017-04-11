@@ -46,6 +46,8 @@ def run(main):
     test_controller.route_urls_bar_1()
     test_controller.route_urls_bar_2()
     test_controller.route_urls_bar_origin()
+    test_controller.common_error_404()
+    test_controller.common_error_5xx()
 
     from . import test_handler
 

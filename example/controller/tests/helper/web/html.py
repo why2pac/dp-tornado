@@ -13,6 +13,7 @@ class HtmlController(Controller):
         assert(self.helper.web.html.unescape('new&lt;br&gt;line.') == 'new<br>line.')
         assert(self.helper.web.html.unescape('new&#60;br&#62;line.') == 'new<br>line.')
 
+        assert(self.helper.web.html.strip_xss('<h99>test</h99>') == 'test')
         assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);">xss</a>') == 'xss')
         assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);" class="foo">xss</a>') == 'xss')
         assert(self.helper.web.html.strip_xss('<a href="javascript:alert(0);" class="foo bar">xss</a>') == 'xss')

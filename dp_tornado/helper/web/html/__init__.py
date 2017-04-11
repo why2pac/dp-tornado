@@ -90,7 +90,7 @@ class HtmlHelper(dpHelper):
                         found = True
                         break
 
-            if found:
+            if found and e.parent:
                 e.unwrap()
 
             self._strip_xss(e, whitelist)

@@ -58,7 +58,6 @@ install_requires = [
         'CyMySQL==0.8.9',
         'httpagentparser==1.7.8',
         'lxml==3.7.3',
-        'Pillow==4.1.0',
         'pycrypto==2.6.1',
         'pytz==2017.2',
         'redis==2.10.5',
@@ -77,8 +76,8 @@ if sys.version_info[0] <= 2:
 
 
 # Will not install pillow when it starts from readthedocs.
-if os.environ.get('READTHEDOCS') == 'True':
-    install_requires = list(filter(lambda x: not x.startswith('Pillow'), install_requires))
+if os.environ.get('READTHEDOCS') != 'True':
+    install_requires.append('Pillow==4.1.0')
 
 
 setup(

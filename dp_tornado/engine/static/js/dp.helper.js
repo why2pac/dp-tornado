@@ -73,6 +73,7 @@ dp.helper = {
         var multiple = obj.multiple || false;
         var fields = obj.fields || [];
         var url = obj.url || undefined;
+        var headers = obj.headers || undefined;
         var type = obj.type || 'POST';
         var data = obj.data || {};
         var dataType = obj.dataType || 'json';
@@ -235,6 +236,7 @@ dp.helper = {
         var ajax_req = function() {
             var payload = {
                 url: prefixize ? dp.helper.prefixize(url, prefix) : url,
+                headers: headers,
                 type: type,
                 data: data,
                 dataType: dataType,

@@ -31,6 +31,17 @@ dp.helper = {
                 'fields': []
             };
 
+            var objSucc = _obj.attr('dp-req-success');
+            var objError = _obj.attr('dp-req-error');
+
+            if (objSucc) {
+                obj.success = eval(objSucc);
+            }
+
+            if (objError) {
+                obj.error = eval(objError);
+            }
+
             if (_obj.find('*[dp-req-type="button"]').length > 0) {
                 var _btn = dp_jqlib(_obj.find('*[dp-req-type="button"]').get(0));
 

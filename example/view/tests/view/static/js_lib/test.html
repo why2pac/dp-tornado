@@ -16,6 +16,7 @@
     <!--
     <form id="req-test-case-1" method="post" action="{{ prefixize('/tests/view/static/js_lib') }}" dp-req-res-type="json" dp-req-prefixize="no">
     -->
+        <input type="checkbox" name="chk" value="ok" dp-req-type="checkbox" dp-req-required="yes" dp-req-focus="true" dp-req-missing="The `chk` field is required." checked />
         <input type="hidden" name="email" value="john@email.com" dp-req-type="email" dp-req-required="yes" dp-req-focus="true" dp-req-missing="The `email` field is required." dp-req-invalid="The specified `email` field is invalid." />
         <input type="hidden" name="name" value="john mayer" dp-req-type="text" dp-req-required="yes" dp-req-length="7,12" dp-req-missing="The `name` field is required." dp-req-invalid="The specified `name` field is invalid." />
         <input type="hidden" name="homepage" value="http://www.google.com" dp-req-type="text" dp-req-required="no" dp-req-missing="The `homepage` field is required." dp-req-invalid="The specified `homepage` field is invalid." />

@@ -49,7 +49,7 @@ dp.helper = {
 
             _obj.find('*[dp-req-type]').each(function(i, e) {
                 var _this = dp_jqlib(this);
-                obj.fields.push({
+                var payload = {
                     'name': _this.attr('name') || _this.attr('id'),
                     'obj': _this,
                     'required': _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
@@ -61,7 +61,13 @@ dp.helper = {
                         'invalid': _this.attr('dp-req-invalid'),
                         'confirm': _this.attr('dp-req-confirm')
                     }
-                });
+                };
+
+                if (_this.attr('dp-req-type') == 'checkbox') {
+                    payload.val = _this.prop('checked') ? _this.val() : '';
+                }
+
+                obj.fields.push(payload);
             });
         }
 
@@ -118,7 +124,12 @@ dp.helper = {
         var output = false;
 
         dp_jqlib(fields).each(function(i, e) {
-            var val = e.obj.val();
+            var val = e.val;
+
+            if (val === undefined) {
+                val = e.obj.val();
+            }
+
             var skip = false;
 
             // Required

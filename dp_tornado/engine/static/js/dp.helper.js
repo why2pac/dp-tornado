@@ -196,12 +196,22 @@ dp.helper = {
 
         var finalize = function(data) {
             if (data && typeof(data) == 'object') {
+                var finalizePage = function() {
+                    if (data.redirect) {
+                        document.location.href = data.redirect;
+                    }
+                    else if (data.reload) {
+                        document.location.reload();
+                    }
+                };
+
                 if (data.message) {
                     dp.alert(data.message, function() {
-                        if (data.redirect) {
-                            document.location.href = data.redirect;
-                        }
+                        finalizePage();
                     });
+                }
+                else {
+                    finalizePage();
                 }
             }
         };

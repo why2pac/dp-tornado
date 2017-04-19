@@ -194,11 +194,19 @@ dp.ui = {
                             }
 
                             if (e.keyCode == 13) {
-                                dp_jqlib(this).attr('dp-on-return-busy', 'yes');
-                                setTimeout(dp_jqlib(this).attr('dp-on-return'), 0);
-                                setTimeout("dp_jqlib('#" + _id + "').attr('dp-on-return-busy', 'no');", 150);
+                                var delegate;
 
-                                e.preventDefault();
+                                try {
+                                    delegate = eval(dp_jqlib(this).attr('dp-on-return'));
+                                }catch(_){}
+
+                                if (delegate && typeof(delegate) == 'function') {
+                                    dp_jqlib(this).attr('dp-on-return-busy', 'yes');
+                                    setTimeout(delegate(dp_jqlib(this)), 0);
+                                    setTimeout("dp_jqlib('#" + _id + "').attr('dp-on-return-busy', 'no');", 150);
+
+                                    e.preventDefault();
+                                }
                             }
                         });
                     });
@@ -212,7 +220,15 @@ dp.ui = {
                         dp_jqlib(this).attr('dp-on-focus-installed', 'yes');
 
                         dp_jqlib(this).focus(function(e) {
-                            setTimeout(dp_jqlib(this).attr('dp-on-focus'), 0);
+                            var delegate;
+
+                            try {
+                                delegate = eval(dp_jqlib(this).attr('dp-on-focus'));
+                            }catch(_){}
+
+                            if (delegate && typeof(delegate) == 'function') {
+                                setTimeout(delegate(dp_jqlib(this)), 0);
+                            }
                         });
                     });
                 }

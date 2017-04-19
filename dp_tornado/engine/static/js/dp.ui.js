@@ -230,7 +230,7 @@ dp.ui = {
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {
-                                setTimeout(delegate(dp_jqlib(this)), 0);
+                                setTimeout(delegate(dp_jqlib(this), e), 0);
                             }
                         });
                     });
@@ -251,7 +251,7 @@ dp.ui = {
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {
-                                setTimeout(delegate(dp_jqlib(this)), 0);
+                                setTimeout(delegate(dp_jqlib(this), e), 0);
                             }
                         });
                     });
@@ -271,7 +271,7 @@ dp.ui = {
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {
-                                setTimeout(delegate(dp_jqlib(this)), 0);
+                                setTimeout(delegate(dp_jqlib(this), e), 0);
                             }
                         });
                     });
@@ -291,7 +291,7 @@ dp.ui = {
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {
-                                setTimeout(delegate(dp_jqlib(this)), 0);
+                                setTimeout(delegate(dp_jqlib(this), e), 0);
                             }
                         });
                     });

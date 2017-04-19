@@ -61,16 +61,18 @@ dp.helper = {
             _obj.find('*[dp-req-type]').each(function(i, e) {
                 var _this = dp_jqlib(this);
                 var payload = {
-                    'name': _this.attr('name') || _this.attr('id'),
-                    'obj': _this,
-                    'required': _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
-                    'focus': _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
-                    'validate': _this.attr('dp-req-type'),
-                    'length': _this.attr('dp-req-length') ? dp_jqlib.map(_this.attr('dp-req-length').split(','), function(v, i) { return parseInt(v, 10); }) : undefined,
-                    'message': {
-                        'missing': _this.attr('dp-req-missing'),
-                        'invalid': _this.attr('dp-req-invalid'),
-                        'confirm': _this.attr('dp-req-confirm')
+                    name: _this.attr('name') || _this.attr('id'),
+                    obj: _this,
+                    required: _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
+                    focus: _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
+                    validate: _this.attr('dp-req-type'),
+                    length: _this.attr('dp-req-length') ? dp_jqlib.map(_this.attr('dp-req-length').split(','), function(v, i) { return parseInt(v, 10); }) : undefined,
+                    message: {
+                        missing: _this.attr('dp-req-missing'),
+                        invalid: _this.attr('dp-req-invalid'),
+                        confirm: _this.attr('dp-req-confirm'),
+                        confirmYes: _this.attr('dp-req-confirm-yes'),
+                        confirmNo: _this.attr('dp-req-confirm-no')
                     }
                 };
 
@@ -186,15 +188,19 @@ dp.helper = {
             // Confirm (alert)
             if (fields_checked && e.message && e.message.confirm && !e.message.confirming) {
                 e.message.confirming = true;
+
+                var confirmYes = e.message.confirmYes || 'OK';
+                var confirmNo = e.message.confirmNo || 'Cancel';
+
                 output = dp.alert(
                     e.message.confirm,
                     function() {
                         fn_finalize();
                         dp.req(obj);
-                    },
+                    }, confirmYes,
                     function() {
                         fn_finalize();
-                    }
+                    }, confirmNo
                 );
 
                 no_finalize = true;

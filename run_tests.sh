@@ -1,6 +1,13 @@
 #!/bin/bash
 
-if [ "$1" = "dry" ]
+if [ "$1" = "" ]
+then
+  mode="install"
+else
+  mode="$1"
+fi
+
+if [ "$mode" = "dry" ]
 then
  
   for py_ver in 2.7 3.4; do
@@ -14,7 +21,7 @@ then
   return
 fi
 
-if [ "$1" = "init" ] || [ "$1" = "all" ]
+if [ "$mode" = "init" ] || [ "$mode" = "all" ]
 then
   rm -rf builds
   rm -rf dist
@@ -29,7 +36,7 @@ for py_ver in 2.7 3.4; do
 
   . ./nodeps/$py_ver/bin/activate
 
-  if [ "$1" = "install" ] || [ "$1" = "all" ] || [ "$1" = "init" ]
+  if [ "$mode" = "install" ] || [ "$mode" = "all" ] || [ "$mode" = "init" ]
   then
     python setup.py install > /dev/null 2>&1
     pip install nose > /dev/null 2>&1

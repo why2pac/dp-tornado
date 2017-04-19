@@ -177,6 +177,9 @@ dp.ui = {
         init: function(obj) {
             dp.ui.element.input.delegate.on_return(obj);
             dp.ui.element.input.delegate.on_focus(obj);
+            dp.ui.element.input.delegate.on_focusout(obj);
+            dp.ui.element.input.delegate.on_keyup(obj);
+            dp.ui.element.input.delegate.on_keydown(obj);
         },
         input: {
             delegate: {
@@ -224,6 +227,67 @@ dp.ui = {
 
                             try {
                                 delegate = eval(dp_jqlib(this).attr('dp-on-focus'));
+                            }catch(_){}
+
+                            if (delegate && typeof(delegate) == 'function') {
+                                setTimeout(delegate(dp_jqlib(this)), 0);
+                            }
+                        });
+                    });
+                },
+                on_focusout: function(obj) {
+                    if (!obj) obj = dp_jqlib('body');
+                    obj.find('input[dp-on-focusout][dp-on-focusout-installed!=yes]').each(function() {
+                        var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
+
+                        dp_jqlib(this).attr('id', _id);
+                        dp_jqlib(this).attr('dp-on-focusout-installed', 'yes');
+
+                        dp_jqlib(this).focusout(function(e) {
+                            var delegate;
+
+                            try {
+                                delegate = eval(dp_jqlib(this).attr('dp-on-focusout'));
+                            }catch(_){}
+
+                            if (delegate && typeof(delegate) == 'function') {
+                                setTimeout(delegate(dp_jqlib(this)), 0);
+                            }
+                        });
+                    });
+                },
+                on_keyup: function(obj) {
+                    if (!obj) obj = dp_jqlib('body');
+                    obj.find('input[dp-on-keyup][dp-on-keyup-installed!=yes]').each(function() {
+                        var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
+
+                        dp_jqlib(this).attr('id', _id);
+                        dp_jqlib(this).attr('dp-on-keyup-installed', 'yes');
+
+                        dp_jqlib(this).keyup(function(e) {
+                            var delegate;
+                            try {
+                                delegate = eval(dp_jqlib(this).attr('dp-on-keyup'));
+                            }catch(_){}
+
+                            if (delegate && typeof(delegate) == 'function') {
+                                setTimeout(delegate(dp_jqlib(this)), 0);
+                            }
+                        });
+                    });
+                },
+                on_keydown: function(obj) {
+                    if (!obj) obj = dp_jqlib('body');
+                    obj.find('input[dp-on-keydown][dp-on-keydown-installed!=yes]').each(function() {
+                        var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
+
+                        dp_jqlib(this).attr('id', _id);
+                        dp_jqlib(this).attr('dp-on-keydown-installed', 'yes');
+
+                        dp_jqlib(this).keydown(function(e) {
+                            var delegate;
+                            try {
+                                delegate = eval(dp_jqlib(this).attr('dp-on-keydown'));
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {

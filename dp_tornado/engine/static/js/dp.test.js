@@ -268,12 +268,38 @@ dp.test = {
 
         dp_assert(
             function() {
+                return dp.test.ui.element.input.delegate.on_focusout_called;
+            },
+            'test-ui-element-input-delegate-on-focusout',
+            function() {
+                _el('#input-test').focus();
+                _el('#input-test-2').focus();
+            },
+            wait
+        );
+
+        dp_assert(
+            function() {
                 return dp.test.ui.element.input.delegate.on_return_called;
             },
             'test-ui-element-input-delegate-on-return',
             function() {
                 var e = dp_jqlib.Event('keypress');
                 e.keyCode = 13;
+
+                _el('#input-test').trigger(e);
+            },
+            wait
+        );
+
+        dp_assert(
+            function() {
+                return dp.test.ui.element.input.delegate.on_keydown_called;
+            },
+            'test-ui-element-input-delegate-on-keydown',
+            function() {
+                var e = dp_jqlib.Event('keydown');
+                e.keyCode = 65;
 
                 _el('#input-test').trigger(e);
             },
@@ -301,6 +327,16 @@ dp.test = {
                     on_focus: function() {
                         dp.test.ui.element.input.delegate.on_focus_called = true;
                         console.log('* dp.test.ui.element.input.delegate.on_focus called.');
+                    },
+                    on_focusout_called: false,
+                    on_focusout: function() {
+                        dp.test.ui.element.input.delegate.on_focusout_called = true;
+                        console.log('* dp.test.ui.element.input.delegate.on_focusout called.');
+                    },
+                    on_keydown_called: false,
+                    on_keydown: function() {
+                        dp.test.ui.element.input.delegate.on_keydown_called = true;
+                        console.log('* dp.test.ui.element.input.delegate.on_keydown called.');
                     }
                 }
             }

@@ -10,7 +10,13 @@
         '/js/dp.test.js', dp=True, init=True) %}
 </head>
 <body>
-    <input type="text" dp-on-return="dp.test.ui.element.input.delegate.on_return" dp-on-focus="dp.test.ui.element.input.delegate.on_focus" id="input-test" />
+    <input id="input-test" type="text"
+           dp-on-return="dp.test.ui.element.input.delegate.on_return"
+           dp-on-focus="dp.test.ui.element.input.delegate.on_focus"
+           dp-on-focusout="dp.test.ui.element.input.delegate.on_focusout"
+           dp-on-keydown="dp.test.ui.element.input.delegate.on_keydown"
+           dp-on-on_keyup="dp.test.ui.element.input.delegate.on_keyup" />
+    <input type="text" id="input-test-2" />
 
     <form id="req-test-case-1" method="post" action="/tests/view/static/js_lib" dp-req-res-type="json" dp-req-prefixize="yes">
     <!--

@@ -64,7 +64,7 @@ install_requires = [
         'redis==2.10.5',
         'requests==2.13.0',
         'SQLAlchemy==1.1.9',
-        'tornado==4.4.3',
+        'tornado==4.5',
         'validate_email==1.3',
         'validators==0.11.3',
         'wand==0.4.4',

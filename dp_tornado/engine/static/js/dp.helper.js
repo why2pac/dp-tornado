@@ -369,11 +369,11 @@ dp.helper = {
         endsWith: function(str, suffix) {
             return str ? str.indexOf(suffix, str.length - suffix.length) !== -1 : false;
         },
-        extract_numbers: function(val) {
+        extractNumbers: function(val) {
             var replace = /[^0-9]/gi;
             return (val.substring(0, 1) == '-' ? '-' : '') + val.replace(replace, '');
         },
-        number_format: function(val) {
+        numberFormat: function(val) {
             return val.toFixed(0).replace(/(\d)(?=(\d{3})+$)/g, "$1,");
         }
     }

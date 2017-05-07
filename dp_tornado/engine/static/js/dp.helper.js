@@ -28,7 +28,7 @@ dp.helper = {
                 'type': _obj.attr('method'),
                 'dataType': obj.attr('dp-req-res-type') || 'json',
                 'prefixize': obj.attr('dp-req-prefixize') != 'no' && obj.attr('dp-req-prefixize') != 'false',
-                'fields': []
+                'fields': {}
             };
 
             var objSucc = _obj.attr('dp-req-success');
@@ -60,8 +60,8 @@ dp.helper = {
 
             _obj.find('*[dp-req-type]').each(function(i, e) {
                 var _this = dp_jqlib(this);
+                var key = _this.attr('name') || _this.attr('id');
                 var payload = {
-                    name: _this.attr('name') || _this.attr('id'),
                     obj: _this,
                     required: _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
                     focus: _this.attr('dp-req-required') == 'yes' || _this.attr('dp-req-required') == 'true',
@@ -80,7 +80,7 @@ dp.helper = {
                     payload.val = _this.prop('checked') ? _this.val() : '';
                 }
 
-                obj.fields.push(payload);
+                obj.fields[key] = payload;
             });
         }
 
@@ -136,10 +136,10 @@ dp.helper = {
         var fields_checked = true;
         var output = false;
 
-        dp_jqlib(fields).each(function(i, e) {
+        dp_jqlib.each(fields, function(key, e) {
             var val = e.val;
 
-            if (val === undefined) {
+            if (val === undefined && e.obj) {
                 val = e.obj.val();
             }
 
@@ -212,8 +212,8 @@ dp.helper = {
                 return false;
             }
 
-            if (!skip && e.name) {
-                data[e.name] = val;
+            if (!skip && key) {
+                data[key] = val;
             }
         });
 

@@ -80,6 +80,10 @@ dp.helper = {
                     payload.val = _this.prop('checked') ? _this.val() : '';
                 }
 
+                if (!payload.val && _this.attr('dp-req-val-alter')) {
+                    payload.val = _this.attr(_this.attr('dp-req-val-alter'));
+                }
+
                 obj.fields[key] = payload;
             });
         }

@@ -159,7 +159,7 @@ dp.helper = {
                 skip = true;
             }
             // E-Mail validation
-            else if (fields_checked && e.validate == 'email' && !dp.helper.validator.email(val)) {
+            else if (fields_checked && e.validate == 'email' && val && !dp.helper.validator.email(val)) {
                 if (e.message && e.message.invalid) {
                     output = dp.alert(e.message.invalid);
                 }

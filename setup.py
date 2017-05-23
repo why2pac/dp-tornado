@@ -54,7 +54,7 @@ dp_description = 'MVC Web Application Framework with Tornado.'
 install_requires = [
         'BeautifulSoup4==4.6.0',
         'boto3==1.4.4',
-        'croniter==0.3.16',
+        'croniter==0.3.17',
         'CyMySQL==0.8.9',
         'httpagentparser==1.7.9',
         'lxml==3.7.3',

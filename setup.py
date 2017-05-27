@@ -62,7 +62,7 @@ install_requires = [
         'pycrypto==2.6.1',
         'pytz==2017.2',
         'redis==2.10.5',
-        'requests==2.16.0',
+        'requests==2.16.1',
         'SQLAlchemy==1.1.10',
         'tornado==4.5.1',
         'validate_email==1.3',

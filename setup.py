@@ -57,7 +57,7 @@ install_requires = [
         'croniter==0.3.17',
         'CyMySQL==0.8.9',
         'httpagentparser==1.7.9',
-        'lxml==3.7.3',
+        'lxml==3.8.0',
         'Pillow==4.1.1',
         'pycrypto==2.6.1',
         'pytz==2017.2',
@@ -66,7 +66,7 @@ install_requires = [
         'SQLAlchemy==1.1.10',
         'tornado==4.5.1',
         'validate_email==1.3',
-        'validators==0.11.3',
+        'validators==0.12.0',
         'wand==0.4.4',
         # , 'selenium'
     ]

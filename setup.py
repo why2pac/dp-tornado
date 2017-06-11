@@ -55,7 +55,7 @@ install_requires = [
         'BeautifulSoup4==4.6.0',
         'boto3==1.4.4',
         'croniter==0.3.17',
-        'CyMySQL==0.8.9',
+        'CyMySQL==0.9.0',
         'httpagentparser==1.7.9',
         'lxml==3.8.0',
         'Pillow==4.1.1',

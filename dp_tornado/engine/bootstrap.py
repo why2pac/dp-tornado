@@ -121,6 +121,7 @@ class Bootstrap(object):
         tornado.options.define('crypto_key', default=get_cfg(config, 'key', section='crypto', default='CR$t0-$CR@T'))
         tornado.options.define('session_dsn', default=get_cfg(config, 'dsn', section='session', default=None))
         tornado.options.define('session_exp_in', default=get_cfg(config, 'expire_in', section='session', default=7200))
+        tornado.options.define('session_ip_restrict', default=get_cfg(config, 'ip_restrited', section='session', default=1))
         tornado.options.define('max_body_size', default=get_cfg(config, 'max_body_size', default=1024*1024*10))
         tornado.options.define('application_path', application_path)
         tornado.options.define('python', sys.executable)

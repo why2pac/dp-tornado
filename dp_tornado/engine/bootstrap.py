@@ -148,6 +148,7 @@ class Bootstrap(object):
         engine.ini.crypto.get('key', default='CR$t0-$CR@T')
         engine.ini.session.get('dsn', default=None)
         engine.ini.session.get('expire_in', default=7200)
+        engine.ini.session.get('ip_restrited', default=1)
         engine.ini.server.get('max_body_size', default=1024*1024*10)
 
         # If enabled debugging mode, disable process forking.

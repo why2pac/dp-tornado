@@ -156,6 +156,7 @@ def run(main):
     test_model_cache.redis_set()
     test_model_cache.redis_del()
     test_model_cache.redis_set_with_expire()
+    test_model_cache.redis_setnx()
     test_model_cache.redis_flushdb()
     test_model_cache.redis_flushall()
 

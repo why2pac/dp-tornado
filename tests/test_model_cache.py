@@ -78,6 +78,11 @@ def redis_set(key=None):
         'get', '/model/cache/redis/set/%s/%s' % (key, val), 'cache-redis:%s=%s' % (key, val), 200)
 
 
+def redis_setnx():
+    utils.expecting_text(
+        'get', '/model/cache/redis/setnx', 'done', 200)
+
+
 def redis_del(key=None):
     key = str(uuid.uuid1()) if not key else key
 

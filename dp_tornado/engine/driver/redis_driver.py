@@ -72,19 +72,15 @@ class RedisCacheDriver(dpCacheDriver):
             return p.execute()
 
     def setnx(self, key, val, expire_in=None):
-        setnx = self.conn.setnx(key, val)
+        if expire_in is None:
+            return True if self.conn.setnx(key, val) else False
 
-        if not setnx:
-            return False
+        pipe = self.conn.pipeline()
+        pipe.setnx(key, val)
+        pipe.expire(key, int(expire_in))
+        ret = pipe.execute()
 
-        if expire_in is not None:
-            expire = self.conn.expire(key, int(expire_in))
-
-            if not expire:
-                self.conn.delete(key)
-                return False
-
-        return True
+        return ret[0]
 
     def delete(self, key):
         return self.conn.delete(key)

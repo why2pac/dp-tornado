@@ -42,3 +42,17 @@ class CacheTestModel(dpModel):
 
     def set_redis_with_expire(self, key, val, expire_in):
         return self.cache.set(key=key, val=val, dsn_or_conn='tests.model_test/drv_redis', expire_in=expire_in)
+
+    #
+
+    def setnx_redis_delete(self, key):
+        return self.cache.delete(key=key, dsn_or_conn='tests.model_test/drv_redis')
+
+    def setnx_redis_get(self, key):
+        return self.cache.get(key=key, dsn_or_conn='tests.model_test/drv_redis')
+
+    def setnx_redis_set(self, key, val, ttl):
+        return self.cache.setnx(key=key, val=val, dsn_or_conn='tests.model_test/drv_redis', expire_in=ttl)
+
+    def setnx_redis_ttl(self, key):
+        return self.cache.ttl(key=key, dsn_or_conn='tests.model_test/drv_redis')

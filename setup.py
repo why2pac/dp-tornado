@@ -63,7 +63,7 @@ install_requires = [
         'pytz==2017.2',
         'redis==2.10.5',
         'requests==2.18.1',
-        'SQLAlchemy==1.1.10',
+        'SQLAlchemy==1.1.11',
         'tornado==4.5.1',
         'validate_email==1.3',
         'validators==0.12.0',

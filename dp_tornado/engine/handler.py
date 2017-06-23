@@ -352,7 +352,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         key = self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else 'unknown'
 
         if self.session_ip_restrict:
-            key = '%s:%s' % (key, self.remote_ip)
+            key = '%s:%s' % (self.remote_ip, key)
 
         secure_cookie = self.helper.crypto.encrypt(
             value,
@@ -370,7 +370,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 key = self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else 'unknown'
 
                 if self.session_ip_restrict:
-                    key = '%s:%s' % (key, self.remote_ip)
+                    key = '%s:%s' % (self.remote_ip, key)
 
                 secure_cookie = self.helper.crypto.decrypt(secure_cookie, key)
             except:

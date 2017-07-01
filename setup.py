@@ -58,7 +58,7 @@ install_requires = [
         'CyMySQL==0.9.0',
         'httpagentparser==1.7.9',
         'lxml==3.8.0',
-        'Pillow==4.1.1',
+        'Pillow==4.2.0',
         'pycrypto==2.6.1',
         'pytz==2017.2',
         'redis==2.10.5',

@@ -56,7 +56,7 @@ install_requires = [
         'boto3==1.4.4',
         'croniter==0.3.17',
         'CyMySQL==0.9.0',
-        'httpagentparser==1.7.9',
+        'httpagentparser==1.8.0',
         'lxml==3.8.0',
         'Pillow==4.2.1',
         'pycrypto==2.6.1',

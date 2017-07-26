@@ -365,7 +365,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def set_secure_cookie(self, name, value, expires_days=30, version=2, **kwargs):
         key = self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else 'unknown'
 
-        if self.ini.session.ip_restrited:
+        if self.ini.session.ip_restricted:
             key = '%s:%s' % (self.remote_ip, key)
 
         secure_cookie = self.helper.security.crypto.encrypt(value, randomized=True, key=key)
@@ -379,7 +379,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
             try:
                 key = self.request.headers["User-Agent"] if "User-Agent" in self.request.headers else 'unknown'
 
-                if self.ini.session.ip_restrited:
+                if self.ini.session.ip_restricted:
                     key = '%s:%s' % (self.remote_ip, key)
 
                 secure_cookie = self.helper.security.crypto.decrypt(secure_cookie, key=key)

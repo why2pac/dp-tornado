@@ -2,4 +2,4 @@
 
 mkdir -p /data/dp
 echo "$dp_port" > /data/dp/port
-echo "20161212170000-$pyver" > /data/dp/version
+echo "20170820140000-$pyver" > /data/dp/version

@@ -54,6 +54,8 @@ else
   __DP_CFG_DEBUG__=no
 fi
 
+chown -R dp4p:dp4p /data
+
 cd /data/app
-nohup dp4p run --mode=$__DP_CFG_MODE__ --ini=$__DP_CFG_INI__ --debug=$__DP_CFG_DEBUG__ --port=$(cat /data/dp/port) > /data/out.log 2>&1 &
+su dp4p -c "nohup dp4p run --mode=$__DP_CFG_MODE__ --ini=$__DP_CFG_INI__ --debug=$__DP_CFG_DEBUG__ --port=$(cat /data/dp/port) > /data/out.log 2>&1 &"
 

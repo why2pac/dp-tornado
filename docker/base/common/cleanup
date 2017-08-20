@@ -1,3 +1,9 @@
 #!/bin/bash
 
+# Remove some binaries for security reason.
+yum erase -y wget git
+rm -f /usr/bin/scp
+rm -f /usr/bin/ssh
+rm -f /sbin/ifconfig
+
 yum clean all

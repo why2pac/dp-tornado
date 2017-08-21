@@ -68,7 +68,7 @@ class Controller(dpEngine):
         self._write = []
         self._finish = None
         self._render = None
-        self._headers = [('Server', 'dp')]
+        self._headers = []
 
         self.head_requested = False
         self.post_requested = False
@@ -76,6 +76,9 @@ class Controller(dpEngine):
         self.patch_requested = False
         self.delete_requested = False
         self.put_requested = False
+
+        if self.parent and self.parent._headers and 'Server' in self.parent._headers:
+            del self.parent._headers['Server']
 
     def initialize(self, prefix, parent=None):
         self.prefix = prefix

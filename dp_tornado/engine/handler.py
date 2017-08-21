@@ -249,6 +249,9 @@ class Handler(tornado.web.RequestHandler, dpEngine):
 
         self.set_status(status_code)
 
+        if 'Server' in self._headers:
+            del self._headers['Server']
+
         for handler in self.handlers:
             on_error = getattr(handler, 'on_error', None)
 

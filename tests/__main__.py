@@ -35,6 +35,7 @@ def run(main):
     test_controller.session_get_and_set()
 
     test_controller.cookie_get_and_set()
+    test_controller.secure_cookie_get_and_set()
 
     test_controller.prefix()
 

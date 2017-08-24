@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
 import time
 import requests
 import logging
@@ -9,6 +10,19 @@ try:
     from . import consts
 except (ValueError, SystemError):
     import consts
+
+
+def to_unicode(s, preserve_none=True):
+    if s is None:
+        return s if preserve_none else u''
+
+    if not isinstance(s, (basestring,) if sys.version_info[0] <= 2 else (str, )):
+        s = str(s)
+
+    if type(s) is not type(u''):
+        return s.decode('UTF-8')
+    else:
+        return s
 
 
 def req(session, method, url, params=None, retry=3, retry_delay=1, host=None):
@@ -55,7 +69,7 @@ def expecting_text(
     session, status_code, response = req_text(
         url=url, method=method, params=params, retry=retry, retry_delay=retry_delay, session=session, host=host)
 
-    if status_code == expect_code and (expected is None or response == expected):
+    if status_code == expect_code and (expected is None or to_unicode(response) == to_unicode(expected)):
         return session
 
     logging.error('URL : [%s] %s' % (method.upper(), url))

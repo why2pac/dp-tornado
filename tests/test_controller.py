@@ -85,6 +85,9 @@ def secure_cookie_get_and_set():
     utils.expecting_text('get', '/controller/secure_cookie/get/key', '한글ABC123', 200, session=utils.expecting_text(
         'get', '/controller/secure_cookie/set/key/한글ABC123', None, 200))
 
+    utils.expecting_text('get', '/controller/secure_cookie/get/predefined', 'okay', 200, session=utils.expecting_text(
+        'get', '/controller/secure_cookie/set/predefined/okay', None, 200))
+
     utils.expecting_text('get', '/controller/secure_cookie/get/key', 'empty', 200)
 
 

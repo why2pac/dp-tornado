@@ -305,14 +305,21 @@ dp.ui = {
                         dp_jqlib(this).attr('id', _id);
                         dp_jqlib(this).attr('dp-on-paste-installed', 'yes');
 
-                        dp_jqlib(this).bind('paste', function(e) {
+                        this.addEventListener('paste', function(e) {
                             var delegate;
                             try {
                                 delegate = eval(dp_jqlib(this).attr('dp-on-paste'));
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {
-                                setTimeout(delegate(dp_jqlib(this), e), 0);
+                                var clipboardData, pastedData;
+
+                                try {
+                                    clipboardData = e.clipboardData || window.clipboardData;
+                                    pastedData = clipboardData.getData('Text');
+                                }catch(_){}
+
+                                delegate(dp_jqlib(this), e, pastedData);
                             }
                         });
                     });

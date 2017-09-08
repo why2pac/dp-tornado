@@ -180,6 +180,7 @@ dp.ui = {
             dp.ui.element.input.delegate.on_focusout(obj);
             dp.ui.element.input.delegate.on_keyup(obj);
             dp.ui.element.input.delegate.on_keydown(obj);
+            dp.ui.element.input.delegate.on_paste(obj);
         },
         input: {
             delegate: {
@@ -216,7 +217,7 @@ dp.ui = {
                 },
                 on_focus: function(obj) {
                     if (!obj) obj = dp_jqlib('body');
-                    obj.find('input[dp-on-focus][dp-on-focus-installed!=yes]').each(function() {
+                    obj.find('input[dp-on-focus][dp-on-focus-installed!=yes],textarea[dp-on-focus][dp-on-focus-installed!=yes]').each(function() {
                         var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
 
                         dp_jqlib(this).attr('id', _id);
@@ -237,7 +238,7 @@ dp.ui = {
                 },
                 on_focusout: function(obj) {
                     if (!obj) obj = dp_jqlib('body');
-                    obj.find('input[dp-on-focusout][dp-on-focusout-installed!=yes]').each(function() {
+                    obj.find('input[dp-on-focusout][dp-on-focusout-installed!=yes],textarea[dp-on-focusout][dp-on-focusout-installed!=yes]').each(function() {
                         var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
 
                         dp_jqlib(this).attr('id', _id);
@@ -258,7 +259,7 @@ dp.ui = {
                 },
                 on_keyup: function(obj) {
                     if (!obj) obj = dp_jqlib('body');
-                    obj.find('input[dp-on-keyup][dp-on-keyup-installed!=yes]').each(function() {
+                    obj.find('input[dp-on-keyup][dp-on-keyup-installed!=yes],textarea[dp-on-keyup][dp-on-keyup-installed!=yes]').each(function() {
                         var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
 
                         dp_jqlib(this).attr('id', _id);
@@ -278,7 +279,7 @@ dp.ui = {
                 },
                 on_keydown: function(obj) {
                     if (!obj) obj = dp_jqlib('body');
-                    obj.find('input[dp-on-keydown][dp-on-keydown-installed!=yes]').each(function() {
+                    obj.find('input[dp-on-keydown][dp-on-keydown-installed!=yes],textarea[dp-on-keydown][dp-on-keydown-installed!=yes]').each(function() {
                         var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
 
                         dp_jqlib(this).attr('id', _id);
@@ -288,6 +289,26 @@ dp.ui = {
                             var delegate;
                             try {
                                 delegate = eval(dp_jqlib(this).attr('dp-on-keydown'));
+                            }catch(_){}
+
+                            if (delegate && typeof(delegate) == 'function') {
+                                setTimeout(delegate(dp_jqlib(this), e), 0);
+                            }
+                        });
+                    });
+                },
+                on_paste: function(obj) {
+                    if (!obj) obj = dp_jqlib('body');
+                    obj.find('input[dp-on-paste][dp-on-paste-installed!=yes],textarea[dp-on-paste][dp-on-paste-installed!=yes]').each(function() {
+                        var _id = dp_jqlib(this).attr('id') || 'uniqid-' + dp.helper.string.uniqid();
+
+                        dp_jqlib(this).attr('id', _id);
+                        dp_jqlib(this).attr('dp-on-paste-installed', 'yes');
+
+                        dp_jqlib(this).bind('paste', function(e) {
+                            var delegate;
+                            try {
+                                delegate = eval(dp_jqlib(this).attr('dp-on-paste'));
                             }catch(_){}
 
                             if (delegate && typeof(delegate) == 'function') {

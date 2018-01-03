@@ -6,6 +6,8 @@ from dp_tornado.engine.controller import Controller
 
 class YyyymmddController(Controller):
     def get(self):
+        self.model.tests.helper_test.datetime.switch_timezone('Asia/Seoul')
+
         ts = 1451671445
         ms = ts * 1000
         dt = self.helper.datetime.convert(timestamp=ts)

@@ -5,4 +5,5 @@ rm -rf build
 rm -rf dp_tornado.egg-info
 
 #python setup.py bdist_wheel sdist upload
-python setup.py sdist upload
+python setup.py sdist
+twine upload dist/*

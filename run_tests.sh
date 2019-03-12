@@ -10,7 +10,7 @@ fi
 if [ "$mode" = "dry" ]
 then
  
-  for py_ver in 2.7 3.4; do
+  for py_ver in 2.7 3.6; do
 
     . ./nodeps/$py_ver/bin/activate
     python -m tests
@@ -28,11 +28,11 @@ then
   rm -rf dp_tornado.egg-info
   rm -rf nodeps
   virtualenv nodeps/2.7 --python=python2.7
-  virtualenv nodeps/3.4 --python=python3.4
+  virtualenv nodeps/3.6 --python=python3.6
   brew install phantomjs
 fi
 
-for py_ver in 2.7 3.4; do
+for py_ver in 2.7 3.6; do
 
   . ./nodeps/$py_ver/bin/activate
 

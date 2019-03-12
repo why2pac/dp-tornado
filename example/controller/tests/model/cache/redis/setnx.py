@@ -13,12 +13,16 @@ class SetnxController(Controller):
         self.model.tests.model_test.cache_test.setnx_redis_delete(test_key)
 
         assert not self.model.tests.model_test.cache_test.setnx_redis_get(test_key)
-        assert not self.model.tests.model_test.cache_test.setnx_redis_ttl(test_key)
+
+        ttl_comp = self.model.tests.model_test.cache_test.setnx_redis_ttl(test_key)
+        assert not ttl_comp or ttl_comp == -2
 
         assert self.model.tests.model_test.cache_test.setnx_redis_set(test_key, test_val, None)
 
         assert self.model.tests.model_test.cache_test.setnx_redis_get(test_key) == test_val
-        assert not self.model.tests.model_test.cache_test.setnx_redis_ttl(test_key)
+
+        ttl_comp = self.model.tests.model_test.cache_test.setnx_redis_ttl(test_key)
+        assert not ttl_comp or ttl_comp == -1
 
         assert self.model.tests.model_test.cache_test.setnx_redis_delete(test_key) == 1
         assert self.model.tests.model_test.cache_test.setnx_redis_set(test_key, test_val, test_ttl)

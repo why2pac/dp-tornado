@@ -22,7 +22,7 @@ class MysqlModel(dpModel):
         dt_tuple_value = self.helper.datetime.tuple(datetime_of_birth)
         dt_tuple_fetch = self.helper.datetime.tuple(self.scalar_test_tuple_birth_datetime())
 
-        assert dt_tuple_value == dt_tuple_fetch
+        assert dt_tuple_value[0:-1] == dt_tuple_fetch[0:-1]
 
         datetime_of_birth = self.helper.datetime.date.now()
 

@@ -9,12 +9,12 @@ class HttpController(Controller):
         print(self.get_argument('foo'))
 
     def get(self):
-        get_url = 'http://httpbin.org/get'
-        post_url = 'http://httpbin.org/post'
-        patch_url = 'http://httpbin.org/patch'
-        put_url = 'http://httpbin.org/put'
-        delete_url = 'http://httpbin.org/delete'
-        image_png_url = 'http://httpbin.org/image/png'
+        get_url = 'https://httpbin.org/get'
+        post_url = 'https://httpbin.org/post'
+        patch_url = 'https://httpbin.org/patch'
+        put_url = 'https://httpbin.org/put'
+        delete_url = 'https://httpbin.org/delete'
+        image_png_url = 'https://httpbin.org/image/png'
 
         # GET - TEXT
 

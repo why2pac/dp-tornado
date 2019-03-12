@@ -52,22 +52,22 @@ dp_description = 'MVC Web Application Framework with Tornado.'
 
 
 install_requires = [
-        'BeautifulSoup4==4.6.0',
-        'boto3==1.5.9',
-        'croniter==0.3.20',
-        'CyMySQL==0.9.4',
-        'httpagentparser==1.8.1',
-        'lxml==4.1.1',
-        'Pillow==5.0.0',
+        'BeautifulSoup4==4.7.1',
+        'boto3==1.9.111',
+        'croniter==0.3.27',
+        'CyMySQL==0.9.13',
+        'httpagentparser==1.8.2',
+        'lxml==4.3.2',
+        'Pillow==5.4.1',
         'pycrypto==2.6.1',
-        'pytz==2017.3',
-        'redis==2.10.6',
-        'requests==2.18.4',
-        'SQLAlchemy==1.2.0',
+        'pytz==2018.9',
+        'redis==3.2.0',
+        'requests==2.21.0',
+        'SQLAlchemy==1.3.1',
         'tornado==4.5.3',
         'validate_email==1.3',
-        'validators==0.12.0',
-        'wand==0.4.4',
+        'validators==0.12.4',
+        'wand==0.5.1',
         # , 'selenium'
     ]
 

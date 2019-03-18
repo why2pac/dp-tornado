@@ -74,6 +74,7 @@ class Controller(dpEngine):
         self.post_requested = False
         self.get_requested = False
         self.patch_requested = False
+        self.options_requested = False
         self.delete_requested = False
         self.put_requested = False
 

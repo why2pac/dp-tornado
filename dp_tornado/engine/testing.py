@@ -350,7 +350,7 @@ class Testing(dpEngine):
         elif 'json' in p[4]:
             res_type = 'json'
 
-        if method not in ('get', 'post', 'delete', 'patch', 'put', 'head') or not res_type:
+        if method not in ('get', 'post', 'delete', 'patch', 'put', 'head', 'options') or not res_type:
             self.logging.info('* Method test, %s -> (%s) [INVALID]' % (path, req or '-'))
             return session, False
 

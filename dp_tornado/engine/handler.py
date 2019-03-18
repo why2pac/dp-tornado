@@ -272,6 +272,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
         self.routed = True
         self.__processor('get', path)
 
+    def options(self, path=None):
+        self.routed = True
+        self.__processor('options', path)
+
     def post(self, path=None):
         self.routed = True
         self.__processor('post', path)

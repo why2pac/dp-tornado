@@ -179,10 +179,10 @@ class S3Helper(dpHelper):
             # with prefix, multiple keys
             elif prefix:
                 keys = self.browse(
-                    access_key_id=self.ini.static.aws_id,
-                    secret_access_key=self.ini.static.aws_secret,
-                    region_name=self.ini.static.aws_region,
-                    bucket_name=self.ini.static.aws_bucket,
+                    access_key_id=access_key_id,
+                    secret_access_key=secret_access_key,
+                    region_name=region_name,
+                    bucket_name=bucket_name,
                     prefix=prefix)
 
                 if keys is False:

@@ -210,6 +210,28 @@ class S3Helper(dpHelper):
 
             return False
 
+    def generate_presigned_url(self,
+                               access_key_id,
+                               secret_access_key,
+                               region_name,
+                               bucket_name,
+                               key,
+                               file_name,
+                               expires_in=6000):
+        s3 = boto3.client(
+            service_name='s3',
+            region_name=region_name,
+            aws_access_key_id=access_key_id,
+            aws_secret_access_key=secret_access_key
+        )
+
+        return s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name,
+                    'Key': key,
+                    'ResponseContentDisposition': 'attachment; filename=%s' % file_name},
+                    ExpiresIn=expires_in)
+
     def generate_presigned_post(self,
                                 access_key_id,
                                 secret_access_key,

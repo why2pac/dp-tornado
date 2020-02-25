@@ -229,8 +229,9 @@ class S3Helper(dpHelper):
             'get_object',
             Params={'Bucket': bucket_name,
                     'Key': key,
-                    'ResponseContentDisposition': 'attachment; filename=%s' % file_name},
-                    ExpiresIn=expires_in)
+                    'ResponseContentDisposition': 'attachment; filename=%s' % (
+                        self.helper.web.url.encode(file_name))},
+            ExpiresIn=expires_in)
 
     def generate_presigned_post(self,
                                 access_key_id,

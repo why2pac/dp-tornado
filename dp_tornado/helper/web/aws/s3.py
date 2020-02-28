@@ -218,12 +218,17 @@ class S3Helper(dpHelper):
                                key,
                                file_name,
                                expires_in=6000):
-        s3 = boto3.client(
+
+        client_params = dict(
             service_name='s3',
-            region_name=region_name,
-            aws_access_key_id=access_key_id,
-            aws_secret_access_key=secret_access_key
+            region_name=region_name
         )
+
+        if access_key_id is not None:
+            client_params['aws_access_key_id'] = access_key_id
+            client_params['aws_secret_access_key'] = secret_access_key
+
+        s3 = boto3.client(**client_params)
 
         return s3.generate_presigned_url(
             'get_object',
@@ -244,11 +249,17 @@ class S3Helper(dpHelper):
                                 max_content_length=None,
                                 expires_in=6000,
                                 acl=None):
-        s3 = boto3.client(
+
+        client_params = dict(
             service_name='s3',
-            region_name=region_name,
-            aws_access_key_id=access_key_id,
-            aws_secret_access_key=secret_access_key)
+            region_name=region_name
+        )
+
+        if access_key_id is not None:
+            client_params['aws_access_key_id'] = access_key_id
+            client_params['aws_secret_access_key'] = secret_access_key
+
+        s3 = boto3.client(**client_params)
 
         fields = {}
         conditions = []

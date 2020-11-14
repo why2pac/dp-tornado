@@ -1,5 +1,6 @@
-# PyCharm Configuration
+# IDE Configuration
 .idea/
+.vscode/
 
 # Combined
 example/static/combined

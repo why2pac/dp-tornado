@@ -419,10 +419,10 @@ class Handler(tornado.web.RequestHandler, dpEngine):
     def cookie(self, **kwargs):
         return self.secure_cookie(**kwargs)
 
-    def get_sessionid(self):
-        return self._sessionid if self._sessionid else self.set_sessionid()
+    def get_sessionid(self, **kwargs):
+        return self._sessionid if self._sessionid else self.set_sessionid(**kwargs)
 
-    def set_sessionid(self, sessionid=None):
+    def set_sessionid(self, sessionid=None, **kwargs):
         if not sessionid:
             try:
                 sessionid_from_cookie = self.get_secure_cookie('PSESSIONID')
@@ -435,7 +435,7 @@ class Handler(tornado.web.RequestHandler, dpEngine):
                 sessionid = None
 
         sessionid = sessionid or self.helper.security.crypto.hash.sha224(self.helper.datetime.timestamp.now(ms=True))
-        self.set_secure_cookie('PSESSIONID', sessionid)
+        self.set_secure_cookie('PSESSIONID', sessionid, **kwargs)
         self._sessionid = sessionid
 
         return sessionid

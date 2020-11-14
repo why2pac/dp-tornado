@@ -197,11 +197,11 @@ class Controller(dpEngine):
     def cookie(self, name, value=None, **kwargs):
         return self.parent.cookie(name=name, value=value, **kwargs)
 
-    def get_sessionid(self):
-        return self.parent.get_sessionid()
+    def get_sessionid(self, **kwargs):
+        return self.parent.get_sessionid(**kwargs)
 
-    def set_sessionid(self, sessionid=None):
-        return self.parent.set_sessionid(sessionid=sessionid)
+    def set_sessionid(self, sessionid=None, **kwargs):
+        return self.parent.set_sessionid(sessionid=sessionid, **kwargs)
 
     def get_session_value(self, name, expire_in=None, sessionid=None):
         return self.parent.get_session_value(name, expire_in=expire_in, sessionid=sessionid)
@@ -215,11 +215,11 @@ class Controller(dpEngine):
 
         return self.parent.set_session_value(name, value, expire_in=expire_in)
 
-    def session(self, name, value=None, expire_in=none_value):
+    def session(self, name, value=None, expire_in=none_value, **kwargs):
         if expire_in is none_value:
             expire_in = self.ini.session.expire_in
 
-        return self.parent.session(name, value=value, expire_in=expire_in)
+        return self.parent.session(name, value=value, expire_in=expire_in, **kwargs)
 
     def prefixize(self, url):
         return self.parent.prefixize(url)
